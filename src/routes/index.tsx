@@ -27,7 +27,7 @@ function Reveal({ children, className = "" }: { children: ReactNode; className?:
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => e.isIntersecting && (el.classList.add("is-visible"), io.disconnect()), { threshold: 0.15 });
+    const io = new IntersectionObserver(([e]) => e?.isIntersecting && (el.classList.add("is-visible"), io.disconnect()), { threshold: 0.15 });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -68,7 +68,7 @@ function CountUp({ to }: { to: number }) {
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
+      if (!e?.isIntersecting) return;
       io.disconnect();
       const t0 = performance.now();
       const tick = (t: number) => {
@@ -343,19 +343,19 @@ function Contact() {
     const f = new FormData(e.currentTarget);
     const v = (k: string) => String(f.get(k) ?? "").trim();
     const err: Record<string, string> = {};
-    if (v("name").length < 2) err.name = "Please enter your name";
-    if (!/^\S+@\S+\.\S+$/.test(v("email"))) err.email = "Please enter a valid email";
-    if (v("subject").length < 2) err.subject = "Please add a subject";
-    if (v("message").length < 10) err.message = "Message should be at least 10 characters";
+    if (v("name").length < 2) err["name"] = "Please enter your name";
+    if (!/^\S+@\S+\.\S+$/.test(v("email"))) err["email"] = "Please enter a valid email";
+    if (v("subject").length < 2) err["subject"] = "Please add a subject";
+    if (v("message").length < 10) err["message"] = "Message should be at least 10 characters";
     setErrors(err);
-    if (Object.keys(err).length) return toast.error("Please fix the highlighted fields");
+    if (Object.keys(err).length) { toast.error("Please fix the highlighted fields"); return; }
     toast.success("Thanks! We'll get back to you within 24 hours.");
     e.currentTarget.reset();
   };
   const subscribe = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const email = String(new FormData(e.currentTarget).get("email") ?? "");
-    if (!/^\S+@\S+\.\S+$/.test(email)) return toast.error("Please enter a valid email");
+    if (!/^\S+@\S+\.\S+$/.test(email)) { toast.error("Please enter a valid email"); return; }
     toast.success("You're subscribed!");
     e.currentTarget.reset();
   };
