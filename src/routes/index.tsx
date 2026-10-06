@@ -8,6 +8,9 @@ import heroVideo from "@/assets/hero.mp4.asset.json";
 import {
   AVATARS, BEST_SELLERS, BRAND, CATEGORIES, CONTACT, ESPRESSO_IMG, FOOTER, INSTAGRAM, MENU, NAV, REVIEWS, STATS, type Category,
 } from "@/data/site";
+import { PRODUCT_CATALOG } from "@/data/catalog";
+import { useCart } from "@/contexts/CartContext";
+import { SiteHeader } from "@/components/SiteChrome";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -86,11 +89,16 @@ function CountUp({ to }: { to: number }) {
 
 /* ---------- page ---------- */
 function Index() {
-  const [cart, setCart] = useState(2);
-  const add = (name: string) => { setCart((c) => c + 1); toast.success(`${name} ajouté au panier`); };
+  const { addItem } = useCart();
+  const add = (name: string) => {
+    const product = PRODUCT_CATALOG.find((item) => item.name === name) ?? PRODUCT_CATALOG[0];
+    if (!product) return;
+    addItem(product);
+    toast.success(`${name} ajouté au panier`);
+  };
   return (
     <div className="min-h-screen bg-background">
-      <Navbar cart={cart} />
+      <SiteHeader />
       <main>
         <Hero />
         <Stats />
