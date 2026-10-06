@@ -325,7 +325,7 @@ function Gallery() {
   );
 }
 
-function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
+function Field({ label, error, children }: { label: string; error?: string | undefined; children: ReactNode }) {
   return (
     <label className="block">
       <span className="mb-1.5 block text-sm font-medium text-foreground">{label}</span>
@@ -373,12 +373,12 @@ function Contact() {
           <Reveal className="lg:col-span-3">
             <form onSubmit={submit} noValidate className={`${card} space-y-5 p-6 md:p-8`}>
               <div className="grid gap-5 sm:grid-cols-2">
-                <Field label="Full Name" error={errors.name}><input name="name" className={input} placeholder="Jane Doe" /></Field>
-                <Field label="Email" error={errors.email}><input name="email" type="email" className={input} placeholder="jane@email.com" /></Field>
+                <Field label="Full Name" error={errors["name"]}><input name="name" className={input} placeholder="Jane Doe" /></Field>
+                <Field label="Email" error={errors["email"]}><input name="email" type="email" className={input} placeholder="jane@email.com" /></Field>
                 <Field label="Phone (optional)"><input name="phone" className={input} placeholder="(555) 000-0000" /></Field>
-                <Field label="Subject" error={errors.subject}><input name="subject" className={input} placeholder="How can we help?" /></Field>
+                <Field label="Subject" error={errors["subject"]}><input name="subject" className={input} placeholder="How can we help?" /></Field>
               </div>
-              <Field label="Message" error={errors.message}><textarea name="message" rows={5} className={input} placeholder="Tell us more..." /></Field>
+              <Field label="Message" error={errors["message"]}><textarea name="message" rows={5} className={input} placeholder="Tell us more..." /></Field>
               <button type="submit" className={`${btnPrimary} w-full sm:w-auto`}>Send Message <ArrowRight size={16} /></button>
             </form>
           </Reveal>
