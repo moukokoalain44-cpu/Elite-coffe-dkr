@@ -19,7 +19,7 @@ export const STATS = [
 ];
 
 export const BEST_SELLERS = [
-  { name: "Création Signature", desc: "Notre mélange maison avec une mousse veloutée, du miel et une pointe de cannelle.", price: 6.5, rating: 4.9, tag: "Spécial", featured: true, img: u("photo-1572442388796-11668a67e53d") },
+  { name: "Création Signature", desc: "Notre mélange maison avec une mousse veloutée, du miel et une pointe de cannelle.", price: 6.5, rating: 4.9, tag: "Spécial", featured: true, img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=900&q=80" },
   { name: "Latte Caramel", desc: "Espresso onctueux, lait vapeur et caramel au beurre fait maison.", price: 5.25, rating: 4.8, tag: "Populaire", img: u("photo-1461023058943-07fcbe16d735") },
   { name: "Cold Brew Moka", desc: "Infusion à froid de 18 heures, chocolat noir et une touche de crème.", price: 5.75, rating: 4.9, tag: "Glacé", img: u("photo-1517701604599-bb29b565090c") },
 ];
@@ -28,7 +28,7 @@ export const CATEGORIES = ["Espresso", "Latte", "Cappuccino", "Cold Brew"] as co
 export type Category = (typeof CATEGORIES)[number];
 
 export const MENU: { name: string; category: Category; price: number; img: string }[] = [
-  { name: "Espresso Classique", category: "Espresso", price: 3.0, img: u("photo-1510591509098-f4fdc6d0ff04") },
+  { name: "Espresso Classique", category: "Espresso", price: 3.0, img: "https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=900&q=80" },
   { name: "Doppio", category: "Espresso", price: 3.75, img: u("photo-1579992357154-faf4bde95b3d") },
   { name: "Macchiato", category: "Espresso", price: 4.0, img: u("photo-1485808191679-5f86510681a2") },
   { name: "Latte Vanille", category: "Latte", price: 5.0, img: u("photo-1570968915860-54d5c301fa9f") },
@@ -45,9 +45,9 @@ export const MENU: { name: string; category: Category; price: number; img: strin
 export const ESPRESSO_IMG = u("photo-1511920170033-f8396924c348", 1000);
 
 export const REVIEWS = [
-  { quote: "Le latte caramel est irréel. Chaque visite est un petit rituel que j'attends toute la semaine.", name: "Sarah Mitchell", role: "Cliente fidèle", avatar: u("photo-1494790108377-be9c29b29330", 120) },
-  { quote: "Le meilleur espresso de la ville, sans hésiter. Les baristas soignent vraiment chaque tasse.", name: "James Carter", role: "Amateur de café", avatar: u("photo-1507003211169-0a1dd7228f2d", 120) },
-  { quote: "Endroit chaleureux, commande en ligne rapide, et le cold brew moka m'a sauvée pendant mes examens.", name: "Emily Chen", role: "Étudiante", avatar: u("photo-1438761681033-6461ffad8d80", 120) },
+  { quote: "Le latte caramel est irréel. Chaque visite est un petit rituel que j'attends toute la semaine.", name: "Sarah Mitchell", role: "Cliente fidèle", avatar: u("photo-1494790108377-be9c29b7d6f2") },
+  { quote: "Le meilleur espresso de la ville, sans hésiter. Les baristas soignent vraiment chaque tasse.", name: "James Carter", role: "Amateur de café", avatar: u("photo-1507003211169-0a1dd7228f2d") },
+  { quote: "Endroit chaleureux, commande en ligne rapide, et le cold brew moka m'a sauvée pendant mes examens.", name: "Emily Chen", role: "Étudiante", avatar: u("photo-1438761681033-6461ffad8d8d") },
 ];
 
 export const AVATARS = REVIEWS.map((r) => r.avatar).concat(u("photo-1500648767791-00dcc994a43e", 120));
