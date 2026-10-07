@@ -1,5 +1,5 @@
 # Mise à jour des informations
-- [ ] Transcrire la carte et les prix des documents fournis.
-- [ ] Remplacer les coordonnées et horaires sur toutes les pages.
-- [ ] Retirer les avis, chiffres et offres non vérifiés.
-- [ ] Vérifier les pages et les prix du panier.
+- [x] Transcrire la carte et les prix des documents fournis.
+- [x] Remplacer les coordonnées et horaires sur toutes les pages.
+- [x] Retirer les avis, chiffres et offres non vérifiés.
+- [x] Vérifier les pages et les prix du panier.
