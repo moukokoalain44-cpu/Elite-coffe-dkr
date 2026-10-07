@@ -10,10 +10,14 @@ import { formatCFA } from "@/lib/currency";
 export const Route = createFileRoute("/menu/$id")({
   head: () => ({
     meta: [
+      { property: "og:title", content: "Détails du produit | Elite Coffee" },
+      { property: "og:description", content: "Découvrez les produits et les tarifs de la carte Elite Coffee à Dakar." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Détails du produit | Elite Coffee" },
       {
         name: "description",
-        content: "Personnalisez votre commande Elite Coffee : taille, lait et suppléments.",
+        content: "Découvrez les produits et les tarifs de la carte Elite Coffee à Dakar.",
       },
     ],
   }),
@@ -32,13 +36,7 @@ function ProductPage() {
   const [extras, setExtras] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
   if (!product) throw notFound();
-  const extraChoices = ["Dose d’espresso", "Vanille", "Mousse froide"];
-  const unitPrice =
-    product.price + (size === "Grand" ? 500 : size === "Petit" ? -300 : 0) + extras.length * 300;
-  const toggleExtra = (extra: string) =>
-    setExtras((current) =>
-      current.includes(extra) ? current.filter((item) => item !== extra) : [...current, extra],
-    );
+  const unitPrice = product.price;
   return (
     <PageShell eyebrow={product.category} title={product.name} description={product.description}>
       <section className="mx-auto grid max-w-7xl gap-10 px-4 pb-20 md:px-6 lg:grid-cols-[1.05fr_.95fr] lg:items-start">
@@ -61,69 +59,13 @@ function ProductPage() {
               <span className="rounded-full bg-secondary px-3 py-1 text-xs font-bold text-primary">
                 {product.category}
               </span>
-              <h2 className="mt-3 font-display text-3xl font-bold">Personnalisez votre boisson</h2>
+              <h2 className="mt-3 font-display text-3xl font-bold">Votre sélection</h2>
             </div>
             <span className="font-display text-2xl font-bold text-primary">
               {formatCFA(unitPrice)}
             </span>
           </div>
           <div className="mt-8 space-y-6">
-            <fieldset>
-              <legend className="text-sm font-bold">Taille</legend>
-              <div className="mt-2 grid grid-cols-3 gap-2">
-                {(["Petit", "Moyen", "Grand"] as const).map((option) => (
-                  <button
-                    type="button"
-                    key={option}
-                    onClick={() => setSize(option)}
-                    className={`rounded-xl border px-3 py-3 text-sm font-semibold ${size === option ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}
-                  >
-                    {option}
-                    {option === "Grand" && (
-                      <span className="block text-[10px] opacity-70">+500 FCFA</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend className="text-sm font-bold">Lait</legend>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {(["Lait entier", "Lait d’avoine", "Lait d’amande", "Lait de coco"] as const).map(
-                  (option) => (
-                    <button
-                      type="button"
-                      key={option}
-                      onClick={() => setMilk(option)}
-                      className={`rounded-xl border px-3 py-3 text-left text-sm font-semibold ${milk === option ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}
-                    >
-                      {option}
-                    </button>
-                  ),
-                )}
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend className="text-sm font-bold">
-                Suppléments <span className="font-normal text-muted-foreground">+300 FCFA chacun</span>
-              </legend>
-              <div className="mt-2 space-y-2">
-                {extraChoices.map((extra) => (
-                  <label
-                    key={extra}
-                    className={`flex cursor-pointer items-center justify-between rounded-xl border px-3 py-3 text-sm ${extras.includes(extra) ? "border-primary bg-primary/5" : "border-border"}`}
-                  >
-                    <span>{extra}</span>
-                    <input
-                      type="checkbox"
-                      checked={extras.includes(extra)}
-                      onChange={() => toggleExtra(extra)}
-                      className="size-4 accent-primary"
-                    />
-                  </label>
-                ))}
-              </div>
-            </fieldset>
             <div className="flex items-center justify-between rounded-2xl bg-secondary p-3">
               <span className="text-sm font-semibold">Quantité</span>
               <div className="flex items-center gap-3">
@@ -149,7 +91,7 @@ function ProductPage() {
             <button
               type="button"
               onClick={() => {
-                for (let i = 0; i < quantity; i += 1) addItem(product, { size, milk, extras });
+                for (let i = 0; i < quantity; i += 1) addItem(product);
                 toast.success(`${quantity} ${product.name} ajouté au panier`);
               }}
               className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-4 font-bold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift"
@@ -169,7 +111,7 @@ function ProductPage() {
                 ))}
               </ul>
             </div>
-            <div>
+            <div hidden={!product.brewingMethod}>
               <h3 className="font-bold">Méthode de préparation</h3>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 {product.brewingMethod}

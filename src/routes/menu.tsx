@@ -10,11 +10,15 @@ import { formatCFA } from "@/lib/currency";
 export const Route = createFileRoute("/menu")({
   head: () => ({
     meta: [
+      { property: "og:title", content: "Carte | Elite Coffee" },
+      { property: "og:description", content: "Explorez les cafés chauds, cafés glacés, thés, cocktails, entrées, crêpes et pâtisseries d’Elite Coffee." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Carte | Elite Coffee" },
       {
         name: "description",
         content:
-          "Explorez les cafés chauds, cafés glacés, boissons signature et pâtisseries d’Elite Coffee.",
+          "Explorez les cafés chauds, cafés glacés, thés, cocktails, entrées, crêpes et pâtisseries d’Elite Coffee.",
       },
     ],
   }),
@@ -66,7 +70,7 @@ function MenuPage() {
                   />
                   {product.featured && (
                     <span className="absolute left-4 top-4 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">
-                      Préféré des clients
+                      À la carte
                     </span>
                   )}
                 </div>
@@ -89,7 +93,7 @@ function MenuPage() {
                 </div>
                 <div className="mt-5 flex items-center justify-between gap-3">
                   <span className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
-                    <Star size={14} className="fill-star text-star" /> Préparé chaque jour
+                    <Star size={14} className="fill-star text-star" /> À la carte
                   </span>
                   <button
                     type="button"

@@ -11,7 +11,7 @@ export function SiteHeader() {
   const { itemCount } = useCart();
   const links = [
     ["Carte", "/menu"],
-    ["Brunch", "/brunch"],
+    ["Petit déjeuner", "/brunch"],
     ["Réserver", "/reserver"],
     ["Récompenses", "/rewards"],
     ["Notre histoire", "/about"],
@@ -254,7 +254,7 @@ export function PageShell({
               Notre histoire
             </Link>
             <Link to="/brunch" className="hover:text-primary">
-              Brunch
+              Petit déjeuner
             </Link>
             <Link to="/reserver" className="hover:text-primary">
               Réserver

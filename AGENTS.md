@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep the uploaded menu transcription in `src/data/catalog.ts` and derive homepage products from it, so displayed and cart prices cannot diverge.
+- Keep verified contact details in `src/data/site.ts` and reuse them across pages, so updates remain consistent.
