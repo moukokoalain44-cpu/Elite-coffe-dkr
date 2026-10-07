@@ -6,10 +6,10 @@ import { PageShell } from "@/components/SiteChrome";
 export const Route = createFileRoute("/locations")({
   head: () => ({
     meta: [
-      { title: "Locations | Elite Coffee" },
+      { title: "Adresses | Elite Coffee" },
       {
         name: "description",
-        content: "Find an Elite Coffee bar, hours, phone number and directions.",
+        content: "Trouvez un comptoir Elite Coffee, ses horaires, son téléphone et son itinéraire.",
       },
     ],
   }),
@@ -18,18 +18,18 @@ export const Route = createFileRoute("/locations")({
 
 const locations = [
   {
-    name: "Downtown Roastery",
-    address: "123 Roast Street, Brewville, CA 90210",
-    phone: "(555) 123-4567",
-    hours: ["Mon–Fri · 6:30am–8pm", "Sat–Sun · 7:30am–9pm"],
-    note: "Our original bar, with the roastery just behind the counter.",
+    name: "Comptoir Central",
+    address: "123 rue du Café, Dakar",
+    phone: "+221 77 000 00 00",
+    hours: ["Lun–Ven · 6h30–20h", "Sam–Dim · 7h30–21h"],
+    note: "Notre adresse historique, avec la torréfaction juste derrière le comptoir.",
   },
   {
-    name: "Market & Main",
-    address: "48 Market Avenue, Brewville, CA 90211",
-    phone: "(555) 123-8920",
-    hours: ["Every day · 7am–7pm"],
-    note: "A bright neighborhood stop for quick coffee and pastry runs.",
+    name: "KeurGui Café",
+    address: "48 avenue du Marché, Dakar",
+    phone: "+221 77 000 00 01",
+    hours: ["Tous les jours · 7h–19h"],
+    note: "Une adresse lumineuse pour un café rapide, une pâtisserie ou une pause tranquille.",
   },
 ];
 
@@ -43,9 +43,9 @@ function LocationsPage() {
   };
   return (
     <PageShell
-      eyebrow="Come by"
-      title="Find your everyday favorite."
-      description="Two bars, one warm welcome. Stop in for a slow morning, a fast pickup or whatever your day needs."
+      eyebrow="Venez nous voir"
+      title="Trouvez votre nouveau rendez-vous."
+      description="Deux comptoirs, un accueil chaleureux. Passez pour un matin tranquille, un retrait rapide ou une pause bien méritée."
     >
       <section className="mx-auto max-w-7xl px-4 pb-20 md:px-6">
         <div className="grid gap-6 lg:grid-cols-2">
@@ -56,7 +56,7 @@ function LocationsPage() {
                   <MapPin />
                 </span>
                 <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-bold text-primary">
-                  Open today
+                  Ouvert aujourd’hui
                 </span>
               </div>
               <h2 className="mt-6 font-display text-3xl font-bold">{location.name}</h2>
@@ -86,7 +86,7 @@ function LocationsPage() {
                 onClick={() => directions(location.address)}
                 className="mt-7 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift"
               >
-                <Navigation size={16} /> Get directions <ArrowUpRight size={15} />
+                <Navigation size={16} /> Itinéraire <ArrowUpRight size={15} />
               </button>
             </article>
           ))}
@@ -102,17 +102,17 @@ function LocationsPage() {
             <span className="grid size-14 place-items-center rounded-full bg-accent text-accent-foreground">
               <MapPin size={25} />
             </span>
-            <h2 className="mt-5 font-display text-3xl font-bold">A map is coming soon.</h2>
+            <h2 className="mt-5 font-display text-3xl font-bold">La carte arrive bientôt.</h2>
             <p className="mt-3 max-w-md text-sm text-primary-foreground/75">
-              For now, use Get directions on any location card and your preferred maps app will open
-              with the address ready.
+              Utilisez le bouton Itinéraire d’une adresse : votre application de cartes s’ouvrira
+              directement avec l’adresse prête.
             </p>
             <button
               type="button"
-              onClick={() => toast("Choose a location above to get turn-by-turn directions.")}
+              onClick={() => toast("Choisissez une adresse ci-dessus pour ouvrir l’itinéraire.")}
               className="mt-6 rounded-full bg-card px-5 py-3 text-sm font-bold text-primary"
             >
-              How it works
+              Comment ça marche
             </button>
           </div>
         </div>

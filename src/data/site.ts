@@ -19,27 +19,27 @@ export const STATS = [
 ];
 
 export const BEST_SELLERS = [
-  { name: "Création Signature", desc: "Notre mélange maison avec une mousse veloutée, du miel et une pointe de cannelle.", price: 6.5, rating: 4.9, tag: "Spécial", featured: true, img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=900&q=80" },
-  { name: "Latte Caramel", desc: "Espresso onctueux, lait vapeur et caramel au beurre fait maison.", price: 5.25, rating: 4.8, tag: "Populaire", img: u("photo-1461023058943-07fcbe16d735") },
-  { name: "Cold Brew Moka", desc: "Infusion à froid de 18 heures, chocolat noir et une touche de crème.", price: 5.75, rating: 4.9, tag: "Glacé", img: u("photo-1517701604599-bb29b565090c") },
+  { name: "Création Signature", desc: "Notre mélange maison avec une mousse veloutée, du miel et une pointe de cannelle.", price: 4250, rating: 4.9, tag: "Spécial", featured: true, img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=900&q=80" },
+  { name: "Latte Caramel", desc: "Espresso onctueux, lait vapeur et caramel au beurre fait maison.", price: 3500, rating: 4.8, tag: "Populaire", img: u("photo-1461023058943-07fcbe16d735") },
+  { name: "Cold Brew Moka", desc: "Infusion à froid de 18 heures, chocolat noir et une touche de crème.", price: 3750, rating: 4.9, tag: "Glacé", img: u("photo-1517701604599-bb29b565090c") },
 ];
 
-export const CATEGORIES = ["Espresso", "Latte", "Cappuccino", "Cold Brew"] as const;
+export const CATEGORIES = ["Espresso", "Latte", "Cappuccino", "Café glacé"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 export const MENU: { name: string; category: Category; price: number; img: string }[] = [
-  { name: "Espresso Classique", category: "Espresso", price: 3.0, img: "https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=900&q=80" },
-  { name: "Doppio", category: "Espresso", price: 3.75, img: u("photo-1579992357154-faf4bde95b3d") },
-  { name: "Macchiato", category: "Espresso", price: 4.0, img: u("photo-1485808191679-5f86510681a2") },
-  { name: "Latte Vanille", category: "Latte", price: 5.0, img: u("photo-1570968915860-54d5c301fa9f") },
-  { name: "Latte Avoine-Miel", category: "Latte", price: 5.5, img: u("photo-1541167760496-1628856ab772") },
-  { name: "Latte Matcha", category: "Latte", price: 5.25, img: u("photo-1515823064-d6e0c04616a7") },
-  { name: "Cappuccino Classique", category: "Cappuccino", price: 4.5, img: u("photo-1534778101976-62847782c213") },
-  { name: "Cappuccino Cannelle", category: "Cappuccino", price: 4.75, img: u("photo-1509042239860-f550ce710b93") },
-  { name: "Cappuccino Sec", category: "Cappuccino", price: 4.5, img: u("photo-1572286258217-215cf8e7e0d2") },
-  { name: "Cold Brew Original", category: "Cold Brew", price: 4.5, img: u("photo-1461023058943-07fcbe16d735") },
-  { name: "Cold Brew Nitro", category: "Cold Brew", price: 5.25, img: u("photo-1517701604599-bb29b565090c") },
-  { name: "Cold Brew Crème Salée", category: "Cold Brew", price: 5.5, img: u("photo-1592663527359-cf6642f54cff") },
+  { name: "Espresso Classique", category: "Espresso", price: 2000, img: "https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=900&q=80" },
+  { name: "Doppio", category: "Espresso", price: 2500, img: u("photo-1579992357154-faf4bde95b3d") },
+  { name: "Macchiato", category: "Espresso", price: 2500, img: u("photo-1485808191679-5f86510681a2") },
+  { name: "Latte Vanille", category: "Latte", price: 3250, img: u("photo-1570968915860-54d5c301fa9f") },
+  { name: "Latte Avoine-Miel", category: "Latte", price: 3500, img: u("photo-1541167760496-1628856ab772") },
+  { name: "Latte Matcha", category: "Latte", price: 3500, img: u("photo-1515823064-d6e0c04616a7") },
+  { name: "Cappuccino Classique", category: "Cappuccino", price: 3000, img: u("photo-1534778101976-62847782c213") },
+  { name: "Cappuccino Cannelle", category: "Cappuccino", price: 3000, img: u("photo-1509042239860-f550ce710b93") },
+  { name: "Cappuccino Sec", category: "Cappuccino", price: 3000, img: u("photo-1572286258217-215cf8e7e0d2") },
+  { name: "Cold Brew Original", category: "Café glacé", price: 3000, img: u("photo-1461023058943-07fcbe16d735") },
+  { name: "Cold Brew Nitro", category: "Café glacé", price: 3500, img: u("photo-1517701604599-bb29b565090c") },
+  { name: "Cold Brew Crème Salée", category: "Café glacé", price: 3500, img: u("photo-1592663527359-cf6642f54cff") },
 ];
 
 export const ESPRESSO_IMG = u("photo-1511920170033-f8396924c348", 1000);
@@ -62,9 +62,9 @@ export const INSTAGRAM = [
 ];
 
 export const CONTACT = {
-  email: "hello@elitecoffee.com",
-  phone: "(555) 123-4567",
-  address: "123 Roast Street, Brewville, CA 90210",
+  email: "bonjour@elitecoffee.sn",
+  phone: "+221 77 000 00 00",
+  address: "Dakar, Sénégal",
   hours: ["Lun–Ven : 6h30 – 20h", "Sam–Dim : 7h30 – 21h"],
 };
 

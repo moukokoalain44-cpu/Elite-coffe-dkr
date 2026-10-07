@@ -7,10 +7,10 @@ import { PageShell } from "@/components/SiteChrome";
 export const Route = createFileRoute("/rewards")({
   head: () => ({
     meta: [
-      { title: "Rewards | Elite Coffee" },
+      { title: "Récompenses | Elite Coffee" },
       {
         name: "description",
-        content: "Track your Elite Coffee points, perks and personalized offers.",
+        content: "Suivez vos points, vos avantages et vos offres personnalisées Elite Coffee.",
       },
     ],
   }),
@@ -24,7 +24,7 @@ function RewardsPage() {
   const login = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoggedIn(true);
-    toast.success("Welcome back — your rewards are ready");
+    toast.success("Bienvenue, vos récompenses sont prêtes");
   };
   return (
     <PageShell
@@ -39,7 +39,7 @@ function RewardsPage() {
               <span className="inline-flex rounded-full bg-primary-foreground/10 p-3">
                 <LockKeyhole size={22} />
               </span>
-              <h2 className="mt-6 font-display text-4xl font-bold">Your coffee, your perks.</h2>
+              <h2 className="mt-6 font-display text-4xl font-bold">Votre café, vos avantages.</h2>
               <p className="mt-4 max-w-md text-primary-foreground/75">
                 Sign in with a mock rewards account to preview your points dashboard. No account or
                 payment details required.
@@ -80,7 +80,7 @@ function RewardsPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent">
-                      Member dashboard
+                      Espace membre
                     </p>
                     <h2 className="mt-3 font-display text-4xl font-bold">
                       Hi, {email.split("@")[0]}.
@@ -109,27 +109,27 @@ function RewardsPage() {
                   </span>
                   <div>
                     <p className="text-xs font-bold uppercase tracking-widest text-accent">
-                      Birthday perk
+                      Avantage anniversaire
                     </p>
-                    <h3 className="mt-1 font-display text-2xl font-bold">A treat on us</h3>
+                    <h3 className="mt-1 font-display text-2xl font-bold">Une douceur pour vous</h3>
                   </div>
                 </div>
                 <p className="mt-6 text-sm leading-6 text-muted-foreground">
-                  Add your birthday to unlock a complimentary pastry during your birthday month.
+                  Ajoutez votre date d’anniversaire pour recevoir une pâtisserie offerte ce mois-là.
                 </p>
                 <button
                   type="button"
-                  onClick={() => toast.success("Birthday perk saved to your profile")}
+                  onClick={() => toast.success("Avantage anniversaire saved to your profile")}
                   className="mt-6 rounded-full bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground"
                 >
-                  Add birthday
+                  Ajouter mon anniversaire
                 </button>
               </div>
             </div>
             <div className="grid gap-5 lg:grid-cols-2">
               <div className="rounded-3xl bg-card p-7 shadow-soft">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-display text-2xl font-bold">Rewards history</h3>
+                  <h3 className="font-display text-2xl font-bold">Historique des récompenses</h3>
                   <Star className="fill-star text-star" />
                 </div>
                 <div className="mt-5 space-y-4">
@@ -160,7 +160,7 @@ function RewardsPage() {
                   <p className="text-xs font-bold uppercase tracking-widest text-accent">
                     This week only
                   </p>
-                  <h4 className="mt-2 text-xl font-bold">Free size upgrade</h4>
+                  <h4 className="mt-2 text-xl font-bold">Taille supérieure offerte</h4>
                   <p className="mt-2 text-sm text-muted-foreground">
                     Make any hot coffee a Large on us. Just show this offer at checkout.
                   </p>
@@ -169,7 +169,7 @@ function RewardsPage() {
                     onClick={() => toast.success("Offer saved")}
                     className="mt-4 text-sm font-bold text-primary underline"
                   >
-                    Save offer
+                    Enregistrer l’offre
                   </button>
                 </div>
               </div>

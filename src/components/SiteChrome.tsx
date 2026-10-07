@@ -3,16 +3,19 @@ import { Minus, Plus, ShoppingBag, Trash2, X, Coffee, ArrowRight } from "lucide-
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
+import { formatCFA } from "@/lib/currency";
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const { itemCount } = useCart();
   const links = [
-    ["Menu", "/menu"],
-    ["Rewards", "/rewards"],
-    ["Our story", "/about"],
-    ["Locations", "/locations"],
+    ["Carte", "/menu"],
+    ["Brunch", "/brunch"],
+    ["Réserver", "/reserver"],
+    ["Récompenses", "/rewards"],
+    ["Notre histoire", "/about"],
+    ["Adresses", "/locations"],
   ] as const;
   return (
     <>
@@ -21,7 +24,7 @@ export function SiteHeader() {
           <Link
             to="/"
             className="flex items-center gap-2 text-primary"
-            aria-label="Elite Coffee home"
+            aria-label="Accueil Elite Coffee"
           >
             <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground">
               <Coffee size={18} />
@@ -43,7 +46,7 @@ export function SiteHeader() {
             <Link
               to="/checkout"
               className="relative rounded-full p-2 text-foreground hover:bg-secondary"
-              aria-label={`Open cart, ${itemCount} items`}
+              aria-label={`Ouvrir le panier, ${itemCount} articles`}
               onClick={() => setCartOpen(false)}
             >
               <ShoppingBag size={20} />
@@ -55,11 +58,11 @@ export function SiteHeader() {
             </Link>
             <button
               type="button"
-              aria-label="Open cart drawer"
+              aria-label="Ouvrir le panier"
               onClick={() => setCartOpen(true)}
               className="hidden rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift sm:inline-flex"
             >
-              View cart
+              Voir le panier
             </button>
             <button
               type="button"
@@ -98,23 +101,23 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   const { lines, subtotal, removeItem, updateQuantity } = useCart();
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Shopping cart">
+    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Panier">
       <button
         type="button"
-        aria-label="Close cart"
+        aria-label="Fermer le panier"
         onClick={onClose}
         className="absolute inset-0 bg-primary/25 backdrop-blur-sm"
       />
       <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-background p-5 shadow-lift">
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">Your order</p>
-            <h2 className="mt-1 font-display text-2xl font-bold">Shopping bag</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">Votre commande</p>
+            <h2 className="mt-1 font-display text-2xl font-bold">Panier</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close cart"
+            aria-label="Fermer le panier"
             className="rounded-full p-2 hover:bg-secondary"
           >
             <X size={20} />
@@ -125,13 +128,13 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
             <div className="grid h-full place-items-center text-center">
               <div>
                 <ShoppingBag className="mx-auto size-10 text-muted-foreground" />
-                <p className="mt-3 font-semibold">Your bag is empty</p>
+                <p className="mt-3 font-semibold">Votre panier est vide</p>
                 <Link
                   to="/menu"
                   onClick={onClose}
                   className="mt-4 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
                 >
-                  Explore the menu
+                  Découvrir la carte
                 </Link>
               </div>
             </div>
@@ -153,10 +156,10 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
                         <p className="truncate font-bold">{line.product.name}</p>
                         <button
                           type="button"
-                          aria-label={`Remove ${line.product.name}`}
+                          aria-label={`Retirer ${line.product.name}`}
                           onClick={() => {
                             removeItem(index);
-                            toast.success("Removed from cart");
+                            toast.success("Article retiré du panier");
                           }}
                           className="text-muted-foreground hover:text-destructive"
                         >
@@ -170,7 +173,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
-                            aria-label="Decrease quantity"
+                            aria-label="Diminuer la quantité"
                             onClick={() => updateQuantity(index, line.quantity - 1)}
                             className="grid size-7 place-items-center rounded-full bg-card"
                           >
@@ -181,7 +184,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
                           </span>
                           <button
                             type="button"
-                            aria-label="Increase quantity"
+                            aria-label="Augmenter la quantité"
                             onClick={() => updateQuantity(index, line.quantity + 1)}
                             className="grid size-7 place-items-center rounded-full bg-card"
                           >
@@ -189,7 +192,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
                           </button>
                         </div>
                         <span className="font-display font-bold">
-                          ${(line.product.price * line.quantity).toFixed(2)}
+                          {formatCFA(line.product.price * line.quantity)}
                         </span>
                       </div>
                     </div>
@@ -202,15 +205,15 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
         {lines.length > 0 && (
           <div className="border-t border-border pt-4">
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <strong className="font-display text-2xl">${subtotal.toFixed(2)}</strong>
+              <span className="text-muted-foreground">Sous-total</span>
+              <strong className="font-display text-2xl">{formatCFA(subtotal)}</strong>
             </div>
             <Link
               to="/checkout"
               onClick={onClose}
               className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 font-semibold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift"
             >
-              Checkout <ArrowRight size={16} />
+              Valider la commande <ArrowRight size={16} />
             </Link>
           </div>
         )}
@@ -248,13 +251,19 @@ export function PageShell({
           <span>© {new Date().getFullYear()} Elite Coffee</span>
           <div className="flex gap-5">
             <Link to="/about" className="hover:text-primary">
-              Our story
+              Notre histoire
+            </Link>
+            <Link to="/brunch" className="hover:text-primary">
+              Brunch
+            </Link>
+            <Link to="/reserver" className="hover:text-primary">
+              Réserver
             </Link>
             <Link to="/locations" className="hover:text-primary">
-              Locations
+              Adresses
             </Link>
             <Link to="/rewards" className="hover:text-primary">
-              Rewards
+              Récompenses
             </Link>
           </div>
         </div>

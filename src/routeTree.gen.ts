@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as BrunchRouteImport } from './routes/brunch'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as MenuRouteImport } from './routes/menu'
+import { Route as ReserverRouteImport } from './routes/reserver'
 import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as MenuIdRouteImport } from './routes/menu.$id'
 
@@ -25,6 +27,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrunchRoute = BrunchRouteImport.update({
+  id: '/brunch',
+  path: '/brunch',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -42,6 +49,11 @@ const MenuRoute = MenuRouteImport.update({
   path: '/menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReserverRoute = ReserverRouteImport.update({
+  id: '/reserver',
+  path: '/reserver',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RewardsRoute = RewardsRouteImport.update({
   id: '/rewards',
   path: '/rewards',
@@ -56,18 +68,22 @@ const MenuIdRoute = MenuIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/brunch': typeof BrunchRoute
   '/checkout': typeof CheckoutRoute
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
+  '/reserver': typeof ReserverRoute
   '/rewards': typeof RewardsRoute
   '/menu/$id': typeof MenuIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/brunch': typeof BrunchRoute
   '/checkout': typeof CheckoutRoute
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
+  '/reserver': typeof ReserverRoute
   '/rewards': typeof RewardsRoute
   '/menu/$id': typeof MenuIdRoute
 }
@@ -75,9 +91,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/brunch': typeof BrunchRoute
   '/checkout': typeof CheckoutRoute
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
+  '/reserver': typeof ReserverRoute
   '/rewards': typeof RewardsRoute
   '/menu/$id': typeof MenuIdRoute
 }
@@ -86,27 +104,33 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/brunch'
     | '/checkout'
     | '/locations'
     | '/menu'
+    | '/reserver'
     | '/rewards'
     | '/menu/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/brunch'
     | '/checkout'
     | '/locations'
     | '/menu'
+    | '/reserver'
     | '/rewards'
     | '/menu/$id'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/brunch'
     | '/checkout'
     | '/locations'
     | '/menu'
+    | '/reserver'
     | '/rewards'
     | '/menu/$id'
   fileRoutesById: FileRoutesById
@@ -114,9 +138,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  BrunchRoute: typeof BrunchRoute
   CheckoutRoute: typeof CheckoutRoute
   LocationsRoute: typeof LocationsRoute
   MenuRoute: typeof MenuRouteWithChildren
+  ReserverRoute: typeof ReserverRoute
   RewardsRoute: typeof RewardsRoute
 }
 
@@ -134,6 +160,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brunch': {
+      id: '/brunch'
+      path: '/brunch'
+      fullPath: '/brunch'
+      preLoaderRoute: typeof BrunchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -155,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/menu'
       fullPath: '/menu'
       preLoaderRoute: typeof MenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reserver': {
+      id: '/reserver'
+      path: '/reserver'
+      fullPath: '/reserver'
+      preLoaderRoute: typeof ReserverRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rewards': {
@@ -187,9 +227,11 @@ const MenuRouteWithChildren = MenuRoute._addFileChildren(MenuRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  BrunchRoute: BrunchRoute,
   CheckoutRoute: CheckoutRoute,
   LocationsRoute: LocationsRoute,
   MenuRoute: MenuRouteWithChildren,
+  ReserverRoute: ReserverRoute,
   RewardsRoute: RewardsRoute,
 }
 export const routeTree = rootRouteImport

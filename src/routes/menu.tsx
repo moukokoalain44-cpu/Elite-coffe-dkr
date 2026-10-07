@@ -5,15 +5,16 @@ import { toast } from "sonner";
 import { MENU_CATEGORIES, PRODUCT_CATALOG, type MenuCategory } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
 import { PageShell } from "@/components/SiteChrome";
+import { formatCFA } from "@/lib/currency";
 
 export const Route = createFileRoute("/menu")({
   head: () => ({
     meta: [
-      { title: "Menu | Elite Coffee" },
+      { title: "Carte | Elite Coffee" },
       {
         name: "description",
         content:
-          "Explorez les cafés chauds, iced coffee, créations signature et pâtisseries d’Elite Coffee.",
+          "Explorez les cafés chauds, cafés glacés, boissons signature et pâtisseries d’Elite Coffee.",
       },
     ],
   }),
@@ -21,20 +22,20 @@ export const Route = createFileRoute("/menu")({
 });
 
 function MenuPage() {
-  const [category, setCategory] = useState<MenuCategory>("Hot Coffee");
+  const [category, setCategory] = useState<MenuCategory>("Cafés chauds");
   const { addItem } = useCart();
   const products = PRODUCT_CATALOG.filter((product) => product.category === category);
   return (
     <PageShell
-      eyebrow="The menu"
-      title="Made for your moment."
-      description="From first sip to last bite, every item is made with thoughtful ingredients and a little more care than necessary."
+      eyebrow="La carte"
+      title="Pensée pour votre moment."
+      description="De la première gorgée à la dernière bouchée, chaque produit est préparé avec des ingrédients choisis et beaucoup de soin."
     >
       <section className="mx-auto max-w-7xl px-4 pb-20 md:px-6">
         <div
           className="flex flex-wrap gap-2 border-b border-border pb-5"
           role="tablist"
-          aria-label="Menu categories"
+          aria-label="Catégories de la carte"
         >
           {MENU_CATEGORIES.map((item) => (
             <button
@@ -65,7 +66,7 @@ function MenuPage() {
                   />
                   {product.featured && (
                     <span className="absolute left-4 top-4 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">
-                      Guest favorite
+                      Préféré des clients
                     </span>
                   )}
                 </div>
@@ -83,22 +84,22 @@ function MenuPage() {
                     </p>
                   </div>
                   <span className="shrink-0 font-display text-xl font-bold text-primary">
-                    ${product.price.toFixed(2)}
+                    {formatCFA(product.price)}
                   </span>
                 </div>
                 <div className="mt-5 flex items-center justify-between gap-3">
                   <span className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
-                    <Star size={14} className="fill-star text-star" /> Crafted daily
+                    <Star size={14} className="fill-star text-star" /> Préparé chaque jour
                   </span>
                   <button
                     type="button"
                     onClick={() => {
                       addItem(product);
-                      toast.success(`${product.name} added to cart`);
+                      toast.success(`${product.name} ajouté au panier`);
                     }}
                     className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift"
                   >
-                    <Plus size={16} /> Add
+                    <Plus size={16} /> Ajouter
                   </button>
                 </div>
               </div>
@@ -111,9 +112,9 @@ function MenuPage() {
               <ShoppingBag />
             </span>
             <div>
-              <p className="font-display text-xl font-bold">Know what you want?</p>
+              <p className="font-display text-xl font-bold">Vous savez déjà quoi choisir ?</p>
               <p className="text-sm text-primary-foreground/70">
-                Build your order and choose pickup or delivery.
+                Composez votre commande et choisissez le retrait ou la livraison.
               </p>
             </div>
           </div>
@@ -121,7 +122,7 @@ function MenuPage() {
             to="/checkout"
             className="inline-flex items-center gap-2 rounded-full bg-card px-5 py-3 text-sm font-bold text-primary hover:bg-secondary"
           >
-            Go to checkout <ArrowRight size={16} />
+            Valider la commande <ArrowRight size={16} />
           </Link>
         </div>
       </section>

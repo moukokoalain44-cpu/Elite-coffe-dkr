@@ -5,35 +5,36 @@ import { toast } from "sonner";
 import { getProduct } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
 import { PageShell } from "@/components/SiteChrome";
+import { formatCFA } from "@/lib/currency";
 
 export const Route = createFileRoute("/menu/$id")({
   head: () => ({
     meta: [
-      { title: "Product details | Elite Coffee" },
+      { title: "Détails du produit | Elite Coffee" },
       {
         name: "description",
-        content: "Customize your Elite Coffee order with size, milk and extras.",
+        content: "Personnalisez votre commande Elite Coffee : taille, lait et suppléments.",
       },
     ],
   }),
   component: ProductPage,
-  notFoundComponent: () => <div className="p-10">Product not found</div>,
+  notFoundComponent: () => <div className="p-10">Produit introuvable</div>,
 });
 
 function ProductPage() {
   const { id } = useParams({ from: "/menu/$id" });
   const product = getProduct(id);
   const { addItem } = useCart();
-  const [size, setSize] = useState<"Small" | "Medium" | "Large">("Medium");
-  const [milk, setMilk] = useState<"Whole milk" | "Oat milk" | "Almond milk" | "Coconut milk">(
-    "Whole milk",
+  const [size, setSize] = useState<"Petit" | "Moyen" | "Grand">("Moyen");
+  const [milk, setMilk] = useState<"Lait entier" | "Lait d’avoine" | "Lait d’amande" | "Lait de coco">(
+    "Lait entier",
   );
   const [extras, setExtras] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
   if (!product) throw notFound();
-  const extraChoices = ["Extra shot", "Vanilla", "Cold foam"];
+  const extraChoices = ["Dose d’espresso", "Vanille", "Mousse froide"];
   const unitPrice =
-    product.price + (size === "Large" ? 0.75 : size === "Small" ? -0.5 : 0) + extras.length * 0.5;
+    product.price + (size === "Grand" ? 500 : size === "Petit" ? -300 : 0) + extras.length * 300;
   const toggleExtra = (extra: string) =>
     setExtras((current) =>
       current.includes(extra) ? current.filter((item) => item !== extra) : [...current, extra],
@@ -53,24 +54,24 @@ function ProductPage() {
             to="/menu"
             className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-primary"
           >
-            <ArrowLeft size={16} /> Back to menu
+            <ArrowLeft size={16} /> Retour à la carte
           </Link>
           <div className="mt-7 flex items-start justify-between gap-4">
             <div>
               <span className="rounded-full bg-secondary px-3 py-1 text-xs font-bold text-primary">
                 {product.category}
               </span>
-              <h2 className="mt-3 font-display text-3xl font-bold">Make it yours</h2>
+              <h2 className="mt-3 font-display text-3xl font-bold">Personnalisez votre boisson</h2>
             </div>
             <span className="font-display text-2xl font-bold text-primary">
-              ${unitPrice.toFixed(2)}
+              {formatCFA(unitPrice)}
             </span>
           </div>
           <div className="mt-8 space-y-6">
             <fieldset>
-              <legend className="text-sm font-bold">Size</legend>
+              <legend className="text-sm font-bold">Taille</legend>
               <div className="mt-2 grid grid-cols-3 gap-2">
-                {(["Small", "Medium", "Large"] as const).map((option) => (
+                {(["Petit", "Moyen", "Grand"] as const).map((option) => (
                   <button
                     type="button"
                     key={option}
@@ -78,17 +79,17 @@ function ProductPage() {
                     className={`rounded-xl border px-3 py-3 text-sm font-semibold ${size === option ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}
                   >
                     {option}
-                    {option === "Large" && (
-                      <span className="block text-[10px] opacity-70">+$0.75</span>
+                    {option === "Grand" && (
+                      <span className="block text-[10px] opacity-70">+500 FCFA</span>
                     )}
                   </button>
                 ))}
               </div>
             </fieldset>
             <fieldset>
-              <legend className="text-sm font-bold">Milk</legend>
+              <legend className="text-sm font-bold">Lait</legend>
               <div className="mt-2 grid grid-cols-2 gap-2">
-                {(["Whole milk", "Oat milk", "Almond milk", "Coconut milk"] as const).map(
+                {(["Lait entier", "Lait d’avoine", "Lait d’amande", "Lait de coco"] as const).map(
                   (option) => (
                     <button
                       type="button"
@@ -104,7 +105,7 @@ function ProductPage() {
             </fieldset>
             <fieldset>
               <legend className="text-sm font-bold">
-                Extras <span className="font-normal text-muted-foreground">+$0.50 each</span>
+                Suppléments <span className="font-normal text-muted-foreground">+300 FCFA chacun</span>
               </legend>
               <div className="mt-2 space-y-2">
                 {extraChoices.map((extra) => (
@@ -124,7 +125,7 @@ function ProductPage() {
               </div>
             </fieldset>
             <div className="flex items-center justify-between rounded-2xl bg-secondary p-3">
-              <span className="text-sm font-semibold">Quantity</span>
+              <span className="text-sm font-semibold">Quantité</span>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
@@ -149,16 +150,16 @@ function ProductPage() {
               type="button"
               onClick={() => {
                 for (let i = 0; i < quantity; i += 1) addItem(product, { size, milk, extras });
-                toast.success(`${quantity} ${product.name} added to cart`);
+                toast.success(`${quantity} ${product.name} ajouté au panier`);
               }}
               className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-4 font-bold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift"
             >
-              <ShoppingBag size={18} /> Add to cart · ${(unitPrice * quantity).toFixed(2)}
+              <ShoppingBag size={18} /> Ajouter au panier · {formatCFA(unitPrice * quantity)}
             </button>
           </div>
           <div className="mt-8 grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
             <div>
-              <h3 className="font-bold">Ingredients</h3>
+              <h3 className="font-bold">Ingrédients</h3>
               <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                 {product.ingredients.map((ingredient) => (
                   <li key={ingredient} className="flex gap-2">
@@ -169,7 +170,7 @@ function ProductPage() {
               </ul>
             </div>
             <div>
-              <h3 className="font-bold">Brewing method</h3>
+              <h3 className="font-bold">Méthode de préparation</h3>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 {product.brewingMethod}
               </p>

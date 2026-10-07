@@ -6,11 +6,11 @@ import { PageShell } from "@/components/SiteChrome";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "Our story | Elite Coffee" },
+      { title: "Notre histoire | Elite Coffee" },
       {
         name: "description",
         content:
-          "Meet Elite Coffee: thoughtful sourcing, human hospitality and a better daily cup.",
+          "Découvrez Elite Coffee : des produits choisis, une hospitalité sincère et un meilleur café au quotidien.",
       },
     ],
   }),
@@ -37,9 +37,9 @@ function AboutPage() {
   ];
   return (
     <PageShell
-      eyebrow="Our story"
-      title="Coffee can be serious without taking itself too seriously."
-      description="Elite Coffee started with a simple belief: an exceptional cup should feel both considered and completely at home."
+      eyebrow="Notre histoire"
+      title="Le café peut être exigeant sans se prendre trop au sérieux."
+      description="Elite Coffee est né d’une conviction simple : une tasse exceptionnelle doit être travaillée avec soin tout en restant chaleureuse."
     >
       <section className="mx-auto max-w-7xl px-4 pb-20 md:px-6">
         <div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
@@ -63,10 +63,10 @@ function AboutPage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-2 text-sm font-semibold">
-                <Check size={15} className="text-accent" /> Small-batch roasted
+                <Check size={15} className="text-accent" /> Torréfié en petites quantités
               </span>
               <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-2 text-sm font-semibold">
-                <Check size={15} className="text-accent" /> Baked daily
+                <Check size={15} className="text-accent" /> Cuit chaque matin
               </span>
             </div>
           </div>
@@ -95,9 +95,9 @@ function AboutPage() {
           />
           <div className="flex flex-col justify-center rounded-3xl bg-primary p-7 text-primary-foreground md:p-9">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent">
-              Sourcing notes
+              Notre approvisionnement
             </p>
-            <h2 className="mt-3 font-display text-3xl font-bold">Traceable by design.</h2>
+            <h2 className="mt-3 font-display text-3xl font-bold">Une origine que l’on peut raconter.</h2>
             <p className="mt-4 text-sm leading-6 text-primary-foreground/75">
               Our rotating single origins come from producers we can name, regions we can explain
               and harvests we can celebrate.
@@ -109,7 +109,7 @@ function AboutPage() {
             href="/menu"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift"
           >
-            Taste the story <ArrowRight size={16} />
+            Goûter notre histoire <ArrowRight size={16} />
           </a>
         </div>
       </section>

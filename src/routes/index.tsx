@@ -4,13 +4,13 @@ import { toast } from "sonner";
 import {
   ArrowRight, Award, Check, Clock, Coffee, Heart, Instagram, Mail, MapPin, Menu, Phone, Search, ShoppingBag, Star, X,
 } from "lucide-react";
-import heroVideo from "@/assets/hero.mp4.asset.json";
 import {
   AVATARS, BEST_SELLERS, BRAND, CATEGORIES, CONTACT, ESPRESSO_IMG, FOOTER, INSTAGRAM, MENU, NAV, REVIEWS, STATS, type Category,
 } from "@/data/site";
 import { PRODUCT_CATALOG } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
 import { SiteHeader } from "@/components/SiteChrome";
+import { formatCFA } from "@/lib/currency";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -91,7 +91,13 @@ function CountUp({ to }: { to: number }) {
 function Index() {
   const { addItem } = useCart();
   const add = (name: string) => {
-    const product = PRODUCT_CATALOG.find((item) => item.name === name) ?? PRODUCT_CATALOG[0];
+    const aliases: Record<string, string> = {
+      "Création Signature": "Nuage érable & épices",
+      "Latte Caramel": "Latte Velours",
+      "Cold Brew Moka": "Cold Brew Moka",
+      "Espresso Classique": "Cortado Maison",
+    };
+    const product = PRODUCT_CATALOG.find((item) => item.name === (aliases[name] ?? name)) ?? PRODUCT_CATALOG[0];
     if (!product) return;
     addItem(product);
     toast.success(`${name} ajouté au panier`);
@@ -128,10 +134,10 @@ function Navbar({ cart }: { cart: number }) {
         </nav>
         <div className="flex items-center gap-2 md:gap-3">
           <button aria-label="Rechercher" className="hidden rounded-full p-2 text-foreground transition-colors hover:bg-secondary sm:block"><Search size={20} /></button>
-          <button aria-label="Panier" className="relative rounded-full p-2 text-foreground transition-colors hover:bg-secondary">
+          <a href="/checkout" aria-label="Ouvrir le panier" className="relative rounded-full p-2 text-foreground transition-colors hover:bg-secondary">
             <ShoppingBag size={20} />
             <span className="absolute -right-0.5 -top-0.5 grid h-5 w-5 place-items-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">{cart}</span>
-          </button>
+          </a>
           <a href="#contact" className="hidden text-sm font-semibold text-foreground hover:text-accent md:block">Se connecter</a>
           <a href="#menu" className={`${btnPrimary} hidden !px-5 !py-2.5 sm:inline-flex`}>Commander</a>
           <button aria-label="Menu" onClick={() => setOpen(!open)} className="rounded-full p-2 text-foreground hover:bg-secondary lg:hidden">{open ? <X size={22} /> : <Menu size={22} />}</button>
@@ -174,7 +180,7 @@ function Hero() {
       </Reveal>
       <Reveal className="relative mx-auto w-full max-w-md lg:max-w-none">
         <div className="overflow-hidden rounded-[2rem] shadow-lift">
-          <video src={heroVideo.url} poster="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=900&q=80" autoPlay muted loop playsInline className="aspect-[4/5] w-full object-cover" />
+          <video src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663939247814/uKlriZfYeyBJJEhB.mp4" poster="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=900&q=80" autoPlay muted loop playsInline controls preload="metadata" className="aspect-[4/5] w-full object-cover" />
         </div>
         <div className={`${card} animate-float absolute -right-2 top-8 flex items-center gap-3 p-3 pr-5 md:-right-6`}>
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-primary"><Heart size={18} /></span>
@@ -223,7 +229,7 @@ function BestSellers({ onAdd }: { onAdd: (n: string) => void }) {
                 </div>
                 <p className={`mt-2 text-sm ${b.featured ? "text-primary-foreground/75" : "text-muted-foreground"}`}>{b.desc}</p>
                 <div className="mt-6 flex items-center justify-between">
-                  <span className="font-display text-2xl font-bold">{b.price.toFixed(2)} €</span>
+                  <span className="font-display text-2xl font-bold">{formatCFA(b.price)}</span>
                   <button onClick={() => onAdd(b.name)} className={`${btn} !py-2.5 ${b.featured ? "bg-card text-primary hover:bg-secondary" : "bg-primary text-primary-foreground hover:shadow-lift"}`}>Ajouter au panier</button>
                 </div>
               </div>
@@ -255,7 +261,7 @@ function MenuFilter({ onAdd }: { onAdd: (n: string) => void }) {
                 <h3 className="truncate text-lg font-bold text-foreground">{m.name}</h3>
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">{m.category}</p>
                 <div className="mt-3 flex items-center justify-between">
-                  <span className="font-display text-xl font-bold text-primary">{m.price.toFixed(2)} €</span>
+                  <span className="font-display text-xl font-bold text-primary">{formatCFA(m.price)}</span>
                   <button aria-label={`Ajouter ${m.name}`} onClick={() => onAdd(m.name)} className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-110">+</button>
                 </div>
               </div>

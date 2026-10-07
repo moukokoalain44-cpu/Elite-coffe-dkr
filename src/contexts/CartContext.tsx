@@ -4,8 +4,8 @@ import type { Product } from "@/data/catalog";
 type CartLine = {
   product: Product;
   quantity: number;
-  size: "Small" | "Medium" | "Large";
-  milk: "Whole milk" | "Oat milk" | "Almond milk" | "Coconut milk";
+  size: "Petit" | "Moyen" | "Grand";
+  milk: "Lait entier" | "Lait d’avoine" | "Lait d’amande" | "Lait de coco";
   extras: string[];
 };
 
@@ -31,8 +31,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const line: CartLine = {
         product,
         quantity: 1,
-        size: options.size ?? "Medium",
-        milk: options.milk ?? "Whole milk",
+        size: options.size ?? "Moyen",
+        milk: options.milk ?? "Lait entier",
         extras: options.extras ?? [],
       };
       setLines((current) => [...current, line]);
@@ -46,8 +46,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const clearCart = () => setLines([]);
     const itemCount = lines.reduce((sum, line) => sum + line.quantity, 0);
     const subtotal = lines.reduce((sum, line) => {
-      const sizeFee = line.size === "Large" ? 0.75 : line.size === "Small" ? -0.5 : 0;
-      const extrasFee = line.extras.length * 0.5;
+      const sizeFee = line.size === "Grand" ? 500 : line.size === "Petit" ? -300 : 0;
+      const extrasFee = line.extras.length * 300;
       return sum + (line.product.price + sizeFee + extrasFee) * line.quantity;
     }, 0);
     return { lines, itemCount, subtotal, addItem, removeItem, updateQuantity, clearCart };
