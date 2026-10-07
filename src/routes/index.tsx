@@ -5,7 +5,7 @@ import {
   ArrowRight, Award, Check, Clock, Coffee, Heart, Instagram, Mail, MapPin, Menu, Phone, Search, ShoppingBag, Star, X,
 } from "lucide-react";
 import {
-  AVATARS, BEST_SELLERS, BRAND, CATEGORIES, CONTACT, ESPRESSO_IMG, FOOTER, INSTAGRAM, MENU, NAV, REVIEWS, STATS, type Category,
+  BEST_SELLERS, BRAND, CATEGORIES, CONTACT, ESPRESSO_IMG, FOOTER, INSTAGRAM, MENU, NAV, STATS, type Category,
 } from "@/data/site";
 import { PRODUCT_CATALOG } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
@@ -15,10 +15,10 @@ import { formatCFA } from "@/lib/currency";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Elite Coffee — Café de spécialité, perfectionné chaque jour" },
-      { name: "description", content: "Café de spécialité primé depuis 2015. Commandez en ligne, découvrez notre carte et rejoignez nos récompenses." },
-      { property: "og:title", content: "Elite Coffee — Café d'exception, perfectionné chaque jour" },
-      { property: "og:description", content: "Café de spécialité primé depuis 2015. Commandez en ligne et découvrez notre carte." },
+      { title: "Elite Coffee — Café et restaurant à Dakar" },
+      { name: "description", content: "Découvrez la carte Elite Coffee à Dakar : cafés, petits déjeuners, crêpes et sandwiches, avec les prix en FCFA." },
+      { property: "og:title", content: "Elite Coffee — Café et restaurant à Dakar" },
+      { property: "og:description", content: "La carte et les coordonnées Elite Coffee à la Cité Keur Gorgui, Dakar." },
     ],
   }),
   component: Index,
@@ -91,13 +91,7 @@ function CountUp({ to }: { to: number }) {
 function Index() {
   const { addItem } = useCart();
   const add = (name: string) => {
-    const aliases: Record<string, string> = {
-      "Création Signature": "Nuage érable & épices",
-      "Latte Caramel": "Latte Velours",
-      "Cold Brew Moka": "Cold Brew Moka",
-      "Espresso Classique": "Cortado Maison",
-    };
-    const product = PRODUCT_CATALOG.find((item) => item.name === (aliases[name] ?? name)) ?? PRODUCT_CATALOG[0];
+    const product = PRODUCT_CATALOG.find((item) => item.name === name);
     if (!product) return;
     addItem(product);
     toast.success(`${name} ajouté au panier`);
@@ -111,7 +105,6 @@ function Index() {
         <BestSellers onAdd={add} />
         <MenuFilter onAdd={add} />
         <Espresso />
-        <Reviews />
         <Gallery />
         <Contact />
       </main>
@@ -157,38 +150,22 @@ function Hero() {
   return (
     <section id="home" className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-12 md:px-6 md:py-20 lg:grid-cols-2">
       <Reveal>
-        <Pill icon={<Award size={14} />}>Café primé depuis 2015</Pill>
+        <Pill icon={<Award size={14} />}>Cité Keur Gorgui · Dakar</Pill>
         <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] text-foreground md:text-7xl">
-          Un café d'exception, <span className="italic text-accent">perfectionné</span> chaque jour
+          Elite Coffee <span className="italic text-accent">Dakar</span>
         </h1>
         <p className="mt-6 max-w-lg text-lg text-muted-foreground">
-          Des grains issus du commerce équitable, torréfiés en petites quantités et servis par des baristas passionnés par chaque détail — du grain à la tasse.
+          Cafés, cocktails, crêpes, sandwiches et petits déjeuners : retrouvez notre carte à la Cité Keur Gorgui, après la boutique Canal+.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <a href="#menu" className={btnPrimary}>Commander en ligne <ArrowRight size={16} /></a>
           <a href="#menu" className={btnOutline}>Voir la carte</a>
         </div>
-        <div className="mt-10 flex items-center gap-4">
-          <div className="flex -space-x-3">
-            {AVATARS.map((a) => <img key={a} src={a} alt="" className="h-11 w-11 rounded-full border-2 border-background object-cover" />)}
-          </div>
-          <div>
-            <Stars />
-            <p className="mt-1 text-sm font-semibold text-foreground">Plus de 1 500 clients satisfaits</p>
-          </div>
-        </div>
+        <p className="mt-8 text-sm text-muted-foreground">{CONTACT.hours.join(" · ")}</p>
       </Reveal>
       <Reveal className="relative mx-auto w-full max-w-md lg:max-w-none">
         <div className="overflow-hidden rounded-[2rem] shadow-lift">
           <video src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663939247814/gJvDUlkNuaZGVmRI.mp4" poster="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=900&q=80" autoPlay muted loop playsInline controls preload="metadata" className="aspect-[4/5] w-full object-cover" />
-        </div>
-        <div className={`${card} animate-float absolute -right-2 top-8 flex items-center gap-3 p-3 pr-5 md:-right-6`}>
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-primary"><Heart size={18} /></span>
-          <div><p className="text-xs text-muted-foreground">Meilleure vente</p><p className="text-sm font-bold text-foreground">Latte Caramel</p></div>
-        </div>
-        <div className={`${card} animate-float-delayed absolute -left-2 bottom-10 flex items-center gap-3 p-3 pr-5 md:-left-6`}>
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground"><Star size={18} className="fill-star text-star" /></span>
-          <div><p className="text-sm font-bold text-foreground">4,9</p><p className="text-xs text-muted-foreground">1 250 avis</p></div>
         </div>
       </Reveal>
     </section>
@@ -201,7 +178,7 @@ function Stats() {
       <Reveal className="grid grid-cols-1 divide-y divide-primary-foreground/15 rounded-2xl bg-primary py-4 text-center text-primary-foreground sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {STATS.map((s) => (
           <div key={s.label} className="px-6 py-5">
-            <p className="font-display text-4xl font-bold md:text-5xl"><CountUp to={s.value} /></p>
+            <p className="font-display text-4xl font-bold md:text-5xl">{s.value}</p>
             <p className="mt-1 text-sm text-primary-foreground/75">{s.label}</p>
           </div>
         ))}
@@ -213,7 +190,7 @@ function Stats() {
 function BestSellers({ onAdd }: { onAdd: (n: string) => void }) {
   return (
     <section id="about" className="mx-auto max-w-7xl px-4 py-20 md:px-6 md:py-28">
-      <SectionHead badge={<Pill icon={<Heart size={14} />}>Les préférés de nos clients</Pill>} title="Nos meilleures ventes" sub="Les boissons que nos habitués ne cessent de commander — préparées avec soin, à chaque fois." />
+      <SectionHead badge={<Pill icon={<Heart size={14} />}>À la carte</Pill>} title="Nos boissons" sub="Cafés et milkshakes de notre carte." />
       <div className="grid gap-6 md:grid-cols-3">
         {BEST_SELLERS.map((b) => (
           <Reveal key={b.name}>
@@ -225,7 +202,6 @@ function BestSellers({ onAdd }: { onAdd: (n: string) => void }) {
               <div className="px-2 pb-2 pt-5">
                 <div className="flex items-center justify-between">
                   <h3 className="text-2xl font-bold">{b.name}</h3>
-                  <span className="flex items-center gap-1 text-sm font-semibold"><Star size={14} className="fill-star text-star" />{b.rating}</span>
                 </div>
                 <p className={`mt-2 text-sm ${b.featured ? "text-primary-foreground/75" : "text-muted-foreground"}`}>{b.desc}</p>
                 <div className="mt-6 flex items-center justify-between">
@@ -242,12 +218,12 @@ function BestSellers({ onAdd }: { onAdd: (n: string) => void }) {
 }
 
 function MenuFilter({ onAdd }: { onAdd: (n: string) => void }) {
-  const [cat, setCat] = useState<Category>("Espresso");
+  const [cat, setCat] = useState<Category>("Cafés chauds");
   const items = MENU.filter((m) => m.category === cat);
   return (
     <section id="menu" className="bg-secondary/60 py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
-        <SectionHead badge={<Pill icon={<Coffee size={14} />}>Notre carte</Pill>} title="Choisissez votre café" sub="De l'espresso corsé au cold brew infusé lentement — trouvez votre tasse idéale." />
+        <SectionHead badge={<Pill icon={<Coffee size={14} />}>Notre carte</Pill>} title="Découvrez notre carte" sub="Boissons, entrées, petits déjeuners, crêpes et sandwiches." />
         <div className="mb-10 flex flex-wrap justify-center gap-3">
           {CATEGORIES.map((c) => (
             <button key={c} onClick={() => setCat(c)} className={`${btn} !py-2.5 ${cat === c ? "bg-primary text-primary-foreground shadow-soft" : "bg-card text-foreground hover:bg-primary/10"}`}>{c}</button>
@@ -258,7 +234,7 @@ function MenuFilter({ onAdd }: { onAdd: (n: string) => void }) {
             <article key={m.name} className={`${card} group flex items-center gap-4 p-4 transition-all hover:-translate-y-1 hover:shadow-lift`}>
               <img src={m.img} alt={m.name} loading="lazy" className="h-24 w-24 shrink-0 rounded-xl object-cover" />
               <div className="min-w-0 flex-1">
-                <h3 className="truncate text-lg font-bold text-foreground">{m.name}</h3>
+                <h3 className="text-lg font-bold text-foreground">{m.name}</h3>
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">{m.category}</p>
                 <div className="mt-3 flex items-center justify-between">
                   <span className="font-display text-xl font-bold text-primary">{formatCFA(m.price)}</span>
@@ -279,10 +255,10 @@ function Espresso() {
       <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 md:px-6 lg:grid-cols-2">
         <Reveal>
           <Pill dark icon={<Award size={14} />}>Notre savoir-faire</Pill>
-          <h2 className="mt-4 text-4xl font-bold md:text-5xl">La perfection de l'espresso</h2>
-          <p className="mt-5 max-w-lg text-primary-foreground/75">Chaque extraction est réalisée sur nos machines italiennes réglées à la main, ajustées chaque matin pour une crema riche et une douceur équilibrée.</p>
+          <h2 className="mt-4 text-4xl font-bold md:text-5xl">Votre rendez-vous à Dakar</h2>
+          <p className="mt-5 max-w-lg text-primary-foreground/75">Retrouvez Elite Coffee à la Cité Keur Gorgui, après la boutique Canal+.</p>
           <ul className="mt-8 space-y-4">
-            {["Grains d'origine unique torréfiés chaque semaine sur place", "Extraction précise à 9 bars, de 25 à 30 secondes", "Baristas certifiés avec plus de 1 000 heures de formation"].map((t) => (
+            {CONTACT.hours.concat(CONTACT.phone).map((t) => (
               <li key={t} className="flex items-start gap-3">
                 <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground"><Check size={14} /></span>
                 <span>{t}</span>
@@ -299,32 +275,10 @@ function Espresso() {
   );
 }
 
-function Reviews() {
-  return (
-    <section id="reviews" className="mx-auto max-w-7xl px-4 py-20 md:px-6 md:py-28">
-      <SectionHead badge={<Pill icon={<Star size={14} className="fill-star text-star" />}>Noté 4,9/5</Pill>} title="Ce que disent nos clients" />
-      <div className="grid gap-6 md:grid-cols-3">
-        {REVIEWS.map((r) => (
-          <Reveal key={r.name}>
-            <figure className={`${card} flex h-full flex-col p-7 transition-all hover:-translate-y-1 hover:shadow-lift`}>
-              <Stars />
-              <blockquote className="mt-5 flex-1 text-foreground/85">« {r.quote} »</blockquote>
-              <figcaption className="mt-6 flex items-center gap-3 border-t border-border pt-5">
-                <img src={r.avatar} alt={r.name} className="h-12 w-12 rounded-full object-cover" />
-                <div><p className="font-semibold text-foreground">{r.name}</p><p className="text-sm text-muted-foreground">{r.role}</p></div>
-              </figcaption>
-            </figure>
-          </Reveal>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function Gallery() {
   return (
     <section id="locations" className="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-28">
-      <SectionHead badge={<Pill icon={<Instagram size={14} />}>{BRAND.handle}</Pill>} title="Suivez notre aventure" sub="Des moments de notre comptoir, de notre torréfaction et de notre communauté." />
+      <SectionHead badge={<Pill icon={<Instagram size={14} />}>{BRAND.handle}</Pill>} title="Une pause gourmande" sub="Photos d’illustration." />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
         {INSTAGRAM.map((g) => (
           <a key={g.alt} href="#" className="group relative overflow-hidden rounded-2xl">
@@ -374,9 +328,8 @@ function Contact() {
     e.currentTarget.reset();
   };
   const info = [
-    { icon: Mail, label: "E-mail", lines: [CONTACT.email] },
-    { icon: Phone, label: "Téléphone", lines: [CONTACT.phone] },
-    { icon: MapPin, label: "Adresse", lines: [CONTACT.address] },
+    { icon: Phone, label: "Téléphone", lines: CONTACT.phones },
+    { icon: MapPin, label: "Adresse", lines: [CONTACT.address, CONTACT.landmark] },
     { icon: Clock, label: "Horaires d'ouverture", lines: CONTACT.hours },
   ];
   return (
@@ -389,7 +342,7 @@ function Contact() {
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field label="Nom complet" error={errors["name"]}><input name="name" className={input} placeholder="Marie Dupont" /></Field>
                 <Field label="E-mail" error={errors["email"]}><input name="email" type="email" className={input} placeholder="marie@email.com" /></Field>
-                <Field label="Téléphone (facultatif)"><input name="phone" className={input} placeholder="06 00 00 00 00" /></Field>
+                <Field label="Téléphone (facultatif)"><input name="phone" className={input} placeholder="+221 …" /></Field>
                 <Field label="Objet" error={errors["subject"]}><input name="subject" className={input} placeholder="Comment pouvons-nous aider ?" /></Field>
               </div>
               <Field label="Message" error={errors["message"]}><textarea name="message" rows={5} className={input} placeholder="Dites-nous en plus..." /></Field>
@@ -429,7 +382,7 @@ function Footer() {
             <span className="grid h-9 w-9 place-items-center rounded-full bg-accent text-accent-foreground"><Coffee size={18} /></span>
             <span className="font-display text-xl font-bold">{BRAND.name}</span>
           </div>
-          <p className="mt-4 max-w-xs text-sm text-background/65">Un café d'exception, perfectionné chaque jour. Torréfié avec soin depuis 2015.</p>
+          <p className="mt-4 max-w-xs text-sm text-background/65">Elite Coffee — Cité Keur Gorgui, Dakar, Sénégal.</p>
         </div>
         {Object.entries(FOOTER).map(([h, links]) => (
           <div key={h}>
