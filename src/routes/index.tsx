@@ -15,6 +15,8 @@ import { formatCFA } from "@/lib/currency";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Elite Coffee — Café et restaurant à Dakar" },
       { name: "description", content: "Découvrez la carte Elite Coffee à Dakar : cafés, petits déjeuners, crêpes et sandwiches, avec les prix en FCFA." },
       { property: "og:title", content: "Elite Coffee — Café et restaurant à Dakar" },

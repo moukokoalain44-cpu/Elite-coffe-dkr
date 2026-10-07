@@ -9,6 +9,10 @@ import { formatCFA } from "@/lib/currency";
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
+      { property: "og:title", content: "Commande en ligne | Elite Coffee" },
+      { property: "og:description", content: "Choisissez le retrait ou la livraison et finalisez votre commande Elite Coffee." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Commande en ligne | Elite Coffee" },
       {
         name: "description",
@@ -64,7 +68,7 @@ function CheckoutPage() {
               <p
                 className={`mt-1 text-sm ${fulfillment === "pickup" ? "text-primary-foreground/75" : "text-muted-foreground"}`}
               >
-                Prêt en 5–10 minutes
+                Délai à confirmer auprès du restaurant
               </p>
               <p className="mt-5 text-sm font-semibold">
                 Évitez les frais de livraison et dégustez-le tout frais.
@@ -85,7 +89,7 @@ function CheckoutPage() {
               <p
                 className={`mt-1 text-sm ${fulfillment === "delivery" ? "text-primary-foreground/75" : "text-muted-foreground"}`}
               >
-                Arrive en 20–35 minutes
+                Disponibilité et délai à confirmer
               </p>
               <p className="mt-5 text-sm font-semibold">
                 Restez confortablement chez vous, nous vous livrons.
