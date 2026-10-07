@@ -180,7 +180,7 @@ function Hero() {
       </Reveal>
       <Reveal className="relative mx-auto w-full max-w-md lg:max-w-none">
         <div className="overflow-hidden rounded-[2rem] shadow-lift">
-          <video src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663939247814/uKlriZfYeyBJJEhB.mp4" poster="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=900&q=80" autoPlay muted loop playsInline controls preload="metadata" className="aspect-[4/5] w-full object-cover" />
+          <video src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663939247814/gJvDUlkNuaZGVmRI.mp4" poster="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=900&q=80" autoPlay muted loop playsInline controls preload="metadata" className="aspect-[4/5] w-full object-cover" />
         </div>
         <div className={`${card} animate-float absolute -right-2 top-8 flex items-center gap-3 p-3 pr-5 md:-right-6`}>
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-primary"><Heart size={18} /></span>
