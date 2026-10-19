@@ -9,6 +9,7 @@ import {
 } from "@/data/site";
 import { PRODUCT_CATALOG } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
+import { useAdmin } from "@/contexts/AdminContext";
 import { SiteHeader } from "@/components/SiteChrome";
 import { formatCFA } from "@/lib/currency";
 
@@ -149,15 +150,16 @@ function Navbar({ cart }: { cart: number }) {
 }
 
 function Hero() {
+  const { content } = useAdmin();
   return (
     <section id="home" className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-12 md:px-6 md:py-20 lg:grid-cols-2">
       <Reveal>
         <Pill icon={<Award size={14} />}>Cité Keur Gorgui · Dakar</Pill>
         <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] text-foreground md:text-7xl">
-          Elite Coffee <span className="italic text-accent">Dakar</span>
+          {content.heroTitle} <span className="italic text-accent">Dakar</span>
         </h1>
         <p className="mt-6 max-w-lg text-lg text-muted-foreground">
-          Cafés, cocktails, crêpes, sandwiches et petits déjeuners : retrouvez notre carte à la Cité Keur Gorgui, après la boutique Canal+.
+          {content.heroDescription}
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <a href="#menu" className={btnPrimary}>Commander en ligne <ArrowRight size={16} /></a>
