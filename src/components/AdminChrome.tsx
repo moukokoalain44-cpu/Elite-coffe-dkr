@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from "@tanstack/react-router";
+import { Link, Outlet, useLocation, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
   ChevronDown,
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useAdmin } from "@/contexts/AdminContext";
+import { useAdminAuth } from "@/contexts/AuthContext";
 
 const nav = [
   { label: "Vue d’ensemble", to: "/admin", icon: LayoutDashboard },
@@ -35,6 +36,8 @@ const navGroups = [
 ];
 
 export function AdminLayout() {
+  const navigate = useNavigate();
+  const { session, loading, signOut } = useAdminAuth();
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -42,6 +45,7 @@ export function AdminLayout() {
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
   const { registrations } = useAdmin();
+  const userEmail = session?.user.email ?? "Administrateur";
   const results = query.trim()
     ? nav.filter((item) => item.label.toLowerCase().includes(query.toLowerCase()))
     : [];
@@ -56,6 +60,20 @@ export function AdminLayout() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+  useEffect(() => {
+    if (!loading && !session) void navigate({ to: "/admin/login" });
+  }, [loading, navigate, session]);
+  if (loading || !session) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-[#f7f5f1] text-sm text-[#776d65]">
+        Vérification de votre session…
+      </div>
+    );
+  }
+  const handleSignOut = async () => {
+    await signOut();
+    await navigate({ to: "/admin/login" });
+  };
   const toggleTheme = () =>
     setDarkMode((current) => {
       const next = !current;
@@ -134,13 +152,14 @@ export function AdminLayout() {
               onClick={() => setOpen(false)}
               collapsed={collapsed}
             />
-            <Link
-              to="/"
+            <button
+              type="button"
+              onClick={() => void handleSignOut()}
               title={collapsed ? "Quitter le back-office" : undefined}
               className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold text-[#a1462c] hover:bg-[#fff3ed] ${collapsed ? "justify-center" : ""}`}
             >
               <LogOut size={18} /> {!collapsed && "Quitter le back-office"}
-            </Link>
+            </button>
             <button
               type="button"
               onClick={() => setCollapsed((value) => !value)}
@@ -239,8 +258,8 @@ export function AdminLayout() {
               {profileOpen && (
                 <div className="absolute right-0 top-14 z-50 w-56 rounded-2xl border border-[#e8e0d7] bg-white p-2 shadow-xl">
                   <div className="border-b border-[#eee8e2] px-3 py-2">
-                    <strong className="block text-sm">Oripio Studio</strong>
-                    <span className="text-xs text-[#9b9188]">Compte super admin</span>
+                    <strong className="block max-w-[190px] truncate text-sm">{userEmail}</strong>
+                    <span className="text-xs text-[#9b9188]">Compte administrateur</span>
                   </div>
                   <Link
                     to="/admin/settings"
@@ -257,12 +276,13 @@ export function AdminLayout() {
                     {darkMode ? <Sun size={16} /> : <Moon size={16} />}{" "}
                     {darkMode ? "Mode clair" : "Mode sombre"}
                   </button>
-                  <Link
-                    to="/"
-                    className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#a1462c] hover:bg-[#fff3ed]"
+                  <button
+                    type="button"
+                    onClick={() => void handleSignOut()}
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-[#a1462c] hover:bg-[#fff3ed]"
                   >
                     <LogOut size={16} /> Quitter
-                  </Link>
+                  </button>
                 </div>
               )}
             </div>
@@ -426,5 +446,6 @@ export function AdminPagination({
 }
 
 export function AdminOutlet() {
-  return <AdminLayout />;
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  return pathname === "/admin/login" ? <Outlet /> : <AdminLayout />;
 }
