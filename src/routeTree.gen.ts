@@ -13,7 +13,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BrunchRouteImport } from './routes/brunch'
-import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as ReserverRouteImport } from './routes/reserver'
@@ -44,11 +43,6 @@ const AdminRoute = AdminRouteImport.update({
 const BrunchRoute = BrunchRouteImport.update({
   id: '/brunch',
   path: '/brunch',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LocationsRoute = LocationsRouteImport.update({
@@ -112,7 +106,6 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/brunch': typeof BrunchRoute
-  '/checkout': typeof CheckoutRoute
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
@@ -129,7 +122,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/brunch': typeof BrunchRoute
-  '/checkout': typeof CheckoutRoute
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
@@ -148,7 +140,6 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/brunch': typeof BrunchRoute
-  '/checkout': typeof CheckoutRoute
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
@@ -168,7 +159,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/brunch'
-    | '/checkout'
     | '/locations'
     | '/menu'
     | '/reserver'
@@ -185,7 +175,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/brunch'
-    | '/checkout'
     | '/locations'
     | '/menu'
     | '/reserver'
@@ -203,7 +192,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/brunch'
-    | '/checkout'
     | '/locations'
     | '/menu'
     | '/reserver'
@@ -222,7 +210,6 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   BrunchRoute: typeof BrunchRoute
-  CheckoutRoute: typeof CheckoutRoute
   LocationsRoute: typeof LocationsRoute
   MenuRoute: typeof MenuRouteWithChildren
   ReserverRoute: typeof ReserverRoute
@@ -256,13 +243,6 @@ declare module '@tanstack/react-router' {
       path: '/brunch'
       fullPath: '/brunch'
       preLoaderRoute: typeof BrunchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/locations': {
@@ -382,7 +362,6 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   BrunchRoute: BrunchRoute,
-  CheckoutRoute: CheckoutRoute,
   LocationsRoute: LocationsRoute,
   MenuRoute: MenuRouteWithChildren,
   ReserverRoute: ReserverRoute,

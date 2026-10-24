@@ -89,48 +89,7 @@ export const MENU_SECTIONS: { label: string; categories: MenuCategory[]; intro: 
   },
 ];
 
-export const INSTAGRAM_REELS = [
-  {
-    url: "https://www.instagram.com/elitecoffee_dkr/reel/DX45KTqsgVj/",
-    title: "Comment nous trouver",
-    text: "Depuis le rond-point de la Cité Keur Gorgui, retrouvez Elite Coffee pour bruncher, chiller et bien manger.",
-  },
-  {
-    url: "https://www.instagram.com/elitecoffee_dkr/reel/DXAbjMaDSun/",
-    title: "La référence brunch à Dakar",
-    text: "Un lieu chaleureux où saveurs, convivialité et bonne ambiance se rencontrent.",
-  },
-];
-
 export const ESPRESSO_IMG = "/assets/instagram/coffee-dessert.jpg";
-
-export const INSTAGRAM = [
-  {
-    img: "/assets/instagram/hero-brunch.jpg",
-    alt: "Nouvelle carte brunch Elite Coffee",
-    source: "https://www.instagram.com/elitecoffee_dkr/p/Dbn08xcDcl4/",
-  },
-  {
-    img: "/assets/instagram/brunch-table.jpg",
-    alt: "Table brunch Elite Coffee",
-    source: "https://www.instagram.com/elitecoffee_dkr/p/DeaRmE7jUDh/",
-  },
-  {
-    img: "/assets/instagram/coffee-dessert.jpg",
-    alt: "Café et douceur Elite Coffee",
-    source: "https://www.instagram.com/elitecoffee_dkr/p/DdL1xfmjaDN/",
-  },
-  {
-    img: "/assets/instagram/smoothie-video.jpg",
-    alt: "Cappuccino et smoothie Elite Coffee",
-    source: "https://www.instagram.com/elitecoffee_dkr/reel/Dbn145cNB0B/",
-  },
-  {
-    img: "/assets/instagram/dessert-toast.jpg",
-    alt: "Toast et dessert Elite Coffee",
-    source: "https://www.instagram.com/elitecoffee_dkr/p/Dbfla7-ty29/",
-  },
-];
 
 export const CONTACT = {
   phone: "+221 33 824 96 93",

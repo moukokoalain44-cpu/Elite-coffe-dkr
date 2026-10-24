@@ -97,3 +97,29 @@ export async function createReservation(reservation: ReservationInsert): Promise
   if (error) throw new Error(error.message);
   return data.id as string;
 }
+
+export type SiteMediaRow = {
+  id: string;
+  label: string;
+  slot: string;
+  media_type: "image" | "video";
+  url: string;
+  alt_text: string;
+  is_visible: boolean;
+  sort_order: number;
+};
+
+export async function fetchSiteMedia(): Promise<SiteMediaRow[]> {
+  const { data, error } = await supabase
+    .from("site_media_assets")
+    .select("id,label,slot,media_type,url,alt_text,is_visible,sort_order")
+    .eq("is_visible", true)
+    .order("sort_order", { ascending: true });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as SiteMediaRow[];
+}
+
+export async function saveSiteMedia(media: SiteMediaRow) {
+  const { error } = await supabase.from("site_media_assets").upsert(media, { onConflict: "id" });
+  if (error) throw new Error(error.message);
+}

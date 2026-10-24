@@ -1,9 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Plus, Search, ShoppingBag, Star } from "lucide-react";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import { MENU_CATEGORIES, type MenuCategory } from "@/data/catalog";
-import { useCart } from "@/contexts/CartContext";
 import { useMenuCatalog } from "@/hooks/use-menu-catalog";
 import { PageShell } from "@/components/SiteChrome";
 import { formatCFA } from "@/lib/currency";
@@ -82,7 +80,6 @@ function MenuPage() {
   const [category, setCategory] = useState<MenuCategory>("Petit déjeuner");
   const [query, setQuery] = useState("");
   const { products: menuProducts, isLoading: menuLoading, isRemote } = useMenuCatalog();
-  const { addItem } = useCart();
   const normalizedQuery = query.trim().toLocaleLowerCase("fr");
   const products = useMemo(
     () =>
@@ -253,41 +250,12 @@ function MenuPage() {
                         <Star size={13} className="fill-star text-star" />{" "}
                         {product.availabilityNote ? "À confirmer" : "Disponible"}
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          addItem(product);
-                          toast.success(`${product.name} ajouté au panier`);
-                        }}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift"
-                      >
-                        <Plus size={14} /> Ajouter
-                      </button>
                     </div>
                   </article>
                 ))}
               </div>
             )}
           </div>
-        </div>
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-3xl bg-secondary p-6 sm:flex-row md:p-8">
-          <div className="flex items-center gap-4">
-            <span className="grid size-12 place-items-center rounded-2xl bg-primary text-primary-foreground">
-              <ShoppingBag />
-            </span>
-            <div>
-              <p className="font-display text-xl font-bold">Vous savez déjà quoi choisir ?</p>
-              <p className="text-sm text-muted-foreground">
-                Composez votre commande pour le retrait ou la livraison.
-              </p>
-            </div>
-          </div>
-          <Link
-            to="/checkout"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground hover:bg-accent"
-          >
-            Valider la commande <ArrowRight size={16} />
-          </Link>
         </div>
       </section>
     </PageShell>

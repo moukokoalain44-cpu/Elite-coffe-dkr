@@ -1,9 +1,6 @@
 import { createFileRoute, Link, notFound, useParams } from "@tanstack/react-router";
-import { ArrowLeft, Check, Minus, Plus, ShoppingBag } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { ArrowLeft, Check } from "lucide-react";
 import { getProduct } from "@/data/catalog";
-import { useCart } from "@/contexts/CartContext";
 import { PageShell } from "@/components/SiteChrome";
 import { formatCFA } from "@/lib/currency";
 
@@ -11,7 +8,10 @@ export const Route = createFileRoute("/menu/$id")({
   head: () => ({
     meta: [
       { property: "og:title", content: "Détails du produit | Elite Coffee" },
-      { property: "og:description", content: "Découvrez les produits et les tarifs de la carte Elite Coffee à Dakar." },
+      {
+        property: "og:description",
+        content: "Découvrez les produits et les tarifs de la carte Elite Coffee à Dakar.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { title: "Détails du produit | Elite Coffee" },
@@ -28,13 +28,6 @@ export const Route = createFileRoute("/menu/$id")({
 function ProductPage() {
   const { id } = useParams({ from: "/menu/$id" });
   const product = getProduct(id);
-  const { addItem } = useCart();
-  const [size, setSize] = useState<"Petit" | "Moyen" | "Grand">("Moyen");
-  const [milk, setMilk] = useState<"Lait entier" | "Lait d’avoine" | "Lait d’amande" | "Lait de coco">(
-    "Lait entier",
-  );
-  const [extras, setExtras] = useState<string[]>([]);
-  const [quantity, setQuantity] = useState(1);
   if (!product) throw notFound();
   const unitPrice = product.price;
   return (
@@ -65,39 +58,9 @@ function ProductPage() {
               {formatCFA(unitPrice)}
             </span>
           </div>
-          <div className="mt-8 space-y-6">
-            <div className="flex items-center justify-between rounded-2xl bg-secondary p-3">
-              <span className="text-sm font-semibold">Quantité</span>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  aria-label="Decrease quantity"
-                  onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-                  className="grid size-9 place-items-center rounded-full bg-card"
-                >
-                  <Minus size={15} />
-                </button>
-                <span className="w-5 text-center font-bold">{quantity}</span>
-                <button
-                  type="button"
-                  aria-label="Increase quantity"
-                  onClick={() => setQuantity((value) => value + 1)}
-                  className="grid size-9 place-items-center rounded-full bg-card"
-                >
-                  <Plus size={15} />
-                </button>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                for (let i = 0; i < quantity; i += 1) addItem(product);
-                toast.success(`${quantity} ${product.name} ajouté au panier`);
-              }}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-4 font-bold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift"
-            >
-              <ShoppingBag size={18} /> Ajouter au panier · {formatCFA(unitPrice * quantity)}
-            </button>
+          <div className="mt-8 rounded-2xl bg-secondary p-4 text-sm text-muted-foreground">
+            Produit disponible sur place. Pour connaître les disponibilités du jour, contactez
+            directement le restaurant.
           </div>
           <div className="mt-8 grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
             <div>

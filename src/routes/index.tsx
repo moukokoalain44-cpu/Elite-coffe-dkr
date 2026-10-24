@@ -13,18 +13,10 @@ import {
   Phone,
   Star,
 } from "lucide-react";
-import {
-  BRAND,
-  CONTACT,
-  FOOTER,
-  INSTAGRAM,
-  INSTAGRAM_REELS,
-  MENU_SECTIONS,
-  STATS,
-} from "@/data/site";
+import { BRAND, CONTACT, FOOTER, MENU_SECTIONS, STATS } from "@/data/site";
 import { type Product } from "@/data/catalog";
-import { useCart } from "@/contexts/CartContext";
 import { useMenuCatalog } from "@/hooks/use-menu-catalog";
+import { useSiteMedia } from "@/hooks/use-site-media";
 import { useAdmin } from "@/contexts/AdminContext";
 import { SiteHeader } from "@/components/SiteChrome";
 import { formatCFA } from "@/lib/currency";
@@ -134,21 +126,14 @@ function CountUp({ to }: { to: number }) {
 /* ---------- page ---------- */
 function Index() {
   const { products } = useMenuCatalog();
-  const { addItem } = useCart();
-  const add = (name: string) => {
-    const product = products.find((item) => item.name === name);
-    if (!product) return;
-    addItem(product);
-    toast.success(`${name} ajouté au panier`);
-  };
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <main>
         <Hero />
         <Stats />
-        <BestSellers products={products} onAdd={add} />
-        <MenuFilter products={products} onAdd={add} />
+        <BestSellers products={products} />
+        <MenuFilter products={products} />
         <Gallery />
         <Contact />
       </main>
@@ -159,6 +144,7 @@ function Index() {
 
 function Hero() {
   const { content } = useAdmin();
+  const media = useSiteMedia().find((item) => item.slot === "hero");
   return (
     <section
       id="home"
@@ -171,8 +157,8 @@ function Hero() {
         </h1>
         <p className="mt-6 max-w-lg text-lg text-muted-foreground">{content.heroDescription}</p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <a href="#menu" className={btnPrimary}>
-            Commander en ligne <ArrowRight size={16} />
+          <a href="/reserver" className={btnPrimary}>
+            Réserver une table <ArrowRight size={16} />
           </a>
           <a href="#menu" className={btnOutline}>
             Voir la carte
@@ -183,21 +169,18 @@ function Hero() {
         </p>
       </Reveal>
       <Reveal className="relative mx-auto w-full max-w-md lg:max-w-none">
-        <a
-          href="https://www.instagram.com/elitecoffee_dkr/p/Dbn08xcDcl4/"
-          target="_blank"
-          rel="noreferrer"
-          className="group relative block overflow-hidden rounded-[2rem] shadow-lift"
-        >
-          <img
-            src="/assets/instagram/hero-brunch.jpg"
-            alt="Nouvelle carte brunch publiée par Elite Coffee"
-            className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        <div className="overflow-hidden rounded-[2rem] shadow-lift">
+          <video
+            src={media?.url}
+            poster="/assets/instagram/hero-brunch.jpg"
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="aspect-[4/5] w-full object-cover"
+            aria-label={media?.alt_text ?? "Ambiance Elite Coffee"}
           />
-          <span className="absolute bottom-5 left-5 rounded-full bg-primary/85 px-4 py-2 text-xs font-semibold text-primary-foreground">
-            Voir la publication Instagram
-          </span>
-        </a>
+        </div>
       </Reveal>
     </section>
   );
@@ -218,7 +201,7 @@ function Stats() {
   );
 }
 
-function BestSellers({ products, onAdd }: { products: Product[]; onAdd: (n: string) => void }) {
+function BestSellers({ products }: { products: Product[] }) {
   const picks = ["Café expresso", "Café glacé caramel", "Milkshake fruits rouges"]
     .map((name) => products.find((product) => product.name === name))
     .filter((product): product is Product => Boolean(product));
@@ -258,12 +241,12 @@ function BestSellers({ products, onAdd }: { products: Product[]; onAdd: (n: stri
                 </p>
                 <div className="mt-6 flex items-center justify-between">
                   <span className="font-display text-2xl font-bold">{formatCFA(b.price)}</span>
-                  <button
-                    onClick={() => onAdd(b.name)}
+                  <a
+                    href="/menu"
                     className={`${btn} !py-2.5 ${index === 0 ? "bg-card text-primary hover:bg-secondary" : "bg-primary text-primary-foreground hover:shadow-lift"}`}
                   >
-                    Ajouter
-                  </button>
+                    Voir la carte
+                  </a>
                 </div>
               </div>
             </article>
@@ -274,7 +257,7 @@ function BestSellers({ products, onAdd }: { products: Product[]; onAdd: (n: stri
   );
 }
 
-function MenuFilter({ products, onAdd }: { products: Product[]; onAdd: (n: string) => void }) {
+function MenuFilter({ products }: { products: Product[] }) {
   const defaultSection = MENU_SECTIONS[0]!;
   const [section, setSection] = useState(defaultSection.label);
   const current = MENU_SECTIONS.find((item) => item.label === section) ?? defaultSection;
@@ -342,13 +325,6 @@ function MenuFilter({ products, onAdd }: { products: Product[]; onAdd: (n: strin
                       <span className="font-display text-xl font-bold text-primary">
                         {formatCFA(m.price)}
                       </span>
-                      <button
-                        aria-label={`Ajouter ${m.name}`}
-                        onClick={() => onAdd(m.name)}
-                        className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-110"
-                      >
-                        +
-                      </button>
                     </div>
                   </div>
                 </article>
@@ -362,53 +338,24 @@ function MenuFilter({ products, onAdd }: { products: Product[]; onAdd: (n: strin
 }
 
 function Gallery() {
+  const media = useSiteMedia().filter((item) => item.slot.startsWith("gallery-"));
   return (
     <section id="locations" className="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-28">
       <SectionHead
-        badge={<Pill icon={<Instagram size={14} />}>{BRAND.handle}</Pill>}
+        badge={<Pill icon={<Coffee size={14} />}>Notre univers</Pill>}
         title="Une pause gourmande, en vrai"
-        sub="Les images et les mots viennent des publications publiques d’Elite Coffee."
+        sub="Une adresse chaleureuse pour bruncher, déjeuner, prendre un café ou partager une douceur."
       />
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-5">
-        {INSTAGRAM.map((g) => (
-          <a
-            key={g.alt}
-            href={g.source}
-            target="_blank"
-            rel="noreferrer"
-            className="group relative overflow-hidden rounded-2xl"
-            aria-label={`Voir ${g.alt} sur Instagram`}
-          >
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
+        {media.map((item) => (
+          <div key={item.id} className="group relative overflow-hidden rounded-2xl">
             <img
-              src={g.img}
-              alt={g.alt}
+              src={item.url}
+              alt={item.alt_text}
               loading="lazy"
-              className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-110"
+              className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
-            <span className="absolute inset-0 grid place-items-center bg-primary/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <Instagram className="text-primary-foreground" size={32} />
-            </span>
-          </a>
-        ))}
-      </div>
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        {INSTAGRAM_REELS.map((reel) => (
-          <a
-            key={reel.url}
-            href={reel.url}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-3xl bg-primary p-6 text-primary-foreground transition-transform hover:-translate-y-1"
-          >
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent">
-              Reel Instagram
-            </p>
-            <h3 className="mt-2 font-display text-2xl font-bold">{reel.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-primary-foreground/75">{reel.text}</p>
-            <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold">
-              Voir le reel <ArrowRight size={16} />
-            </span>
-          </a>
+          </div>
         ))}
       </div>
     </section>

@@ -79,3 +79,18 @@ alter table public.menu_products enable row level security;
 create policy "public_read_menu_products" on public.menu_products for select using (is_visible = true);
 create policy "admin_manage_menu_products" on public.menu_products for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 create index if not exists menu_products_category_order_idx on public.menu_products (category, sort_order);
+
+create table if not exists public.site_media_assets (
+  id text primary key,
+  label text not null,
+  slot text not null unique,
+  media_type text not null default 'image' check (media_type in ('image', 'video')),
+  url text not null,
+  alt_text text not null default '',
+  is_visible boolean not null default true,
+  sort_order integer not null default 0,
+  updated_at timestamptz not null default now()
+);
+alter table public.site_media_assets enable row level security;
+create policy "public_read_site_media_assets" on public.site_media_assets for select using (is_visible = true);
+create policy "admin_manage_site_media_assets" on public.site_media_assets for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
