@@ -45,15 +45,18 @@ function ReservationPage() {
 
     setLoading(true);
     try {
-      const id = await createReservation({
+      const reservation = {
         name: data.get("name") as string,
         phone: data.get("phone") as string,
         date: data.get("date") as string,
         time: data.get("time") as string,
         guests: parseInt(guests),
         occasion,
-        message: (data.get("message") as string) || undefined,
-      });
+        ...((data.get("message") as string)?.trim()
+          ? { message: (data.get("message") as string).trim() }
+          : {}),
+      } satisfies Parameters<typeof createReservation>[0];
+      const id = await createReservation(reservation);
       setReservationId(id);
       setSent(true);
       toast.success("Votre demande de réservation est enregistrée");

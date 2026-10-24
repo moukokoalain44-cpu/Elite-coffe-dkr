@@ -11,7 +11,7 @@ export function SiteHeader() {
   const { itemCount } = useCart();
   const links = [
     ["Carte", "/menu"],
-    ["Petit déjeuner", "/brunch"],
+    ["Brunch", "/brunch"],
     ["Réserver", "/reserver"],
     ["Récompenses", "/rewards"],
     ["Notre histoire", "/about"],
@@ -29,7 +29,7 @@ export function SiteHeader() {
             <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground">
               <Coffee size={18} />
             </span>
-            <span className="font-display text-xl font-bold">Elite Coffee</span>
+            <span><span className="block font-display text-xl font-bold leading-none">Elite Coffee</span><span className="hidden text-[9px] font-bold uppercase tracking-[0.18em] text-accent sm:block">Restaurant · Brunch · Glacier</span></span>
           </Link>
           <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary navigation">
             {links.map(([label, to]) => (
@@ -254,7 +254,7 @@ export function PageShell({
               Notre histoire
             </Link>
             <Link to="/brunch" className="hover:text-primary">
-              Petit déjeuner
+              Brunch
             </Link>
             <Link to="/reserver" className="hover:text-primary">
               Réserver

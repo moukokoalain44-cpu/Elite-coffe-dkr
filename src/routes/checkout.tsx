@@ -73,17 +73,18 @@ function CheckoutPage() {
     }
     setLoading(true);
     try {
+      const order = {
+        name,
+        phone,
+        fulfillment,
+        payment,
+        subtotal,
+        delivery_fee: fee,
+        total,
+        ...(address.trim() ? { address: address.trim() } : {}),
+      } satisfies Parameters<typeof createOrder>[0];
       const id = await createOrder(
-        {
-          name,
-          phone,
-          fulfillment,
-          address: address || undefined,
-          payment,
-          subtotal,
-          delivery_fee: fee,
-          total,
-        },
+        order,
         lines.map((l) => ({
           product_id: l.product.id,
           name: l.product.name,

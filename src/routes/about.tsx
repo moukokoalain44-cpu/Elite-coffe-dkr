@@ -8,14 +8,14 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { property: "og:title", content: "Notre histoire | Elite Coffee" },
-      { property: "og:description", content: "Découvrez Elite Coffee : des produits choisis, une hospitalité sincère et un meilleur café au quotidien." },
+      { property: "og:description", content: "Découvrez Elite Coffee : restaurant, brunch et glacier à l’entrée de la Cité Keur Gorgui à Dakar." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { title: "Notre histoire | Elite Coffee" },
       {
         name: "description",
         content:
-          "Découvrez Elite Coffee : des produits choisis, une hospitalité sincère et un meilleur café au quotidien.",
+          "Découvrez Elite Coffee : restaurant, brunch et glacier à l’entrée de la Cité Keur Gorgui à Dakar.",
       },
     ],
   }),
@@ -26,25 +26,25 @@ function AboutPage() {
   const values: { icon: LucideIcon; title: string; copy: string }[] = [
     {
       icon: Heart,
-      title: "À la Cité Keur Gorgui",
-      copy: "Retrouvez Elite Coffee à Dakar, après la boutique Canal+.",
+      title: "À l’entrée de Keur Gorgui",
+      copy: "Une adresse facile à retrouver sur la route du Collège Sacré-Cœur, près du BRT.",
     },
     {
       icon: Leaf,
-      title: "Une carte variée",
-      copy: "Cafés, thés, cocktails, milkshakes, entrées, crêpes, sandwiches et toasts.",
+      title: "Une cuisine généreuse",
+      copy: "Brunchs, plats du jour, grillades, fruits de mer, pizzas, desserts et boissons.",
     },
     {
       icon: Users,
-      title: "Du matin au soir",
-      copy: "Ouvert du lundi au jeudi de 07h à 23h et du vendredi au dimanche de 07h à minuit.",
+      title: "Du brunch au dîner",
+      copy: "Ouvert de 08h à 23h du lundi au jeudi, puis jusqu’à minuit du vendredi au dimanche.",
     },
   ];
   return (
     <PageShell
       eyebrow="Notre histoire"
-      title="Elite Coffee, à Dakar."
-      description="Un café et restaurant à la Cité Keur Gorgui, après la boutique Canal+."
+      title="Une adresse gourmande à Dakar."
+      description="Restaurant, brunch et glacier à l’entrée de la Cité Keur Gorgui, sur la route du Collège Sacré-Cœur."
     >
       <section className="mx-auto max-w-7xl px-4 pb-20 md:px-6">
         <div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
@@ -60,14 +60,14 @@ function AboutPage() {
               {CONTACT.address} — {CONTACT.landmark}.
             </p>
             <p className="mt-6 text-lg leading-8 text-muted-foreground">
-              Découvrez nos boissons, petits déjeuners et plats à la carte, avec les prix en FCFA.
+              Découvrez une cuisine généreuse et diversifiée : brunchs gourmands, plats du jour, grillades, fruits de mer, pizzas et desserts.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-2 text-sm font-semibold">
-                <Check size={15} className="text-accent" /> Cafés & boissons
+                <Check size={15} className="text-accent" /> Restaurant · brunch · glacier
               </span>
               <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-2 text-sm font-semibold">
-                <Check size={15} className="text-accent" /> Petit déjeuner & déjeuner
+                <Check size={15} className="text-accent" /> Terrasse · livraison · événements privés
               </span>
             </div>
           </div>
@@ -98,9 +98,9 @@ function AboutPage() {
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent">
               Notre carte
             </p>
-            <h2 className="mt-3 font-display text-3xl font-bold">Du café au déjeuner.</h2>
+            <h2 className="mt-3 font-display text-3xl font-bold">Du brunch aux grandes occasions.</h2>
             <p className="mt-4 text-sm leading-6 text-primary-foreground/75">
-              Formule déjeuner à 9 500 FCFA du lundi au vendredi : entrée, plat du jour au choix, dessert et ataya offert.
+              Brunchs gourmands proposés tous les jours de 09h à 17h, avec aussi une carte variée pour déjeuner, dîner ou partager un dessert.
             </p>
           </div>
         </div>

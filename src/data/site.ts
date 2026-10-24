@@ -1,7 +1,13 @@
 import { MENU_CATEGORIES, PRODUCT_CATALOG, type MenuCategory } from "./catalog";
 const u = (id: string, w = 800) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
 
-export const BRAND = { name: "Elite Coffee", handle: "Elite Coffee" };
+export const BRAND = {
+  name: "Elite Coffee",
+  handle: "@elitecoffee_dkr",
+  tagline: "Restaurant · Brunch · Glacier",
+  instagram: "https://www.instagram.com/elitecoffee_dkr/?hl=fr",
+  facebook: "https://www.facebook.com/p/Elite-Coffee-Restaurant-100062907903923/",
+};
 
 export const NAV = [
   { label: "Accueil", id: "home" },
@@ -13,9 +19,9 @@ export const NAV = [
 ];
 
 export const STATS = [
-  { value: "07h", label: "Ouverture tous les jours" },
-  { value: "9 500 FCFA", label: "Formule déjeuner · lundi au vendredi" },
-  { value: "Cité Keur Gorgui", label: "Dakar, Sénégal" },
+  { value: "08h", label: "Ouverture tous les jours" },
+  { value: "09h–17h", label: "Brunch tous les jours" },
+  { value: "BRT", label: "À l’entrée de Keur Gorgui" },
 ];
 export const BEST_SELLERS = PRODUCT_CATALOG.filter(p => ["Café expresso", "Café glacé caramel", "Milkshake fruits rouges"].includes(p.name)).map(p => ({ name: p.name, desc: p.description, price: p.price, img: p.image, tag: p.category, featured: p.name === "Café expresso" }));
 export const CATEGORIES = MENU_CATEGORIES;
@@ -36,11 +42,12 @@ export const INSTAGRAM = [
 export const CONTACT = {
   phone: "+221 33 824 96 93",
   phones: ["+221 33 824 96 93", "+221 77 506 39 39", "+221 77 507 36 36"],
-  address: "Cité Keur Gorgui, Dakar, Sénégal",
-  landmark: "Après la boutique Canal+",
-  hours: ["Lundi–jeudi : 07h – 23h", "Vendredi–dimanche : 07h – 00h"],
+  email: "elitecoffee2021@gmail.com",
+  address: "À l’entrée de la Cité Keur Gorgui, Dakar",
+  landmark: "Sur la route du Collège Sacré-Cœur, près du BRT",
+  hours: ["Lundi–jeudi : 08h – 23h", "Vendredi–dimanche : 08h – 00h"],
   website: "https://www.elite-coffee.eatbu.com",
-  sourceNote: "Coordonnées et horaires issus des infos pratiques de mars 2022 ; carte fournie de mai 2024.",
+  sourceNote: "Horaires et coordonnées vérifiés sur les canaux publics d’Elite Coffee en octobre 2026.",
 };
 
 export const FOOTER = {

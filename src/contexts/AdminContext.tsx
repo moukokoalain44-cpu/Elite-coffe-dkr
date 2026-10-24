@@ -55,14 +55,14 @@ const seedOrders: AdminOrder[] = [
 ];
 
 const initialContent: SiteContent = {
-  heroTitle: "Elite Coffee Dakar",
-  heroDescription: "Cafés, cocktails, crêpes, sandwiches et petits déjeuners à la Cité Keur Gorgui.",
-  address: "Cité Keur Gorgui, après la boutique Canal+",
+  heroTitle: "Restaurant, brunch & glacier à Dakar",
+  heroDescription: "Une cuisine généreuse, des brunchs gourmands et des pauses café à l’entrée de la Cité Keur Gorgui.",
+  address: "À l’entrée de la Cité Keur Gorgui, sur la route du Collège Sacré-Cœur",
   phone: "+221 33 824 96 93",
-  hours: "Lundi–jeudi : 07h – 23h · Vendredi–dimanche : 07h – 00h",
-  lunchOffer: "Formule déjeuner à 9 500 FCFA du lundi au vendredi",
-  aboutTitle: "Un café qui rassemble",
-  aboutText: "Un lieu chaleureux à Dakar pour ralentir, travailler, déjeuner et partager.",
+  hours: "Lundi–jeudi : 08h – 23h · Vendredi–dimanche : 08h – 00h",
+  lunchOffer: "Brunchs gourmands tous les jours de 09h à 17h",
+  aboutTitle: "Une adresse qui rassemble",
+  aboutText: "Un restaurant chaleureux à Dakar pour bruncher, déjeuner, prendre un café ou organiser un moment privé.",
 };
 
 type AdminContextValue = {

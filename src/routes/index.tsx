@@ -18,10 +18,10 @@ export const Route = createFileRoute("/")({
     meta: [
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { title: "Elite Coffee — Café et restaurant à Dakar" },
-      { name: "description", content: "Découvrez la carte Elite Coffee à Dakar : cafés, petits déjeuners, crêpes et sandwiches, avec les prix en FCFA." },
-      { property: "og:title", content: "Elite Coffee — Café et restaurant à Dakar" },
-      { property: "og:description", content: "La carte et les coordonnées Elite Coffee à la Cité Keur Gorgui, Dakar." },
+      { title: "Elite Coffee — Restaurant, brunch & glacier à Dakar" },
+      { name: "description", content: "Elite Coffee est un restaurant, brunch et glacier à Dakar, à l’entrée de la Cité Keur Gorgui : brunchs, plats généreux, cafés et desserts." },
+      { property: "og:title", content: "Elite Coffee — Restaurant, brunch & glacier à Dakar" },
+      { property: "og:description", content: "Restaurant, brunch et glacier à l’entrée de la Cité Keur Gorgui : découvrez la carte, les horaires et réservez votre table." },
     ],
   }),
   component: Index,
@@ -134,7 +134,7 @@ function Navbar({ cart }: { cart: number }) {
             <ShoppingBag size={20} />
             <span className="absolute -right-0.5 -top-0.5 grid h-5 w-5 place-items-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">{cart}</span>
           </a>
-          <a href="#contact" className="hidden text-sm font-semibold text-foreground hover:text-accent md:block">Se connecter</a>
+          <a href="#contact" className="hidden text-sm font-semibold text-foreground hover:text-accent md:block">Nous contacter</a>
           <a href="#menu" className={`${btnPrimary} hidden !px-5 !py-2.5 sm:inline-flex`}>Commander</a>
           <button aria-label="Menu" onClick={() => setOpen(!open)} className="rounded-full p-2 text-foreground hover:bg-secondary lg:hidden">{open ? <X size={22} /> : <Menu size={22} />}</button>
         </div>
@@ -154,9 +154,9 @@ function Hero() {
   return (
     <section id="home" className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-12 md:px-6 md:py-20 lg:grid-cols-2">
       <Reveal>
-        <Pill icon={<Award size={14} />}>Cité Keur Gorgui · Dakar</Pill>
+        <Pill icon={<Award size={14} />}>{BRAND.tagline} · Dakar</Pill>
         <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] text-foreground md:text-7xl">
-          {content.heroTitle} <span className="italic text-accent">Dakar</span>
+          {content.heroTitle}
         </h1>
         <p className="mt-6 max-w-lg text-lg text-muted-foreground">
           {content.heroDescription}
@@ -165,7 +165,7 @@ function Hero() {
           <a href="#menu" className={btnPrimary}>Commander en ligne <ArrowRight size={16} /></a>
           <a href="#menu" className={btnOutline}>Voir la carte</a>
         </div>
-        <p className="mt-8 text-sm text-muted-foreground">{CONTACT.hours.join(" · ")}</p>
+        <p className="mt-8 text-sm text-muted-foreground">{CONTACT.hours.join(" · ")} · Brunch tous les jours de 09h à 17h</p>
       </Reveal>
       <Reveal className="relative mx-auto w-full max-w-md lg:max-w-none">
         <div className="overflow-hidden rounded-[2rem] shadow-lift">
@@ -260,7 +260,7 @@ function Espresso() {
         <Reveal>
           <Pill dark icon={<Award size={14} />}>Notre savoir-faire</Pill>
           <h2 className="mt-4 text-4xl font-bold md:text-5xl">Votre rendez-vous à Dakar</h2>
-          <p className="mt-5 max-w-lg text-primary-foreground/75">Retrouvez Elite Coffee à la Cité Keur Gorgui, après la boutique Canal+.</p>
+          <p className="mt-5 max-w-lg text-primary-foreground/75">Une adresse chaleureuse à l’entrée de la Cité Keur Gorgui, sur la route du Collège Sacré-Cœur et du BRT.</p>
           <ul className="mt-8 space-y-4">
             {CONTACT.hours.concat(CONTACT.phone).map((t) => (
               <li key={t} className="flex items-start gap-3">
@@ -269,6 +269,9 @@ function Espresso() {
               </li>
             ))}
           </ul>
+          <div className="mt-8 flex flex-wrap gap-2">
+            {["Terrasse", "Livraison", "Traiteur", "Événements privés"].map((service) => <span key={service} className="rounded-full bg-primary-foreground/10 px-3 py-1.5 text-xs font-semibold text-primary-foreground/85">{service}</span>)}
+          </div>
           <a href="#menu" className={`${btn} mt-10 bg-card text-primary hover:bg-secondary`}>Découvrir la carte <ArrowRight size={16} /></a>
         </Reveal>
         <Reveal>
@@ -284,8 +287,8 @@ function Gallery() {
     <section id="locations" className="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-28">
       <SectionHead badge={<Pill icon={<Instagram size={14} />}>{BRAND.handle}</Pill>} title="Une pause gourmande" sub="Photos d’illustration." />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
-        {INSTAGRAM.map((g) => (
-          <a key={g.alt} href="#" className="group relative overflow-hidden rounded-2xl">
+          {INSTAGRAM.map((g) => (
+          <a key={g.alt} href={BRAND.instagram} target="_blank" rel="noreferrer" className="group relative overflow-hidden rounded-2xl" aria-label={`Voir ${g.alt} sur Instagram`}>
             <img src={g.img} alt={g.alt} loading="lazy" className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-110" />
             <span className="absolute inset-0 grid place-items-center bg-primary/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <Instagram className="text-primary-foreground" size={32} />
@@ -333,6 +336,7 @@ function Contact() {
   };
   const info = [
     { icon: Phone, label: "Téléphone", lines: CONTACT.phones },
+    { icon: Mail, label: "E-mail", lines: [CONTACT.email] },
     { icon: MapPin, label: "Adresse", lines: [CONTACT.address, CONTACT.landmark] },
     { icon: Clock, label: "Horaires d'ouverture", lines: CONTACT.hours },
   ];
@@ -378,6 +382,16 @@ function Contact() {
 }
 
 function Footer() {
+  const hrefFor = (label: string) => ({
+    Carte: "#menu",
+    Adresses: "#locations",
+    Récompenses: "#rewards",
+    Contact: "#contact",
+    FAQ: "#contact",
+    "Conditions d'utilisation": "/#contact",
+    "Politique de confidentialité": "/#contact",
+    Cookies: "/#contact",
+  })[label] ?? "/#contact";
   return (
     <footer className="bg-foreground text-background">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-5 md:px-6">
@@ -386,12 +400,16 @@ function Footer() {
             <span className="grid h-9 w-9 place-items-center rounded-full bg-accent text-accent-foreground"><Coffee size={18} /></span>
             <span className="font-display text-xl font-bold">{BRAND.name}</span>
           </div>
-          <p className="mt-4 max-w-xs text-sm text-background/65">Elite Coffee — Cité Keur Gorgui, Dakar, Sénégal.</p>
+          <p className="mt-4 max-w-xs text-sm text-background/65">{BRAND.tagline} — à l’entrée de la Cité Keur Gorgui, Dakar.</p>
+          <div className="mt-5 flex gap-4 text-sm font-semibold">
+            <a href={BRAND.instagram} target="_blank" rel="noreferrer" className="text-background/70 transition-colors hover:text-accent">Instagram</a>
+            <a href={BRAND.facebook} target="_blank" rel="noreferrer" className="text-background/70 transition-colors hover:text-accent">Facebook</a>
+          </div>
         </div>
         {Object.entries(FOOTER).map(([h, links]) => (
           <div key={h}>
             <p className="font-semibold">{h}</p>
-            <ul className="mt-4 space-y-2.5">{links.map((l) => <li key={l}><a href="#" className="text-sm text-background/65 transition-colors hover:text-accent">{l}</a></li>)}</ul>
+            <ul className="mt-4 space-y-2.5">{links.map((l) => <li key={l}><a href={hrefFor(l)} className="text-sm text-background/65 transition-colors hover:text-accent">{l}</a></li>)}</ul>
           </div>
         ))}
       </div>

@@ -8,13 +8,13 @@ export const Route = createFileRoute("/locations")({
   head: () => ({
     meta: [
       { property: "og:title", content: "Adresses | Elite Coffee" },
-      { property: "og:description", content: "Trouvez un comptoir Elite Coffee, ses horaires, son téléphone et son itinéraire." },
+      { property: "og:description", content: "Retrouvez Elite Coffee à l’entrée de la Cité Keur Gorgui, sur la route du Collège Sacré-Cœur et du BRT." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { title: "Adresses | Elite Coffee" },
       {
         name: "description",
-        content: "Trouvez un comptoir Elite Coffee, ses horaires, son téléphone et son itinéraire.",
+        content: "Retrouvez Elite Coffee à l’entrée de la Cité Keur Gorgui, sur la route du Collège Sacré-Cœur et du BRT.",
       },
     ],
   }),
@@ -35,7 +35,7 @@ function LocationsPage() {
     <PageShell
       eyebrow="Venez nous voir"
       title="Elite Coffee à Dakar."
-      description="Retrouvez-nous à la Cité Keur Gorgui, après la boutique Canal+."
+      description="Retrouvez-nous à l’entrée de la Cité Keur Gorgui, sur la route du Collège Sacré-Cœur, près du BRT."
     >
       <section className="mx-auto max-w-7xl px-4 pb-20 md:px-6">
         <div className="grid gap-6 lg:grid-cols-2">
@@ -46,7 +46,7 @@ function LocationsPage() {
                   <MapPin />
                 </span>
                 <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-bold text-primary">
-                  Cité Keur Gorgui
+                  Route du BRT
                 </span>
               </div>
               <h2 className="mt-6 font-display text-3xl font-bold">{location.name}</h2>
