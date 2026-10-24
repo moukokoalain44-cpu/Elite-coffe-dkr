@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Plus, ShoppingBag, Star } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, Plus, Search, ShoppingBag, Star } from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { MENU_CATEGORIES, PRODUCT_CATALOG, type MenuCategory } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
@@ -10,121 +10,272 @@ import { formatCFA } from "@/lib/currency";
 export const Route = createFileRoute("/menu")({
   head: () => ({
     meta: [
-      { property: "og:title", content: "Carte | Elite Coffee" },
-      { property: "og:description", content: "Explorez les cafés chauds, cafés glacés, thés, cocktails, entrées, crêpes et pâtisseries d’Elite Coffee." },
+      { property: "og:title", content: "La carte | Elite Coffee" },
+      {
+        property: "og:description",
+        content:
+          "Brunch, cafés, plats, pizzas, jus et douceurs : découvrez la carte complète d’Elite Coffee à Dakar.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { title: "Carte | Elite Coffee" },
+      { title: "La carte | Elite Coffee" },
       {
         name: "description",
         content:
-          "Explorez les cafés chauds, cafés glacés, thés, cocktails, entrées, crêpes et pâtisseries d’Elite Coffee.",
+          "Découvrez la carte complète d’Elite Coffee : petit déjeuner, brunch, plats, boissons et desserts.",
       },
     ],
   }),
   component: MenuPage,
 });
 
+const MENU_MOMENTS: { label: string; categories: MenuCategory[]; intro: string }[] = [
+  {
+    label: "Matin & brunch",
+    categories: ["Petit déjeuner", "Formule déjeuner", "Pâtisseries et viennoiseries"],
+    intro: "Commencer doucement, avec du café, des œufs et nos douceurs maison.",
+  },
+  {
+    label: "À boire",
+    categories: [
+      "Cafés chauds",
+      "Cafés glacés",
+      "Infusions de thé",
+      "Boissons chaudes",
+      "Cocktails",
+      "Smoothies",
+      "Jus locaux",
+      "Jus détox",
+      "Milkshakes",
+      "Boissons gazeuses",
+      "Jus en brique",
+    ],
+    intro: "Des cafés de caractère et des boissons fraîches pour chaque envie.",
+  },
+  {
+    label: "Déjeuner & dîner",
+    categories: [
+      "Entrées",
+      "Cuisine du monde",
+      "Viandes",
+      "Volailles",
+      "Poissons et fruits de mer",
+      "Pâtes",
+      "Pizzas",
+    ],
+    intro: "Une cuisine généreuse, entre recettes du monde, grillades et produits de la mer.",
+  },
+  {
+    label: "Sur le pouce",
+    categories: ["Crêpes", "Club sandwichs et paninis", "Toasts"],
+    intro: "Des assiettes faciles à partager ou à savourer sur le pouce.",
+  },
+  {
+    label: "La touche sucrée",
+    categories: ["Desserts", "Plats du jour ponctuels"],
+    intro: "Finir sur une note gourmande, avec une petite sélection selon les arrivages.",
+  },
+];
+
 function MenuPage() {
-  const [category, setCategory] = useState<MenuCategory>("Cafés chauds");
+  const [category, setCategory] = useState<MenuCategory>("Petit déjeuner");
+  const [query, setQuery] = useState("");
   const { addItem } = useCart();
-  const products = PRODUCT_CATALOG.filter((product) => product.category === category);
+  const normalizedQuery = query.trim().toLocaleLowerCase("fr");
+  const products = useMemo(
+    () =>
+      PRODUCT_CATALOG.filter((product) => {
+        const matchesCategory = product.category === category;
+        const haystack = `${product.name} ${product.description}`.toLocaleLowerCase("fr");
+        return matchesCategory && (!normalizedQuery || haystack.includes(normalizedQuery));
+      }),
+    [category, normalizedQuery],
+  );
+  const activeMoment = MENU_MOMENTS.find((moment) => moment.categories.includes(category));
+  const categoryCount = PRODUCT_CATALOG.filter((product) => product.category === category).length;
+
   return (
     <PageShell
-      eyebrow="La carte"
-      title="Pensée pour votre moment."
-      description="De la première gorgée à la dernière bouchée, chaque produit est préparé avec des ingrédients choisis et beaucoup de soin."
+      eyebrow="Restaurant · Brunch · Glacier"
+      title="La carte, pour tous les moments."
+      description="Du café du matin au dîner, Elite Coffee rassemble une cuisine généreuse, des boissons fraîches et des douceurs à partager à Dakar."
     >
       <section className="mx-auto max-w-7xl px-4 pb-20 md:px-6">
-        <div
-          className="flex flex-wrap gap-2 border-b border-border pb-5"
-          role="tablist"
-          aria-label="Catégories de la carte"
-        >
-          {MENU_CATEGORIES.map((item) => (
-            <button
-              key={item}
-              type="button"
-              role="tab"
-              aria-selected={category === item}
-              onClick={() => setCategory(item)}
-              className={`rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${category === item ? "bg-primary text-primary-foreground shadow-soft" : "bg-secondary text-foreground hover:bg-primary/10"}`}
-            >
-              {item}
-            </button>
-          ))}
+        <div className="grid gap-4 rounded-[2rem] bg-primary p-5 text-primary-foreground shadow-lift md:grid-cols-[1fr_auto] md:items-center md:p-7">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">
+              À la carte aujourd’hui
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-bold">
+              Une envie précise ? Trouvons-la.
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-primary-foreground/75">
+              Parcourez les grands moments de la journée, puis choisissez une catégorie pour voir
+              les produits et leurs tarifs.
+            </p>
+          </div>
+          <div className="flex gap-6 border-t border-primary-foreground/15 pt-4 text-sm md:border-l md:border-t-0 md:pl-7 md:pt-0">
+            <div>
+              <strong className="block font-display text-2xl text-accent">
+                {PRODUCT_CATALOG.length}
+              </strong>
+              <span className="text-primary-foreground/65">produits</span>
+            </div>
+            <div>
+              <strong className="block font-display text-2xl text-accent">
+                {MENU_CATEGORIES.length}
+              </strong>
+              <span className="text-primary-foreground/65">catégories</span>
+            </div>
+          </div>
         </div>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
-            <article
-              key={product.id}
-              className="group overflow-hidden rounded-3xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
-            >
-              <Link to="/menu/$id" params={{ id: product.id }} className="block">
-                <div className="relative overflow-hidden">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    loading="lazy"
-                    className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  {product.featured && (
-                    <span className="absolute left-4 top-4 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">
-                      À la carte
-                    </span>
-                  )}
-                </div>
-              </Link>
-              <div className="p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <Link to="/menu/$id" params={{ id: product.id }}>
-                      <h2 className="font-display text-2xl font-bold hover:text-accent">
-                        {product.name}
-                      </h2>
-                    </Link>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {product.description}
-                    </p>
-                  </div>
-                  <span className="shrink-0 font-display text-xl font-bold text-primary">
-                    {formatCFA(product.price)}
-                  </span>
-                </div>
-                <div className="mt-5 flex items-center justify-between gap-3">
-                  <span className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
-                    <Star size={14} className="fill-star text-star" /> À la carte
-                  </span>
+
+        <div className="mt-10 flex flex-col gap-4 border-b border-border pb-5 md:flex-row md:items-center md:justify-between">
+          <div
+            className="flex gap-2 overflow-x-auto pb-1"
+            role="tablist"
+            aria-label="Moments de la carte"
+          >
+            {MENU_MOMENTS.map((moment) => {
+              const active = moment.categories.includes(category);
+              return (
+                <button
+                  key={moment.label}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setCategory(moment.categories[0]!)}
+                  className={`whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${active ? "bg-primary text-primary-foreground shadow-soft" : "bg-secondary text-foreground hover:bg-primary/10"}`}
+                >
+                  {moment.label}
+                </button>
+              );
+            })}
+          </div>
+          <label className="flex min-w-0 items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm text-muted-foreground md:w-72">
+            <Search size={16} aria-hidden="true" />
+            <span className="sr-only">Rechercher dans la catégorie</span>
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Rechercher un produit"
+              className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
+            />
+          </label>
+        </div>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-[230px_1fr] lg:items-start">
+          <aside className="rounded-3xl bg-secondary/70 p-3 lg:sticky lg:top-28">
+            <p className="px-3 pb-2 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              {activeMoment?.label}
+            </p>
+            <div className="flex gap-2 overflow-x-auto lg:grid lg:overflow-visible">
+              {activeMoment?.categories.map((item) => {
+                const count = PRODUCT_CATALOG.filter((product) => product.category === item).length;
+                return (
                   <button
+                    key={item}
                     type="button"
-                    onClick={() => {
-                      addItem(product);
-                      toast.success(`${product.name} ajouté au panier`);
-                    }}
-                    className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift"
+                    onClick={() => setCategory(item)}
+                    className={`flex shrink-0 items-center justify-between gap-4 rounded-2xl px-3 py-2.5 text-left text-sm font-semibold transition-colors lg:w-full ${category === item ? "bg-card text-primary shadow-soft" : "text-foreground/70 hover:bg-card/70"}`}
                   >
-                    <Plus size={16} /> Ajouter
+                    <span>{item}</span>
+                    <span className="text-xs text-muted-foreground">{count}</span>
                   </button>
-                </div>
+                );
+              })}
+            </div>
+          </aside>
+
+          <div>
+            <div className="mb-5 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent">
+                  {activeMoment?.label}
+                </p>
+                <h2 className="mt-1 font-display text-3xl font-bold">{category}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{activeMoment?.intro}</p>
               </div>
-            </article>
-          ))}
+              <span className="hidden rounded-full bg-secondary px-3 py-1 text-xs font-bold text-primary sm:inline-flex">
+                {categoryCount} choix
+              </span>
+            </div>
+            {products.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-border bg-card p-10 text-center">
+                <p className="font-display text-2xl font-bold">Aucun résultat</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Essayez un autre mot ou explorez la catégorie complète.
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {products.map((product) => (
+                  <article
+                    key={product.id}
+                    className="group flex min-h-44 flex-col overflow-hidden rounded-3xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+                  >
+                    <div className="flex gap-4 p-4">
+                      <Link to="/menu/$id" params={{ id: product.id }} className="block shrink-0">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          loading="lazy"
+                          className="size-24 rounded-2xl object-cover transition-transform duration-500 group-hover:scale-105 sm:size-28"
+                        />
+                      </Link>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-3">
+                          <Link to="/menu/$id" params={{ id: product.id }}>
+                            <h3 className="font-display text-xl font-bold leading-tight hover:text-accent">
+                              {product.name}
+                            </h3>
+                          </Link>
+                          <span className="shrink-0 font-display text-lg font-bold text-primary">
+                            {formatCFA(product.price)}
+                          </span>
+                        </div>
+                        <p className="mt-2 line-clamp-3 text-sm leading-5 text-muted-foreground">
+                          {product.description || "Préparé à la commande par notre équipe."}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/70 px-4 py-3">
+                      <span className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+                        <Star size={13} className="fill-star text-star" />{" "}
+                        {product.availabilityNote ? "À confirmer" : "Disponible"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          addItem(product);
+                          toast.success(`${product.name} ajouté au panier`);
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift"
+                      >
+                        <Plus size={14} /> Ajouter
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-3xl bg-primary p-6 text-primary-foreground sm:flex-row md:p-8">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-3xl bg-secondary p-6 sm:flex-row md:p-8">
           <div className="flex items-center gap-4">
-            <span className="grid size-12 place-items-center rounded-2xl bg-primary-foreground/10">
+            <span className="grid size-12 place-items-center rounded-2xl bg-primary text-primary-foreground">
               <ShoppingBag />
             </span>
             <div>
               <p className="font-display text-xl font-bold">Vous savez déjà quoi choisir ?</p>
-              <p className="text-sm text-primary-foreground/70">
-                Composez votre commande et choisissez le retrait ou la livraison.
+              <p className="text-sm text-muted-foreground">
+                Composez votre commande pour le retrait ou la livraison.
               </p>
             </div>
           </div>
           <Link
             to="/checkout"
-            className="inline-flex items-center gap-2 rounded-full bg-card px-5 py-3 text-sm font-bold text-primary hover:bg-secondary"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground hover:bg-accent"
           >
             Valider la commande <ArrowRight size={16} />
           </Link>
