@@ -26,7 +26,12 @@ const nav = [
   { label: "Analytics", to: "/admin/analytics", icon: Sparkles },
   { label: "Inscriptions", to: "/admin/registrations", icon: Users },
   { label: "Catalogue", to: "/admin/catalog", icon: Package },
-  { label: "Contenu du site", to: "/admin/content", icon: Pencil },
+  { label: "Médias & contenu", to: "/admin/content", icon: Pencil },
+];
+
+const navGroups = [
+  { label: "Pilotage", items: nav.slice(0, 3) },
+  { label: "Gestion du restaurant", items: nav.slice(3) },
 ];
 
 export function AdminLayout() {
@@ -93,21 +98,32 @@ export function AdminLayout() {
               Pilotage
             </p>
           )}
-          <nav className="space-y-1" aria-label="Navigation administrateur">
-            {nav.map(({ label, to, icon: Icon }) => (
-              <AdminNavLink
-                key={to}
-                label={label}
-                to={to}
-                icon={<Icon size={18} />}
-                onClick={() => setOpen(false)}
-                collapsed={collapsed}
-                count={
-                  label === "Inscriptions"
-                    ? registrations.filter((item) => item.status === "pending").length
-                    : undefined
-                }
-              />
+          <nav className="space-y-4" aria-label="Navigation administrateur">
+            {navGroups.map((group) => (
+              <div key={group.label}>
+                {!collapsed && (
+                  <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#a69a90]">
+                    {group.label}
+                  </p>
+                )}
+                <div className="space-y-1">
+                  {group.items.map(({ label, to, icon: Icon }) => (
+                    <AdminNavLink
+                      key={to}
+                      label={label}
+                      to={to}
+                      icon={<Icon size={18} />}
+                      onClick={() => setOpen(false)}
+                      collapsed={collapsed}
+                      count={
+                        label === "Inscriptions"
+                          ? registrations.filter((item) => item.status === "pending").length
+                          : undefined
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </nav>
           <div className="mt-auto space-y-1 border-t border-[#eee8e2] pt-5">

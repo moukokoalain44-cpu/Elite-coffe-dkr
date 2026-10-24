@@ -1,71 +1,122 @@
-import { Link } from "@tanstack/react-router";
-import { X, Coffee } from "lucide-react";
-import { useState } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { BookOpen, HelpCircle, Images, Info, Menu, Utensils, X } from "lucide-react";
+import { useState, type ReactNode } from "react";
+
+const navLinks = [
+  ["Carte", "/menu"],
+  ["Réservation", "/reserver"],
+  ["Bon plan", "/bon-plan"],
+  ["Galerie", "/galerie"],
+  ["Infos", "/infos"],
+  ["Avis", "/avis"],
+  ["FAQ", "/faq"],
+] as const;
+
+const mobileLinks = [
+  ["Carte", "/menu", Utensils],
+  ["Galerie", "/galerie", Images],
+  ["Réserver", "/reserver", BookOpen],
+  ["Infos", "/infos", Info],
+  ["FAQ", "/faq", HelpCircle],
+] as const;
 
 export function SiteHeader() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const links = [
-    ["Carte", "/menu"],
-    ["Brunch", "/brunch"],
-    ["Réserver", "/reserver"],
-    ["Notre histoire", "/about"],
-    ["Adresses", "/locations"],
-  ] as const;
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const active = (to: string) => pathname === to || (to !== "/" && pathname.startsWith(`${to}/`));
   return (
-    <header className="sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:h-20 md:px-6">
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-primary"
-          aria-label="Accueil Elite Coffee"
-        >
-          <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground">
-            <Coffee size={18} />
-          </span>
-          <span>
-            <span className="block font-display text-xl font-bold leading-none">Elite Coffee</span>
-            <span className="hidden text-[9px] font-bold uppercase tracking-[0.18em] text-accent sm:block">
-              Restaurant · Brunch · Glacier
+    <header className="fixed inset-x-0 top-0 z-50">
+      <nav className="border-b border-primary-foreground/10 bg-primary/90 text-primary-foreground shadow-[0_8px_30px_rgba(91,56,38,.12)] backdrop-blur-md">
+        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-4 sm:h-[76px] sm:px-5 md:px-8">
+          <Link
+            to="/"
+            className="group flex items-center gap-2.5"
+            onClick={() => setMobileOpen(false)}
+          >
+            <span className="grid size-10 place-items-center rounded-full border border-accent/70 font-display text-lg italic text-accent transition-colors group-hover:bg-accent group-hover:text-primary">
+              E
             </span>
-          </span>
-        </Link>
-        <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary navigation">
-          {links.map(([label, to]) => (
+            <span>
+              <span className="block font-display text-lg font-bold leading-none tracking-tight sm:text-xl">
+                Elite Coffee
+              </span>
+              <span className="mt-1 block text-[8px] font-medium uppercase tracking-[0.28em] text-accent sm:text-[9px]">
+                Dakar
+              </span>
+            </span>
+          </Link>
+          <div className="hidden items-center gap-1 text-[13px] font-medium text-primary-foreground/70 md:flex">
+            {navLinks.map(([label, to]) => (
+              <Link
+                key={to}
+                to={to}
+                aria-current={active(to) ? "page" : undefined}
+                className={`rounded-full px-3 py-2 hover:bg-primary-foreground/10 hover:text-primary-foreground ${active(to) ? "bg-accent/15 text-accent ring-1 ring-inset ring-accent/40" : ""}`}
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              to="/reserver"
+              className="hidden rounded-sm bg-accent px-4 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-primary shadow-[0_5px_16px_rgba(216,137,74,.18)] transition-all hover:-translate-y-0.5 hover:bg-primary-foreground sm:inline-flex"
+            >
+              Réserver une table
+            </Link>
+            <button
+              type="button"
+              onClick={() => setMobileOpen((open) => !open)}
+              className="rounded-full p-2 text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-accent md:hidden"
+              aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              aria-expanded={mobileOpen}
+            >
+              {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            </button>
+          </div>
+        </div>
+        {mobileOpen && (
+          <div className="border-t border-primary-foreground/10 bg-primary px-4 py-4 md:hidden">
+            <div className="flex flex-col gap-1 text-sm font-medium text-primary-foreground/75">
+              <Link
+                to="/reserver"
+                onClick={() => setMobileOpen(false)}
+                className="mb-2 inline-flex items-center justify-center rounded-xl bg-accent px-4 py-3 text-xs font-bold uppercase tracking-[0.16em] text-primary"
+              >
+                Réserver une table
+              </Link>
+              {navLinks.map(([label, to]) => (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={() => setMobileOpen(false)}
+                  className={`rounded-xl px-3 py-3 hover:bg-primary-foreground/10 hover:text-primary-foreground ${active(to) ? "bg-accent/15 text-accent" : ""}`}
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </nav>
+      <nav
+        aria-label="Navigation mobile"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-primary-foreground/15 bg-primary/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 text-primary-foreground shadow-[0_-10px_35px_rgba(23,33,29,.18)] backdrop-blur md:hidden"
+      >
+        <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
+          {mobileLinks.map(([label, to, Icon]) => (
             <Link
               key={to}
               to={to}
-              className="text-sm font-semibold text-foreground/75 transition-colors hover:text-accent"
+              aria-current={active(to) ? "page" : undefined}
+              className={`relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-semibold ${active(to) ? "bg-accent/15 text-accent ring-1 ring-inset ring-accent/40" : "text-primary-foreground/60 hover:text-primary-foreground"}`}
             >
-              {label}
+              <Icon className="size-4" aria-hidden="true" />
+              <span>{label}</span>
             </Link>
           ))}
-        </nav>
-        <button
-          type="button"
-          aria-label="Ouvrir la navigation"
-          onClick={() => setMenuOpen((open) => !open)}
-          className="rounded-full p-2 text-foreground hover:bg-secondary lg:hidden"
-        >
-          {menuOpen ? <X size={21} /> : <span className="text-lg">☰</span>}
-        </button>
-      </div>
-      {menuOpen && (
-        <nav
-          className="border-t border-border bg-background px-4 py-3 lg:hidden"
-          aria-label="Mobile navigation"
-        >
-          {links.map(([label, to]) => (
-            <Link
-              key={to}
-              to={to}
-              onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-3 font-semibold hover:bg-secondary"
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
-      )}
+        </div>
+      </nav>
     </header>
   );
 }
@@ -76,7 +127,7 @@ export function PageShell({
   title,
   description,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   eyebrow: string;
   title: string;
   description: string;
@@ -85,9 +136,9 @@ export function PageShell({
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <main>
-        <section className="mx-auto max-w-7xl px-4 pb-12 pt-14 md:px-6 md:pb-16 md:pt-20">
+        <section className="mx-auto max-w-7xl px-4 pb-12 pt-32 md:px-6 md:pb-16 md:pt-40">
           <p className="text-xs font-bold uppercase tracking-[0.28em] text-accent">{eyebrow}</p>
-          <h1 className="mt-4 max-w-3xl text-5xl font-extrabold leading-[1.05] text-foreground md:text-7xl">
+          <h1 className="mt-4 max-w-3xl font-display text-5xl font-bold leading-[1.05] text-foreground md:text-7xl">
             {title}
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted-foreground">{description}</p>
@@ -97,18 +148,21 @@ export function PageShell({
       <footer className="border-t border-border bg-secondary/50">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between md:px-6">
           <span>© {new Date().getFullYear()} Elite Coffee</span>
-          <div className="flex gap-5">
-            <Link to="/about" className="hover:text-primary">
-              Notre histoire
+          <div className="flex flex-wrap gap-5">
+            <Link to="/menu" className="hover:text-primary">
+              Carte
             </Link>
-            <Link to="/brunch" className="hover:text-primary">
-              Brunch
+            <Link to="/galerie" className="hover:text-primary">
+              Galerie
             </Link>
             <Link to="/reserver" className="hover:text-primary">
               Réserver
             </Link>
-            <Link to="/locations" className="hover:text-primary">
-              Adresses
+            <Link to="/infos" className="hover:text-primary">
+              Infos
+            </Link>
+            <Link to="/faq" className="hover:text-primary">
+              FAQ
             </Link>
           </div>
         </div>

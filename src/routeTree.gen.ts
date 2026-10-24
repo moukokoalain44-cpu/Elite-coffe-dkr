@@ -12,7 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AvisRouteImport } from './routes/avis'
+import { Route as BonPlanRouteImport } from './routes/bon-plan'
 import { Route as BrunchRouteImport } from './routes/brunch'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as GalerieRouteImport } from './routes/galerie'
+import { Route as InfosRouteImport } from './routes/infos'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as ReserverRouteImport } from './routes/reserver'
@@ -40,9 +45,34 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AvisRoute = AvisRouteImport.update({
+  id: '/avis',
+  path: '/avis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BonPlanRoute = BonPlanRouteImport.update({
+  id: '/bon-plan',
+  path: '/bon-plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BrunchRoute = BrunchRouteImport.update({
   id: '/brunch',
   path: '/brunch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalerieRoute = GalerieRouteImport.update({
+  id: '/galerie',
+  path: '/galerie',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InfosRoute = InfosRouteImport.update({
+  id: '/infos',
+  path: '/infos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LocationsRoute = LocationsRouteImport.update({
@@ -105,7 +135,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/avis': typeof AvisRoute
+  '/bon-plan': typeof BonPlanRoute
   '/brunch': typeof BrunchRoute
+  '/faq': typeof FaqRoute
+  '/galerie': typeof GalerieRoute
+  '/infos': typeof InfosRoute
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
@@ -121,7 +156,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/avis': typeof AvisRoute
+  '/bon-plan': typeof BonPlanRoute
   '/brunch': typeof BrunchRoute
+  '/faq': typeof FaqRoute
+  '/galerie': typeof GalerieRoute
+  '/infos': typeof InfosRoute
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
@@ -139,7 +179,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/avis': typeof AvisRoute
+  '/bon-plan': typeof BonPlanRoute
   '/brunch': typeof BrunchRoute
+  '/faq': typeof FaqRoute
+  '/galerie': typeof GalerieRoute
+  '/infos': typeof InfosRoute
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
@@ -158,7 +203,12 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/avis'
+    | '/bon-plan'
     | '/brunch'
+    | '/faq'
+    | '/galerie'
+    | '/infos'
     | '/locations'
     | '/menu'
     | '/reserver'
@@ -174,7 +224,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/avis'
+    | '/bon-plan'
     | '/brunch'
+    | '/faq'
+    | '/galerie'
+    | '/infos'
     | '/locations'
     | '/menu'
     | '/reserver'
@@ -191,7 +246,12 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/avis'
+    | '/bon-plan'
     | '/brunch'
+    | '/faq'
+    | '/galerie'
+    | '/infos'
     | '/locations'
     | '/menu'
     | '/reserver'
@@ -209,7 +269,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AvisRoute: typeof AvisRoute
+  BonPlanRoute: typeof BonPlanRoute
   BrunchRoute: typeof BrunchRoute
+  FaqRoute: typeof FaqRoute
+  GalerieRoute: typeof GalerieRoute
+  InfosRoute: typeof InfosRoute
   LocationsRoute: typeof LocationsRoute
   MenuRoute: typeof MenuRouteWithChildren
   ReserverRoute: typeof ReserverRoute
@@ -238,11 +303,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/avis': {
+      id: '/avis'
+      path: '/avis'
+      fullPath: '/avis'
+      preLoaderRoute: typeof AvisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bon-plan': {
+      id: '/bon-plan'
+      path: '/bon-plan'
+      fullPath: '/bon-plan'
+      preLoaderRoute: typeof BonPlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/brunch': {
       id: '/brunch'
       path: '/brunch'
       fullPath: '/brunch'
       preLoaderRoute: typeof BrunchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/galerie': {
+      id: '/galerie'
+      path: '/galerie'
+      fullPath: '/galerie'
+      preLoaderRoute: typeof GalerieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/infos': {
+      id: '/infos'
+      path: '/infos'
+      fullPath: '/infos'
+      preLoaderRoute: typeof InfosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/locations': {
@@ -361,7 +461,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
+  AvisRoute: AvisRoute,
+  BonPlanRoute: BonPlanRoute,
   BrunchRoute: BrunchRoute,
+  FaqRoute: FaqRoute,
+  GalerieRoute: GalerieRoute,
+  InfosRoute: InfosRoute,
   LocationsRoute: LocationsRoute,
   MenuRoute: MenuRouteWithChildren,
   ReserverRoute: ReserverRoute,

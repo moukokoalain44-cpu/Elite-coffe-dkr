@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import {
   ArrowRight,
   Award,
+  BookOpen,
   Clock,
   Coffee,
   Heart,
@@ -145,43 +146,62 @@ function Index() {
 function Hero() {
   const { content } = useAdmin();
   const media = useSiteMedia().find((item) => item.slot === "hero");
+  const [scrollOffset, setScrollOffset] = useState(0);
+  useEffect(() => {
+    const onScroll = () => setScrollOffset(Math.min(window.scrollY, 360));
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  const scrollProgress = Math.min(scrollOffset / 180, 1);
   return (
     <section
       id="home"
-      className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-12 md:px-6 md:py-20 lg:grid-cols-2"
+      className="relative isolate min-h-[42rem] overflow-hidden bg-primary text-primary-foreground md:min-h-[48rem]"
     >
-      <Reveal>
-        <Pill icon={<Award size={14} />}>{BRAND.tagline} · Dakar</Pill>
-        <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] text-foreground md:text-7xl">
-          {content.heroTitle}
-        </h1>
-        <p className="mt-6 max-w-lg text-lg text-muted-foreground">{content.heroDescription}</p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <a href="/reserver" className={btnPrimary}>
-            Réserver une table <ArrowRight size={16} />
-          </a>
-          <a href="#menu" className={btnOutline}>
-            Voir la carte
-          </a>
-        </div>
-        <p className="mt-8 text-sm text-muted-foreground">
-          {CONTACT.hours.join(" · ")} · Brunch tous les jours de 09h à 17h
-        </p>
-      </Reveal>
-      <Reveal className="relative mx-auto w-full max-w-md lg:max-w-none">
-        <div className="overflow-hidden rounded-[2rem] shadow-lift">
-          <video
-            src={media?.url}
-            poster="/assets/instagram/hero-brunch.jpg"
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="aspect-[4/5] w-full object-cover"
-            aria-label={media?.alt_text ?? "Ambiance Elite Coffee"}
-          />
-        </div>
-      </Reveal>
+      <video
+        src={media?.url}
+        poster="/assets/instagram/hero-brunch.jpg"
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 z-0 size-full object-cover object-center transition-transform duration-300"
+        style={{
+          filter: `blur(${Math.round(scrollProgress * 5)}px)`,
+          transform: `translate3d(0, ${scrollProgress * 18}px, 0) scale(${1.02 + scrollProgress * 0.035})`,
+        }}
+        aria-label={media?.alt_text ?? "Ambiance Elite Coffee"}
+      />
+      <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(91,56,38,.52)_0%,rgba(91,56,38,.2)_42%,rgba(32,26,23,.82)_100%)]" />
+      <div className="relative z-20 mx-auto flex min-h-[42rem] max-w-7xl items-center justify-center px-5 pb-20 pt-32 text-center md:min-h-[48rem] md:px-8 md:pb-24">
+        <Reveal className="flex max-w-4xl flex-col items-center">
+          <p className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/25 bg-primary/20 px-4 py-2 text-[10px] font-bold uppercase tracking-[.2em] text-primary-foreground/85 backdrop-blur-sm">
+            <span className="size-2 rounded-full bg-accent shadow-[0_0_0_4px_rgba(216,137,74,.18)]" />
+            {BRAND.tagline} · Dakar
+          </p>
+          <h1 className="mt-7 max-w-4xl font-display text-5xl font-bold leading-none tracking-[-.06em] text-primary-foreground sm:text-6xl md:text-8xl">
+            {content.heroTitle}
+          </h1>
+          <p className="mt-6 max-w-2xl text-base leading-7 text-primary-foreground/75 sm:text-lg">
+            {content.heroDescription}
+          </p>
+          <div className="mt-9 flex flex-wrap justify-center gap-3">
+            <a
+              href="/reserver"
+              className="inline-flex items-center gap-2 rounded-sm bg-accent px-6 py-3 text-xs font-bold uppercase tracking-[.16em] text-primary shadow-[0_8px_20px_rgba(216,137,74,.22)] transition hover:-translate-y-0.5 hover:bg-primary-foreground"
+            >
+              <BookOpen size={15} /> Réserver une table
+            </a>
+            <a
+              href="#menu"
+              className="inline-flex items-center gap-2 rounded-sm border border-primary-foreground/35 bg-primary/20 px-6 py-3 text-xs font-bold uppercase tracking-[.16em] text-primary-foreground backdrop-blur-sm transition hover:bg-primary-foreground/10"
+            >
+              <ArrowRight size={15} /> Voir la carte
+            </a>
+          </div>
+        </Reveal>
+      </div>
     </section>
   );
 }
