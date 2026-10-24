@@ -58,3 +58,24 @@ create policy "insert_reservations" on public.reservations for insert with check
 create policy "admin_orders"        on public.orders        for all using (auth.role() = 'authenticated');
 create policy "admin_order_items"   on public.order_items   for all using (auth.role() = 'authenticated');
 create policy "admin_reservations"  on public.reservations  for all using (auth.role() = 'authenticated');
+
+-- ── Catalogue public ────────────────────────────────────────
+create table if not exists public.menu_products (
+  id                text primary key,
+  name              text not null,
+  category          text not null,
+  price             integer not null check (price >= 0),
+  description       text not null default '',
+  price_options     jsonb not null default '[]'::jsonb,
+  availability_note text,
+  featured          boolean not null default false,
+  image_url         text,
+  is_visible        boolean not null default true,
+  sort_order        integer not null default 0,
+  updated_at        timestamptz not null default now()
+);
+
+alter table public.menu_products enable row level security;
+create policy "public_read_menu_products" on public.menu_products for select using (is_visible = true);
+create policy "admin_manage_menu_products" on public.menu_products for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create index if not exists menu_products_category_order_idx on public.menu_products (category, sort_order);

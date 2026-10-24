@@ -13,7 +13,6 @@ export function SiteHeader() {
     ["Carte", "/menu"],
     ["Brunch", "/brunch"],
     ["Réserver", "/reserver"],
-    ["Récompenses", "/rewards"],
     ["Notre histoire", "/about"],
     ["Adresses", "/locations"],
   ] as const;
@@ -29,7 +28,14 @@ export function SiteHeader() {
             <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground">
               <Coffee size={18} />
             </span>
-            <span><span className="block font-display text-xl font-bold leading-none">Elite Coffee</span><span className="hidden text-[9px] font-bold uppercase tracking-[0.18em] text-accent sm:block">Restaurant · Brunch · Glacier</span></span>
+            <span>
+              <span className="block font-display text-xl font-bold leading-none">
+                Elite Coffee
+              </span>
+              <span className="hidden text-[9px] font-bold uppercase tracking-[0.18em] text-accent sm:block">
+                Restaurant · Brunch · Glacier
+              </span>
+            </span>
           </Link>
           <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary navigation">
             {links.map(([label, to]) => (
@@ -111,7 +117,9 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
       <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-background p-5 shadow-lift">
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">Votre commande</p>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">
+              Votre commande
+            </p>
             <h2 className="mt-1 font-display text-2xl font-bold">Panier</h2>
           </div>
           <button
@@ -261,9 +269,6 @@ export function PageShell({
             </Link>
             <Link to="/locations" className="hover:text-primary">
               Adresses
-            </Link>
-            <Link to="/rewards" className="hover:text-primary">
-              Récompenses
             </Link>
           </div>
         </div>

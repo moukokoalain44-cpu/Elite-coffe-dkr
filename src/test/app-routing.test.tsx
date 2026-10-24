@@ -10,7 +10,7 @@ describe("App routing", () => {
   it("matches all primary storefront pages instead of falling back to not found", () => {
     const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
 
-    for (const path of ["/", "/menu", "/menu/velvet-latte", "/checkout", "/rewards", "/about", "/locations"]) {
+    for (const path of ["/", "/menu", "/menu/velvet-latte", "/checkout", "/about", "/locations"]) {
       const matches = router.matchRoutes(path);
       expect(matches.at(-1)?.routeId, path).not.toBe(rootRouteId);
     }

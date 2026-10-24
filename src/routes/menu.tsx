@@ -2,8 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Plus, Search, ShoppingBag, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { MENU_CATEGORIES, PRODUCT_CATALOG, type MenuCategory } from "@/data/catalog";
+import { MENU_CATEGORIES, type MenuCategory } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
+import { useMenuCatalog } from "@/hooks/use-menu-catalog";
 import { PageShell } from "@/components/SiteChrome";
 import { formatCFA } from "@/lib/currency";
 
@@ -80,19 +81,20 @@ const MENU_MOMENTS: { label: string; categories: MenuCategory[]; intro: string }
 function MenuPage() {
   const [category, setCategory] = useState<MenuCategory>("Petit déjeuner");
   const [query, setQuery] = useState("");
+  const { products: menuProducts, isLoading: menuLoading, isRemote } = useMenuCatalog();
   const { addItem } = useCart();
   const normalizedQuery = query.trim().toLocaleLowerCase("fr");
   const products = useMemo(
     () =>
-      PRODUCT_CATALOG.filter((product) => {
+      menuProducts.filter((product) => {
         const matchesCategory = product.category === category;
         const haystack = `${product.name} ${product.description}`.toLocaleLowerCase("fr");
         return matchesCategory && (!normalizedQuery || haystack.includes(normalizedQuery));
       }),
-    [category, normalizedQuery],
+    [category, menuProducts, normalizedQuery],
   );
   const activeMoment = MENU_MOMENTS.find((moment) => moment.categories.includes(category));
-  const categoryCount = PRODUCT_CATALOG.filter((product) => product.category === category).length;
+  const categoryCount = menuProducts.filter((product) => product.category === category).length;
 
   return (
     <PageShell
@@ -117,7 +119,7 @@ function MenuPage() {
           <div className="flex gap-6 border-t border-primary-foreground/15 pt-4 text-sm md:border-l md:border-t-0 md:pl-7 md:pt-0">
             <div>
               <strong className="block font-display text-2xl text-accent">
-                {PRODUCT_CATALOG.length}
+                {menuProducts.length}
               </strong>
               <span className="text-primary-foreground/65">produits</span>
             </div>
@@ -164,6 +166,13 @@ function MenuPage() {
           </label>
         </div>
 
+        <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
+          {menuLoading
+            ? "Synchronisation de la carte…"
+            : isRemote
+              ? "Carte synchronisée avec Supabase"
+              : "Mode hors connexion"}
+        </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-[230px_1fr] lg:items-start">
           <aside className="rounded-3xl bg-secondary/70 p-3 lg:sticky lg:top-28">
             <p className="px-3 pb-2 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
@@ -171,7 +180,7 @@ function MenuPage() {
             </p>
             <div className="flex gap-2 overflow-x-auto lg:grid lg:overflow-visible">
               {activeMoment?.categories.map((item) => {
-                const count = PRODUCT_CATALOG.filter((product) => product.category === item).length;
+                const count = menuProducts.filter((product) => product.category === item).length;
                 return (
                   <button
                     key={item}

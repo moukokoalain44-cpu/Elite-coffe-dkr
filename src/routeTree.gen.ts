@@ -17,7 +17,6 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as ReserverRouteImport } from './routes/reserver'
-import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
@@ -65,11 +64,6 @@ const MenuRoute = MenuRouteImport.update({
 const ReserverRoute = ReserverRouteImport.update({
   id: '/reserver',
   path: '/reserver',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RewardsRoute = RewardsRouteImport.update({
-  id: '/rewards',
-  path: '/rewards',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -122,7 +116,6 @@ export interface FileRoutesByFullPath {
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
-  '/rewards': typeof RewardsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
@@ -140,7 +133,6 @@ export interface FileRoutesByTo {
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
-  '/rewards': typeof RewardsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
@@ -160,7 +152,6 @@ export interface FileRoutesById {
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
-  '/rewards': typeof RewardsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
@@ -181,7 +172,6 @@ export interface FileRouteTypes {
     | '/locations'
     | '/menu'
     | '/reserver'
-    | '/rewards'
     | '/admin/analytics'
     | '/admin/catalog'
     | '/admin/content'
@@ -199,7 +189,6 @@ export interface FileRouteTypes {
     | '/locations'
     | '/menu'
     | '/reserver'
-    | '/rewards'
     | '/admin/analytics'
     | '/admin/catalog'
     | '/admin/content'
@@ -218,7 +207,6 @@ export interface FileRouteTypes {
     | '/locations'
     | '/menu'
     | '/reserver'
-    | '/rewards'
     | '/admin/analytics'
     | '/admin/catalog'
     | '/admin/content'
@@ -238,7 +226,6 @@ export interface RootRouteChildren {
   LocationsRoute: typeof LocationsRoute
   MenuRoute: typeof MenuRouteWithChildren
   ReserverRoute: typeof ReserverRoute
-  RewardsRoute: typeof RewardsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -297,13 +284,6 @@ declare module '@tanstack/react-router' {
       path: '/reserver'
       fullPath: '/reserver'
       preLoaderRoute: typeof ReserverRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rewards': {
-      id: '/rewards'
-      path: '/rewards'
-      fullPath: '/rewards'
-      preLoaderRoute: typeof RewardsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -406,7 +386,6 @@ const rootRouteChildren: RootRouteChildren = {
   LocationsRoute: LocationsRoute,
   MenuRoute: MenuRouteWithChildren,
   ReserverRoute: ReserverRoute,
-  RewardsRoute: RewardsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

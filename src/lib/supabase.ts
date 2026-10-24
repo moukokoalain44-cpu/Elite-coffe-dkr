@@ -14,7 +14,32 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "");
 
-// ── Types ────────────────────────────────────────────────────────────────────
+export type MenuProductRow = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  description: string;
+  price_options: { label: string; price: number; minQuantity?: number }[];
+  availability_note: string | null;
+  featured: boolean;
+  image_url: string | null;
+  is_visible: boolean;
+  sort_order: number;
+};
+
+export async function fetchMenuProducts(): Promise<MenuProductRow[]> {
+  const { data, error } = await supabase
+    .from("menu_products")
+    .select(
+      "id,name,category,price,description,price_options,availability_note,featured,image_url,is_visible,sort_order",
+    )
+    .eq("is_visible", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as MenuProductRow[];
+}
 
 export type OrderInsert = {
   name: string;
@@ -45,36 +70,24 @@ export type ReservationInsert = {
   message?: string;
 };
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-/** Crée une commande + ses lignes dans Supabase */
 export async function createOrder(
   order: OrderInsert,
   items: Omit<OrderItemInsert, "order_id">[],
 ): Promise<string> {
-  const { data, error } = await supabase
-    .from("orders")
-    .insert(order)
-    .select("id")
-    .single();
+  const { data, error } = await supabase.from("orders").insert(order).select("id").single();
 
   if (error) throw new Error(error.message);
 
   const orderId = data.id as string;
-
   const { error: itemsError } = await supabase
     .from("order_items")
     .insert(items.map((item) => ({ ...item, order_id: orderId })));
 
   if (itemsError) throw new Error(itemsError.message);
-
   return orderId;
 }
 
-/** Crée une réservation dans Supabase */
-export async function createReservation(
-  reservation: ReservationInsert,
-): Promise<string> {
+export async function createReservation(reservation: ReservationInsert): Promise<string> {
   const { data, error } = await supabase
     .from("reservations")
     .insert(reservation)
