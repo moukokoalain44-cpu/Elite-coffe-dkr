@@ -1,6 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env["VITE_SUPABASE_URL"] as string;
+const configuredSupabaseUrl = import.meta.env["VITE_SUPABASE_URL"] as string;
+// Supabase JS attend l’URL racine du projet, pas l’URL REST `/rest/v1/`.
+// Cette normalisation garde la connexion compatible avec l’environnement Vercel existant.
+const supabaseUrl = configuredSupabaseUrl?.replace(/\/rest\/v1\/?$/, "");
 const supabaseAnonKey = import.meta.env["VITE_SUPABASE_ANON_KEY"] as string;
 
 if (!supabaseUrl || !supabaseAnonKey) {
