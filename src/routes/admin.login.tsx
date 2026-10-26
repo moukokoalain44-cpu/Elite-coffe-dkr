@@ -5,6 +5,28 @@ import { useAdminAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/admin/login")({ component: AdminLoginPage });
 
+function getLoginErrorMessage(cause: unknown) {
+  const message = cause instanceof Error ? cause.message.toLowerCase() : "";
+  if (
+    message.includes("invalid login credentials") ||
+    message.includes("invalid credentials") ||
+    message.includes("email or password") ||
+    message.includes("invalid user credentials")
+  ) {
+    return "Adresse e-mail ou mot de passe incorrect. Vérifiez vos identifiants puis réessayez.";
+  }
+  if (message.includes("email not confirmed")) {
+    return "Votre adresse e-mail n’est pas encore confirmée. Vérifiez votre boîte de réception avant de vous connecter.";
+  }
+  if (message.includes("too many requests") || message.includes("rate limit")) {
+    return "Trop de tentatives de connexion. Patientez quelques instants avant de réessayer.";
+  }
+  if (message.includes("network") || message.includes("fetch")) {
+    return "Connexion au service impossible. Vérifiez votre connexion Internet puis réessayez.";
+  }
+  return "Impossible de vous connecter pour le moment. Vérifiez vos identifiants puis réessayez.";
+}
+
 function AdminLoginPage() {
   const navigate = useNavigate();
   const { session, loading, signIn } = useAdminAuth();
@@ -27,7 +49,7 @@ function AdminLoginPage() {
       await signIn(email.trim(), password);
       await navigate({ to: "/admin" });
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Impossible de vous connecter.");
+      setError(getLoginErrorMessage(cause));
     } finally {
       setSubmitting(false);
     }
