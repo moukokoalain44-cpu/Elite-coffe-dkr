@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AvisRouteImport } from './routes/avis'
 import { Route as BonPlanRouteImport } from './routes/bon-plan'
 import { Route as BrunchRouteImport } from './routes/brunch'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -44,11 +43,6 @@ const AboutRoute = AboutRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AvisRoute = AvisRouteImport.update({
-  id: '/avis',
-  path: '/avis',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BonPlanRoute = BonPlanRouteImport.update({
@@ -141,7 +135,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
-  '/avis': typeof AvisRoute
   '/bon-plan': typeof BonPlanRoute
   '/brunch': typeof BrunchRoute
   '/faq': typeof FaqRoute
@@ -163,7 +156,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/avis': typeof AvisRoute
   '/bon-plan': typeof BonPlanRoute
   '/brunch': typeof BrunchRoute
   '/faq': typeof FaqRoute
@@ -187,7 +179,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
-  '/avis': typeof AvisRoute
   '/bon-plan': typeof BonPlanRoute
   '/brunch': typeof BrunchRoute
   '/faq': typeof FaqRoute
@@ -212,7 +203,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
-    | '/avis'
     | '/bon-plan'
     | '/brunch'
     | '/faq'
@@ -234,7 +224,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/avis'
     | '/bon-plan'
     | '/brunch'
     | '/faq'
@@ -257,7 +246,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
-    | '/avis'
     | '/bon-plan'
     | '/brunch'
     | '/faq'
@@ -281,7 +269,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
-  AvisRoute: typeof AvisRoute
   BonPlanRoute: typeof BonPlanRoute
   BrunchRoute: typeof BrunchRoute
   FaqRoute: typeof FaqRoute
@@ -313,13 +300,6 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/avis': {
-      id: '/avis'
-      path: '/avis'
-      fullPath: '/avis'
-      preLoaderRoute: typeof AvisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bon-plan': {
@@ -482,7 +462,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
-  AvisRoute: AvisRoute,
   BonPlanRoute: BonPlanRoute,
   BrunchRoute: BrunchRoute,
   FaqRoute: FaqRoute,

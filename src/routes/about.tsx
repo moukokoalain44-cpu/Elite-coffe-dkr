@@ -3,12 +3,17 @@ import { ArrowRight, Check, Leaf, Heart, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { CONTACT } from "@/data/site";
 import { PageShell } from "@/components/SiteChrome";
+import { useSiteMedia } from "@/hooks/use-site-media";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { property: "og:title", content: "Notre histoire | Elite Coffee" },
-      { property: "og:description", content: "Découvrez Elite Coffee : restaurant, brunch et glacier à l’entrée de la Cité Keur Gorgui à Dakar." },
+      {
+        property: "og:description",
+        content:
+          "Découvrez Elite Coffee : restaurant, brunch et glacier à l’entrée de la Cité Keur Gorgui à Dakar.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { title: "Notre histoire | Elite Coffee" },
@@ -23,6 +28,10 @@ export const Route = createFileRoute("/about")({
 });
 
 function AboutPage() {
+  const media = useSiteMedia();
+  const aboutInterior = media.find((item) => item.id === "about-interior");
+  const aboutCoffee = media.find((item) => item.id === "about-coffee");
+  const aboutRoom = media.find((item) => item.id === "about-room");
   const values: { icon: LucideIcon; title: string; copy: string }[] = [
     {
       icon: Heart,
@@ -50,8 +59,8 @@ function AboutPage() {
         <div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
           <div className="overflow-hidden rounded-[2rem] shadow-lift">
             <img
-              src="https://images.unsplash.com/photo-1497515114629-f71d768fd07c?auto=format&fit=crop&w=1000&q=82"
-              alt="Café — photo d’illustration"
+              src={aboutInterior?.url}
+              alt={aboutInterior?.alt_text ?? "Intérieur chaleureux d’Elite Coffee"}
               className="aspect-[4/5] w-full object-cover"
             />
           </div>
@@ -60,14 +69,15 @@ function AboutPage() {
               {CONTACT.address} — {CONTACT.landmark}.
             </p>
             <p className="mt-6 text-lg leading-8 text-muted-foreground">
-              Découvrez une cuisine généreuse et diversifiée : brunchs gourmands, plats du jour, grillades, fruits de mer, pizzas et desserts.
+              Découvrez une cuisine généreuse et diversifiée : brunchs gourmands, plats du jour,
+              grillades, fruits de mer, pizzas et desserts.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-2 text-sm font-semibold">
                 <Check size={15} className="text-accent" /> Restaurant · brunch · glacier
               </span>
               <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-2 text-sm font-semibold">
-                <Check size={15} className="text-accent" /> Terrasse · livraison · événements privés
+                <Check size={15} className="text-accent" /> Terrasse · événements privés
               </span>
             </div>
           </div>
@@ -85,22 +95,23 @@ function AboutPage() {
         </div>
         <div className="mt-16 grid gap-6 md:grid-cols-3">
           <img
-            src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=700&q=82"
-            alt="Coffee beans"
+            src={aboutCoffee?.url}
+            alt={aboutCoffee?.alt_text ?? "Café Elite Coffee"}
             className="aspect-[4/3] w-full rounded-3xl object-cover"
           />
           <img
-            src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=700&q=82"
-            alt="Intérieur de café — photo d’illustration"
+            src={aboutRoom?.url}
+            alt={aboutRoom?.alt_text ?? "Salle Elite Coffee"}
             className="aspect-[4/3] w-full rounded-3xl object-cover md:translate-y-10"
           />
           <div className="flex flex-col justify-center rounded-3xl bg-primary p-7 text-primary-foreground md:p-9">
-            <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent">
-              Notre carte
-            </p>
-            <h2 className="mt-3 font-display text-3xl font-bold">Du brunch aux grandes occasions.</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent">Notre carte</p>
+            <h2 className="mt-3 font-display text-3xl font-bold">
+              Du brunch aux grandes occasions.
+            </h2>
             <p className="mt-4 text-sm leading-6 text-primary-foreground/75">
-              Brunchs gourmands proposés tous les jours de 09h à 17h, avec aussi une carte variée pour déjeuner, dîner ou partager un dessert.
+              Brunchs gourmands proposés tous les jours de 09h à 17h, avec aussi une carte variée
+              pour déjeuner, dîner ou partager un dessert.
             </p>
           </div>
         </div>

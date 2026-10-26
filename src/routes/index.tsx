@@ -1,19 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { toast } from "sonner";
-import {
-  ArrowRight,
-  Award,
-  BookOpen,
-  Clock,
-  Coffee,
-  Heart,
-  Instagram,
-  Mail,
-  MapPin,
-  Phone,
-  Star,
-} from "lucide-react";
+import { ArrowRight, Award, BookOpen, Coffee, Heart, Star } from "lucide-react";
 import { BRAND, CONTACT, FOOTER, MENU_SECTIONS, STATS } from "@/data/site";
 import { type Product } from "@/data/catalog";
 import { useMenuCatalog } from "@/hooks/use-menu-catalog";
@@ -133,10 +120,8 @@ function Index() {
       <main>
         <Hero />
         <Stats />
-        <BestSellers products={products} />
-        <MenuFilter products={products} />
+        <DishShowcase products={products} />
         <Gallery />
-        <Contact />
       </main>
       <Footer />
     </div>
@@ -145,7 +130,9 @@ function Index() {
 
 function Hero() {
   const { content } = useAdmin();
-  const media = useSiteMedia().find((item) => item.slot === "hero");
+  const siteMedia = useSiteMedia();
+  const media = siteMedia.find((item) => item.id === "hero-main");
+  const posterMedia = siteMedia.find((item) => item.id === "gallery-1");
   const [scrollOffset, setScrollOffset] = useState(0);
   useEffect(() => {
     const onScroll = () => setScrollOffset(Math.min(window.scrollY, 360));
@@ -161,7 +148,7 @@ function Hero() {
     >
       <video
         src={media?.url}
-        poster="/assets/instagram/hero-brunch.jpg"
+        poster={posterMedia?.url ?? "/assets/instagram/hero-brunch.jpg"}
         autoPlay
         muted
         loop
@@ -221,53 +208,45 @@ function Stats() {
   );
 }
 
-function BestSellers({ products }: { products: Product[] }) {
-  const picks = ["Café expresso", "Café glacé caramel", "Milkshake fruits rouges"]
-    .map((name) => products.find((product) => product.name === name))
-    .filter((product): product is Product => Boolean(product));
+function DishShowcase({ products }: { products: Product[] }) {
+  const [slides, setSlides] = useState<Product[]>([]);
+  useEffect(() => {
+    if (!products.length) return;
+    const choose = () => {
+      const shuffled = [...products].sort(() => Math.random() - 0.5);
+      setSlides(shuffled.slice(0, 3));
+    };
+    choose();
+    const timer = window.setInterval(choose, 4200);
+    return () => window.clearInterval(timer);
+  }, [products]);
+  const visible = slides.length ? slides : products.slice(0, 3);
   return (
-    <section id="about" className="mx-auto max-w-7xl px-4 py-20 md:px-6 md:py-28">
+    <section id="plats" className="mx-auto max-w-7xl px-4 py-20 md:px-6 md:py-28">
       <SectionHead
         badge={<Pill icon={<Heart size={14} />}>À la carte</Pill>}
-        title="Les favoris de la maison"
-        sub="Une sélection de boissons préparées à la commande, directement depuis notre carte."
+        title="Découvrez nos plats"
+        sub="Trois envies, trois images de la carte, renouvelées au fil du temps."
       />
-      <div className="grid gap-6 md:grid-cols-3">
-        {picks.map((b, index) => (
-          <Reveal key={b.name}>
-            <article
-              className={`group h-full overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift ${index === 0 ? "bg-primary text-primary-foreground shadow-lift" : "bg-card text-card-foreground shadow-soft"}`}
-            >
-              <div className="relative overflow-hidden rounded-xl">
-                <img
-                  src={b.image}
-                  alt={b.name}
-                  loading="lazy"
-                  className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <span className="absolute left-3 top-3 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
-                  {b.category}
+      <div className="flex snap-x gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-3 md:overflow-visible">
+        {visible.map((dish, index) => (
+          <Reveal key={`${dish.id}-${index}`} className="min-w-[78vw] snap-center md:min-w-0">
+            <article className="group relative overflow-hidden rounded-[1.75rem] bg-primary text-primary-foreground shadow-lift">
+              <img
+                src={dish.image}
+                alt={dish.name}
+                className="aspect-[4/5] w-full object-cover transition duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/20 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
+                <span className="rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-[.14em] text-primary">
+                  {dish.category}
                 </span>
-              </div>
-              <div className="px-2 pb-2 pt-5">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold">{b.name}</h3>
-                  <Stars size={13} />
-                </div>
-                <p
-                  className={`mt-2 text-sm ${index === 0 ? "text-primary-foreground/75" : "text-muted-foreground"}`}
-                >
-                  {b.description}
+                <h3 className="mt-3 font-display text-2xl font-bold">{dish.name}</h3>
+                <p className="mt-1 line-clamp-2 text-sm text-primary-foreground/75">
+                  {dish.description || "Préparé à la commande."}
                 </p>
-                <div className="mt-6 flex items-center justify-between">
-                  <span className="font-display text-2xl font-bold">{formatCFA(b.price)}</span>
-                  <a
-                    href="/menu"
-                    className={`${btn} !py-2.5 ${index === 0 ? "bg-card text-primary hover:bg-secondary" : "bg-primary text-primary-foreground hover:shadow-lift"}`}
-                  >
-                    Voir la carte
-                  </a>
-                </div>
+                <p className="mt-4 font-display text-xl font-bold">{formatCFA(dish.price)}</p>
               </div>
             </article>
           </Reveal>
@@ -277,88 +256,8 @@ function BestSellers({ products }: { products: Product[] }) {
   );
 }
 
-function MenuFilter({ products }: { products: Product[] }) {
-  const defaultSection = MENU_SECTIONS[0]!;
-  const [section, setSection] = useState(defaultSection.label);
-  const current = MENU_SECTIONS.find((item) => item.label === section) ?? defaultSection;
-  const [cat, setCat] = useState(current.categories[0]!);
-  const items = products.filter((product) => product.category === cat);
-  const chooseSection = (label: string) => {
-    const next = MENU_SECTIONS.find((item) => item.label === label) ?? defaultSection;
-    setSection(next.label);
-    setCat(next.categories[0]!);
-  };
-  return (
-    <section id="menu" className="bg-secondary/60 py-20 md:py-28">
-      <div className="mx-auto max-w-7xl px-4 md:px-6">
-        <SectionHead
-          badge={<Pill icon={<Coffee size={14} />}>Notre carte</Pill>}
-          title="Découvrez notre carte"
-          sub="Choisissez d’abord votre moment, puis la catégorie qui vous fait envie."
-        />
-        <div className="grid gap-8 lg:grid-cols-[220px_1fr] lg:items-start">
-          <aside className="rounded-3xl bg-card p-3 shadow-soft lg:sticky lg:top-28">
-            <p className="px-3 pb-2 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
-              Par moment
-            </p>
-            {MENU_SECTIONS.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => chooseSection(item.label)}
-                className={`block w-full rounded-2xl px-3 py-3 text-left text-sm font-semibold transition-colors ${section === item.label ? "bg-primary text-primary-foreground" : "hover:bg-secondary"}`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </aside>
-          <div>
-            <div className="mb-6 flex flex-wrap gap-2">
-              {current.categories.map((item) => (
-                <button
-                  key={item}
-                  onClick={() => setCat(item)}
-                  className={`${btn} !px-4 !py-2.5 text-xs ${cat === item ? "bg-primary text-primary-foreground shadow-soft" : "bg-card text-foreground hover:bg-primary/10"}`}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-            <p className="mb-6 max-w-2xl text-sm text-muted-foreground">{current.intro}</p>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {items.map((m) => (
-                <article
-                  key={m.id}
-                  className={`${card} group flex items-center gap-4 p-4 transition-all hover:-translate-y-1 hover:shadow-lift`}
-                >
-                  <img
-                    src={m.image}
-                    alt={m.name}
-                    loading="lazy"
-                    className="h-24 w-24 shrink-0 rounded-xl object-cover"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-lg font-bold text-foreground">{m.name}</h3>
-                    <p className="line-clamp-2 text-sm text-muted-foreground">
-                      {m.description || "Préparé à la commande."}
-                    </p>
-                    <div className="mt-3 flex items-center justify-between">
-                      <span className="font-display text-xl font-bold text-primary">
-                        {formatCFA(m.price)}
-                      </span>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Gallery() {
-  const media = useSiteMedia().filter((item) => item.slot.startsWith("gallery-"));
+  const media = useSiteMedia().filter((item) => item.id.startsWith("gallery-"));
   return (
     <section id="locations" className="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-28">
       <SectionHead
@@ -402,142 +301,17 @@ function Field({
 const input =
   "w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-accent focus:ring-2 focus:ring-ring/30";
 
-function Contact() {
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    const v = (k: string) => String(f.get(k) ?? "").trim();
-    const err: Record<string, string> = {};
-    if (v("name").length < 2) err["name"] = "Veuillez saisir votre nom";
-    if (!/^\S+@\S+\.\S+$/.test(v("email"))) err["email"] = "Veuillez saisir un e-mail valide";
-    if (v("subject").length < 2) err["subject"] = "Veuillez ajouter un objet";
-    if (v("message").length < 10)
-      err["message"] = "Le message doit contenir au moins 10 caractères";
-    setErrors(err);
-    if (Object.keys(err).length) {
-      toast.error("Veuillez corriger les champs en surbrillance");
-      return;
-    }
-    toast.success("Merci ! Nous vous répondrons sous 24 heures.");
-    e.currentTarget.reset();
-  };
-  const subscribe = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const email = String(new FormData(e.currentTarget).get("email") ?? "");
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      toast.error("Veuillez saisir un e-mail valide");
-      return;
-    }
-    toast.success("Vous êtes inscrit !");
-    e.currentTarget.reset();
-  };
-  const info = [
-    { icon: Phone, label: "Téléphone", lines: CONTACT.phones },
-    { icon: Mail, label: "E-mail", lines: [CONTACT.email] },
-    { icon: MapPin, label: "Adresse", lines: [CONTACT.address, CONTACT.landmark] },
-    { icon: Clock, label: "Horaires d'ouverture", lines: CONTACT.hours },
-  ];
-  return (
-    <section id="contact" className="bg-secondary/60 py-20 md:py-28">
-      <div className="mx-auto max-w-7xl px-4 md:px-6">
-        <SectionHead
-          badge={<Pill icon={<Mail size={14} />}>Contactez-nous</Pill>}
-          title="Restons en contact"
-          sub="Une question, un événement ou juste envie de dire bonjour ? Nous serions ravis de vous lire."
-        />
-        <div className="grid gap-6 lg:grid-cols-5">
-          <Reveal className="lg:col-span-3">
-            <form onSubmit={submit} noValidate className={`${card} space-y-5 p-6 md:p-8`}>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <Field label="Nom complet" error={errors["name"]}>
-                  <input name="name" className={input} placeholder="Marie Dupont" />
-                </Field>
-                <Field label="E-mail" error={errors["email"]}>
-                  <input
-                    name="email"
-                    type="email"
-                    className={input}
-                    placeholder="marie@email.com"
-                  />
-                </Field>
-                <Field label="Téléphone (facultatif)">
-                  <input name="phone" className={input} placeholder="+221 …" />
-                </Field>
-                <Field label="Objet" error={errors["subject"]}>
-                  <input
-                    name="subject"
-                    className={input}
-                    placeholder="Comment pouvons-nous aider ?"
-                  />
-                </Field>
-              </div>
-              <Field label="Message" error={errors["message"]}>
-                <textarea
-                  name="message"
-                  rows={5}
-                  className={input}
-                  placeholder="Dites-nous en plus..."
-                />
-              </Field>
-              <button type="submit" className={`${btnPrimary} w-full sm:w-auto`}>
-                Envoyer le message <ArrowRight size={16} />
-              </button>
-            </form>
-          </Reveal>
-          <Reveal className="space-y-6 lg:col-span-2">
-            <div className={`${card} space-y-5 p-6 md:p-8`}>
-              {info.map(({ icon: I, label, lines }) => (
-                <div key={label} className="flex gap-4">
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
-                    <I size={18} />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="font-semibold text-foreground">{label}</p>
-                    {lines.map((l) => (
-                      <p key={l} className="text-sm text-muted-foreground">
-                        {l}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-2xl bg-primary p-6 text-primary-foreground shadow-lift md:p-8">
-              <h3 className="text-2xl font-bold">Rejoignez notre newsletter</h3>
-              <p className="mt-2 text-sm text-primary-foreground/75">
-                Nouvelles boissons, spécialités de saison et offres réservées aux membres.
-              </p>
-              <form onSubmit={subscribe} className="mt-5 flex flex-col gap-2 sm:flex-row">
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="Votre e-mail"
-                  className="min-w-0 flex-1 rounded-full bg-primary-foreground/10 px-5 py-3 text-sm text-primary-foreground outline-none placeholder:text-primary-foreground/60 focus:ring-2 focus:ring-ring"
-                />
-                <button className={`${btn} bg-card text-primary hover:bg-secondary`}>
-                  S'inscrire
-                </button>
-              </form>
-            </div>
-          </Reveal>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Footer() {
   const hrefFor = (label: string) =>
     ({
       Carte: "#menu",
       Adresses: "#locations",
-      Contact: "#contact",
-      FAQ: "#contact",
-      "Conditions d'utilisation": "/#contact",
-      "Politique de confidentialité": "/#contact",
-      Cookies: "/#contact",
-    })[label] ?? "/#contact";
+      Contact: "/infos",
+      FAQ: "/faq",
+      "Conditions d'utilisation": "/infos",
+      "Politique de confidentialité": "/infos",
+      Cookies: "/infos",
+    })[label] ?? "/infos";
   return (
     <footer className="bg-foreground text-background">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-5 md:px-6">

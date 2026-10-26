@@ -8,7 +8,6 @@ const navLinks = [
   ["Bon plan", "/bon-plan"],
   ["Galerie", "/galerie"],
   ["Infos", "/infos"],
-  ["Avis", "/avis"],
   ["FAQ", "/faq"],
 ] as const;
 

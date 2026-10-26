@@ -132,8 +132,8 @@ function ContentPage() {
           <div>
             <h2 className="font-display text-2xl font-bold">Médias du site</h2>
             <p className="mt-1 text-sm text-[#93877d]">
-              Le hero animé et la galerie sont modifiables ici. Utilisez une URL publique ou un
-              chemin `/assets/...`.
+              Tous les visuels publics sont modifiables ici. Chaque média possède une clé stable
+              (`hero-main`, `gallery-1`, etc.) qui ne change pas lorsque son URL est remplacée.
             </p>
           </div>
         </div>
@@ -153,6 +153,7 @@ function ContentPage() {
                     {item.media_type === "video" ? "Vidéo" : "Image"}
                   </p>
                   <h3 className="mt-1 font-display text-lg font-bold">{item.label}</h3>
+                  <p className="text-xs text-[#93877d]">Clé stable : {item.id}</p>
                   <p className="text-xs text-[#93877d]">Emplacement : {item.slot}</p>
                 </div>
               </div>
