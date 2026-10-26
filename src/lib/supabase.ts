@@ -123,3 +123,27 @@ export async function saveSiteMedia(media: SiteMediaRow) {
   const { error } = await supabase.from("site_media_assets").upsert(media, { onConflict: "id" });
   if (error) throw new Error(error.message);
 }
+
+export async function uploadSiteMedia(file: File, mediaKey: string) {
+  const allowed = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/avif",
+    "video/mp4",
+    "video/webm",
+    "video/quicktime",
+  ];
+  if (!allowed.includes(file.type))
+    throw new Error("Format non pris en charge. Utilisez JPG, PNG, WebP, MP4, WebM ou MOV.");
+  if (file.size > 50 * 1024 * 1024) throw new Error("Le fichier dépasse la limite de 50 Mo.");
+  const extension = file.name.split(".").pop()?.toLowerCase() || "bin";
+  const path = `site/${mediaKey}/${crypto.randomUUID()}.${extension}`;
+  const { error } = await supabase.storage.from("site-media").upload(path, file, {
+    cacheControl: "31536000",
+    contentType: file.type,
+    upsert: false,
+  });
+  if (error) throw new Error(error.message);
+  return supabase.storage.from("site-media").getPublicUrl(path).data.publicUrl;
+}

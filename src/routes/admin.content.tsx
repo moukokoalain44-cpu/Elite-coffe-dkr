@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, Eye, Image, Save } from "lucide-react";
+import { Check, Image, Save, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AdminCard, AdminPageHeader } from "@/components/AdminChrome";
 import { useAdmin, type SiteContent } from "@/contexts/AdminContext";
 import { DEFAULT_SITE_MEDIA } from "@/hooks/use-site-media";
-import { fetchSiteMedia, saveSiteMedia, type SiteMediaRow } from "@/lib/supabase";
+import { fetchSiteMedia, saveSiteMedia, type SiteMediaRow, uploadSiteMedia } from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin/content")({ component: ContentPage });
 
@@ -13,6 +13,7 @@ function ContentPage() {
   const { content, updateContent } = useAdmin();
   const [draft, setDraft] = useState(content);
   const [media, setMedia] = useState<SiteMediaRow[]>(DEFAULT_SITE_MEDIA);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [saved, setSaved] = useState(true);
   const change = (key: keyof SiteContent, value: string) => {
     setDraft((current) => ({ ...current, [key]: value }));
@@ -36,6 +37,25 @@ function ContentPage() {
       toast.success(`${item.label} mis à jour`);
     } catch {
       toast.error("Impossible d'enregistrer ce média");
+    }
+  };
+  const replaceMedia = async (item: SiteMediaRow, file: File | undefined) => {
+    if (!file) return;
+    setUploadingId(item.id);
+    try {
+      const url = await uploadSiteMedia(file, item.id);
+      const next = {
+        ...item,
+        url,
+        media_type: file.type.startsWith("video/") ? ("video" as const) : ("image" as const),
+      };
+      setMedia((items) => items.map((current) => (current.id === item.id ? next : current)));
+      await saveSiteMedia(next);
+      toast.success(`${item.label} remplacé depuis votre appareil`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Impossible d'importer ce média");
+    } finally {
+      setUploadingId(null);
     }
   };
   return (
@@ -158,6 +178,24 @@ function ContentPage() {
                 </div>
               </div>
               <div className="mt-4 space-y-3">
+                <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-[#d8894a] bg-[#fffaf5] px-3 py-3 text-xs font-bold text-[#a75b35] transition hover:bg-[#fff3e8]">
+                  <Upload size={14} />
+                  {uploadingId === item.id ? "Import en cours…" : "Remplacer depuis mon ordinateur"}
+                  <input
+                    type="file"
+                    accept={
+                      item.media_type === "video"
+                        ? "video/mp4,video/webm,video/quicktime"
+                        : "image/jpeg,image/png,image/webp,image/avif"
+                    }
+                    disabled={uploadingId !== null}
+                    onChange={(event) => {
+                      void replaceMedia(item, event.target.files?.[0]);
+                      event.currentTarget.value = "";
+                    }}
+                    className="sr-only"
+                  />
+                </label>
                 <label className="block text-xs font-bold text-[#5f554e]">
                   URL du média
                   <input
