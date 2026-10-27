@@ -64,7 +64,6 @@ function GalleryAdminPage() {
     id: createGalleryKey(DEFAULT_SITE_MEDIA),
     label: "Nouveau média galerie",
     alt_text: "Image Elite Coffee",
-    url: "",
     file: null as File | null,
   });
 
@@ -227,19 +226,19 @@ function GalleryAdminPage() {
       toast.error(`La clé stable « ${id} » existe déjà.`);
       return;
     }
-    if (!draft.file && !draft.url.trim()) {
-      toast.error("Importez une photo ou une vidéo, ou renseignez une URL.");
+    if (!draft.file) {
+      toast.error("Sélectionnez une photo ou une vidéo à importer.");
       return;
     }
 
     setUploadingId("new-gallery-image");
     try {
-      const url = draft.file ? await uploadSiteMedia(draft.file, id) : draft.url.trim();
+      const url = await uploadSiteMedia(draft.file, id);
       const item: SiteMediaRow = {
         id,
         label: draft.label.trim(),
         slot: id,
-        media_type: draft.file?.type.startsWith("video/") ? "video" : inferMediaType(draft.url),
+        media_type: draft.file.type.startsWith("video/") ? "video" : "image",
         url,
         alt_text: draft.alt_text.trim(),
         is_visible: true,
@@ -253,7 +252,6 @@ function GalleryAdminPage() {
         id: createGalleryKey([...media, item]),
         label: "Nouveau média galerie",
         alt_text: "Image Elite Coffee",
-        url: "",
         file: null,
       });
       setAdding(false);
@@ -454,7 +452,7 @@ function GalleryAdminPage() {
             </SheetTitle>
             <SheetDescription className="text-sm leading-6 text-[#887b70]">
               Le panneau s’ouvre à côté de votre médiathèque. La clé stable relie le média à la
-              galerie publique.
+              galerie publique. Le fichier est envoyé automatiquement dans le stockage du site.
             </SheetDescription>
           </SheetHeader>
 
@@ -504,23 +502,6 @@ function GalleryAdminPage() {
                 onChange={(event) =>
                   setDraft((current) => ({ ...current, file: event.target.files?.[0] ?? null }))
                 }
-              />
-            </label>
-            <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.15em] text-[#ad9e90]">
-              <span className="h-px flex-1 bg-[#e9e0d6]" />
-              ou renseignez une URL
-              <span className="h-px flex-1 bg-[#e9e0d6]" />
-            </div>
-            <label className="block text-sm font-bold text-[#57483c]">
-              URL de la photo ou de la vidéo
-              <input
-                type="url"
-                value={draft.url}
-                onChange={(event) =>
-                  setDraft((current) => ({ ...current, url: event.target.value }))
-                }
-                placeholder="https://…"
-                className="mt-2 w-full rounded-xl border border-[#e6ddd2] bg-white px-3 py-3 text-sm font-normal outline-none transition focus:border-[#b07657] focus:ring-4 focus:ring-[#b07657]/10"
               />
             </label>
           </div>
