@@ -10,7 +10,8 @@ import {
   Package,
   PanelLeftClose,
   PanelLeftOpen,
-  Pencil,
+  FileText,
+  Image,
   Search,
   Settings,
   Sun,
@@ -25,8 +26,8 @@ const nav = [
   { label: "Vue d’ensemble", to: "/admin", icon: LayoutDashboard },
   { label: "Réservations", to: "/admin/registrations", icon: Users },
   { label: "Catalogue", to: "/admin/catalog", icon: Package },
-  { label: "Galerie", to: "/admin/gallery", icon: Pencil },
-  { label: "Contenu", to: "/admin/content", icon: Pencil },
+  { label: "Galerie", to: "/admin/gallery", icon: Image },
+  { label: "Contenu", to: "/admin/content", icon: FileText },
 ];
 
 const navGroups = [
@@ -41,7 +42,10 @@ export function AdminLayout() {
   const [collapsed, setCollapsed] = useState(true);
   const [sidebarHovered, setSidebarHovered] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [profileName, setProfileName] = useState("Oripio Studio");
+  const [profileAvatar, setProfileAvatar] = useState("");
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
   const { registrations } = useAdmin();
@@ -50,8 +54,11 @@ export function AdminLayout() {
   const results = query.trim()
     ? nav.filter((item) => item.label.toLowerCase().includes(query.toLowerCase()))
     : [];
+  const pendingReservations = registrations.filter((item) => item.status === "pending");
   useEffect(() => {
     setDarkMode(window.localStorage.getItem("elite-admin-theme") === "dark");
+    setProfileName(window.localStorage.getItem("elite-admin-name") || "Oripio Studio");
+    setProfileAvatar(window.localStorage.getItem("elite-admin-avatar") || "");
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
@@ -236,23 +243,63 @@ export function AdminLayout() {
                 {darkMode ? <Sun size={18} /> : <Moon size={18} />}
               </button>
               <button
+                type="button"
+                onClick={() => setNotificationsOpen((value) => !value)}
                 className="relative rounded-xl border border-[#e7e2e5] bg-white p-2.5 hover:border-[#d85f82]"
                 aria-label="Notifications"
+                aria-expanded={notificationsOpen}
               >
                 <Bell size={18} />
-                <span className="absolute right-2 top-2 size-1.5 rounded-full bg-[#d85f82]" />
+                {pendingReservations.length > 0 && (
+                  <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full bg-[#d85f82] px-1 text-[10px] font-bold text-white">
+                    {pendingReservations.length}
+                  </span>
+                )}
               </button>
+              {notificationsOpen && (
+                <div className="absolute right-28 top-14 z-50 w-80 rounded-2xl border border-[#e7e2e5] bg-white p-3 shadow-xl">
+                  <div className="flex items-center justify-between border-b border-[#eee8e8] px-2 pb-3">
+                    <strong className="text-sm">Notifications</strong>
+                    <span className="text-xs text-[#9b8d91]">
+                      {pendingReservations.length} en attente
+                    </span>
+                  </div>
+                  {pendingReservations.length ? (
+                    pendingReservations.slice(0, 4).map((item) => (
+                      <Link
+                        key={item.id}
+                        to="/admin/registrations"
+                        onClick={() => setNotificationsOpen(false)}
+                        className="mt-2 block rounded-xl px-3 py-2.5 hover:bg-[#fbe9ef]"
+                      >
+                        <p className="text-sm font-bold">Réservation de {item.name}</p>
+                        <p className="mt-1 text-xs text-[#9b8d91]">
+                          {item.date} · {item.time} · {item.guests} personne(s)
+                        </p>
+                      </Link>
+                    ))
+                  ) : (
+                    <p className="px-2 py-5 text-center text-sm text-[#9b8d91]">
+                      Aucune réservation en attente.
+                    </p>
+                  )}
+                </div>
+              )}
               <button
                 type="button"
                 onClick={() => setProfileOpen((value) => !value)}
                 className="hidden items-center gap-3 rounded-2xl border border-[#e7e2e5] bg-white px-3 py-2 text-left hover:border-[#d85f82] sm:flex"
                 aria-expanded={profileOpen}
               >
-                <span className="grid size-8 place-items-center rounded-xl bg-[#fbe9ef] text-xs font-bold text-[#8c4f2d]">
-                  OA
+                <span className="grid size-8 place-items-center overflow-hidden rounded-xl bg-[#fbe9ef] text-xs font-bold text-[#8c4f2d]">
+                  {profileAvatar ? (
+                    <img src={profileAvatar} alt="" className="size-full object-cover" />
+                  ) : (
+                    profileName.slice(0, 2).toUpperCase()
+                  )}
                 </span>
                 <span className="leading-tight">
-                  <strong className="block text-sm">Oripio Studio</strong>
+                  <strong className="block text-sm">{profileName}</strong>
                   <small className="text-[11px] text-[#9b8d91]">Super admin</small>
                 </span>
                 <ChevronDown

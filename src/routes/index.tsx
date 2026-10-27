@@ -1,6 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowRight, Award, BookOpen, Coffee, Heart, Star } from "lucide-react";
+import {
+  ArrowRight,
+  Award,
+  BookOpen,
+  BriefcaseBusiness,
+  Coffee,
+  Heart,
+  House,
+  IceCreamBowl,
+  Sparkles,
+  Star,
+  UsersRound,
+} from "lucide-react";
 import { BRAND, CONTACT, FOOTER, MENU_SECTIONS, STATS } from "@/data/site";
 import { type Product } from "@/data/catalog";
 import { useMenuCatalog } from "@/hooks/use-menu-catalog";
@@ -119,6 +131,8 @@ function Index() {
       <SiteHeader />
       <main>
         <Hero />
+        <DiscoverElite />
+        <FavoriteSpace />
         <Stats />
         <DishShowcase products={products} />
         <Gallery />
@@ -204,6 +218,105 @@ function Stats() {
           </div>
         ))}
       </Reveal>
+    </section>
+  );
+}
+
+const DISCOVER_CARDS = [
+  {
+    title: "Idéal pour télétravailler",
+    text: "Un cadre calme, une connexion pratique et des pauses café bien choisies.",
+    icon: BriefcaseBusiness,
+  },
+  {
+    title: "Brunch toute la journée",
+    text: "Des assiettes généreuses et des douceurs pour commencer sans se presser.",
+    icon: Coffee,
+  },
+  {
+    title: "Dîner en famille",
+    text: "Une adresse chaleureuse où petits et grands trouvent leur envie.",
+    icon: UsersRound,
+  },
+  {
+    title: "Buffets & événements",
+    text: "Un espace modulable pour célébrer, partager et recevoir à Dakar.",
+    icon: Sparkles,
+  },
+  {
+    title: "Pause gourmande",
+    text: "Cafés, glaces et desserts pour une parenthèse légère à tout moment.",
+    icon: IceCreamBowl,
+  },
+  {
+    title: "Un lieu qui rassemble",
+    text: "Venez comme vous êtes : pour une rencontre, un rendez-vous ou un moment à vous.",
+    icon: House,
+  },
+] as const;
+
+function DiscoverElite() {
+  const [offset, setOffset] = useState(0);
+  return (
+    <section
+      className="bg-background px-4 py-20 md:px-6 md:py-28"
+      onMouseMove={(event) => setOffset((event.clientX / window.innerWidth - 0.5) * 12)}
+      onMouseLeave={() => setOffset(0)}
+    >
+      <SectionHead
+        badge={<Pill icon={<Sparkles size={14} />}>Découvrez Elite Coffee</Pill>}
+        title="Plus qu’une pause café"
+        sub="Un lieu pensé pour travailler, se retrouver, bruncher et célébrer sans changer d’adresse."
+      />
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+        {DISCOVER_CARDS.map(({ title, text, icon: Icon }, index) => (
+          <Reveal key={title} className="h-full">
+            <article
+              className="group h-full min-h-52 rounded-[1.5rem] border border-border bg-card p-5 shadow-soft transition duration-500 hover:-translate-y-3 hover:border-accent/50 hover:shadow-lift"
+              style={{ transform: `translateY(${Math.sin((offset + index * 14) / 12) * 2}px)` }}
+            >
+              <span className="grid size-11 place-items-center rounded-2xl bg-secondary text-accent transition duration-500 group-hover:rotate-6 group-hover:scale-110">
+                <Icon size={21} />
+              </span>
+              <h3 className="mt-7 text-lg font-bold leading-tight text-foreground">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{text}</p>
+            </article>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function FavoriteSpace() {
+  const media = useSiteMedia()
+    .filter((item) => item.id.startsWith("interior-"))
+    .slice(0, 3);
+  return (
+    <section className="bg-secondary/45 px-4 py-20 md:px-6 md:py-24">
+      <SectionHead
+        badge={<Pill icon={<House size={14} />}>Votre espace favori</Pill>}
+        title="Installez-vous comme chez vous"
+        sub="Trois ambiances pour choisir votre prochain moment chez Elite Coffee."
+      />
+      <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">
+        {media.map((item, index) => (
+          <Reveal key={item.id} className="group overflow-hidden rounded-[1.75rem]">
+            <div className="relative overflow-hidden">
+              <img
+                src={item.url}
+                alt={item.alt_text}
+                loading="lazy"
+                className={`aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-110 ${index === 1 ? "md:translate-y-8" : ""}`}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent opacity-70" />
+              <span className="absolute bottom-5 left-5 rounded-full bg-background/85 px-3 py-1.5 text-xs font-bold text-foreground backdrop-blur">
+                Espace {index + 1}
+              </span>
+            </div>
+          </Reveal>
+        ))}
+      </div>
     </section>
   );
 }
