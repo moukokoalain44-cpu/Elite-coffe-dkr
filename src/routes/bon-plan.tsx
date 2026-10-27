@@ -18,6 +18,7 @@ function GoodPlanPage() {
       const reservation = {
         name: String(data.get("name") ?? ""),
         phone: String(data.get("phone") ?? ""),
+        email: String(data.get("email") ?? "").trim(),
         date: String(data.get("date") ?? ""),
         time: String(data.get("time") ?? ""),
         guests: Number(data.get("guests") ?? 2),
@@ -28,7 +29,12 @@ function GoodPlanPage() {
       } satisfies Parameters<typeof createReservation>[0];
       const id = await createReservation(reservation);
       await Promise.allSettled([
-        registerCustomer({ name: reservation.name, phone: reservation.phone, source: "buffet" }),
+        registerCustomer({
+          name: reservation.name,
+          email: reservation.email,
+          phone: reservation.phone,
+          source: "buffet",
+        }),
       ]);
       setSent(true);
       toast.success("Votre demande pour le buffet est enregistrée");
@@ -114,6 +120,16 @@ function GoodPlanPage() {
                     />
                   </label>
                   <label className="text-sm font-semibold">
+                    Adresse e-mail
+                    <input
+                      required
+                      type="email"
+                      autoComplete="email"
+                      name="email"
+                      className="mt-2 w-full rounded-xl border border-input bg-background px-3 py-3 font-normal outline-none focus:ring-2"
+                    />
+                  </label>
+                  <label className="text-sm font-semibold">
                     Date
                     <input
                       required
@@ -158,6 +174,14 @@ function GoodPlanPage() {
                     placeholder="Allergie, groupe, occasion…"
                   />
                 </label>
+                <p className="text-xs leading-5 text-muted-foreground">
+                  Vos coordonnées servent à traiter et confirmer cette demande, sans inscription à
+                  la newsletter.{" "}
+                  <Link to="/confidentialite" className="underline">
+                    En savoir plus
+                  </Link>
+                  .
+                </p>
                 <button
                   disabled={loading}
                   className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 font-bold text-primary-foreground disabled:opacity-60"

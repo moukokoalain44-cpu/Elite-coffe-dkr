@@ -25,6 +25,14 @@
       "title": "Infos pratiques"
     },
     {
+      "path": "/confidentialite",
+      "title": "Politique de confidentialité"
+    },
+    {
+      "path": "/cookies",
+      "title": "Cookies et préférences"
+    },
+    {
       "path": "/galerie",
       "title": "Galerie"
     },

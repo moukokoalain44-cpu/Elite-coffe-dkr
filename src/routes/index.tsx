@@ -422,8 +422,8 @@ function Footer() {
       Contact: "/infos",
       FAQ: "/faq",
       "Conditions d'utilisation": "/infos",
-      "Politique de confidentialité": "/infos",
-      Cookies: "/infos",
+      "Politique de confidentialité": "/confidentialite",
+      Cookies: "/cookies",
     })[label] ?? "/infos";
   return (
     <footer className="bg-foreground text-background">

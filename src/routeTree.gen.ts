@@ -14,6 +14,8 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BonPlanRouteImport } from './routes/bon-plan'
 import { Route as BrunchRouteImport } from './routes/brunch'
+import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
+import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as GalerieRouteImport } from './routes/galerie'
 import { Route as InfosRouteImport } from './routes/infos'
@@ -54,6 +56,16 @@ const BonPlanRoute = BonPlanRouteImport.update({
 const BrunchRoute = BrunchRouteImport.update({
   id: '/brunch',
   path: '/brunch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfidentialiteRoute = ConfidentialiteRouteImport.update({
+  id: '/confidentialite',
+  path: '/confidentialite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -143,6 +155,8 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/bon-plan': typeof BonPlanRoute
   '/brunch': typeof BrunchRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/galerie': typeof GalerieRoute
   '/infos': typeof InfosRoute
@@ -165,6 +179,8 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/bon-plan': typeof BonPlanRoute
   '/brunch': typeof BrunchRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/galerie': typeof GalerieRoute
   '/infos': typeof InfosRoute
@@ -189,6 +205,8 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/bon-plan': typeof BonPlanRoute
   '/brunch': typeof BrunchRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/galerie': typeof GalerieRoute
   '/infos': typeof InfosRoute
@@ -214,6 +232,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/bon-plan'
     | '/brunch'
+    | '/confidentialite'
+    | '/cookies'
     | '/faq'
     | '/galerie'
     | '/infos'
@@ -236,6 +256,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/bon-plan'
     | '/brunch'
+    | '/confidentialite'
+    | '/cookies'
     | '/faq'
     | '/galerie'
     | '/infos'
@@ -259,6 +281,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/bon-plan'
     | '/brunch'
+    | '/confidentialite'
+    | '/cookies'
     | '/faq'
     | '/galerie'
     | '/infos'
@@ -283,6 +307,8 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   BonPlanRoute: typeof BonPlanRoute
   BrunchRoute: typeof BrunchRoute
+  ConfidentialiteRoute: typeof ConfidentialiteRoute
+  CookiesRoute: typeof CookiesRoute
   FaqRoute: typeof FaqRoute
   GalerieRoute: typeof GalerieRoute
   InfosRoute: typeof InfosRoute
@@ -326,6 +352,20 @@ declare module '@tanstack/react-router' {
       path: '/brunch'
       fullPath: '/brunch'
       preLoaderRoute: typeof BrunchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confidentialite': {
+      id: '/confidentialite'
+      path: '/confidentialite'
+      fullPath: '/confidentialite'
+      preLoaderRoute: typeof ConfidentialiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -485,6 +525,8 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   BonPlanRoute: BonPlanRoute,
   BrunchRoute: BrunchRoute,
+  ConfidentialiteRoute: ConfidentialiteRoute,
+  CookiesRoute: CookiesRoute,
   FaqRoute: FaqRoute,
   GalerieRoute: GalerieRoute,
   InfosRoute: InfosRoute,

@@ -15,7 +15,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "");
+export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "", {
+  global: {
+    fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }),
+  },
+});
 
 export type MenuProductRow = {
   id: string;
@@ -107,6 +111,7 @@ export type OrderItemInsert = {
 export type ReservationInsert = {
   name: string;
   phone: string;
+  email: string;
   date: string;
   time: string;
   guests: number;
@@ -114,7 +119,8 @@ export type ReservationInsert = {
   message?: string;
 };
 
-export type ReservationRow = ReservationInsert & {
+export type ReservationRow = Omit<ReservationInsert, "email"> & {
+  email: string | null;
   id: string;
   created_at: string;
   status: "pending" | "confirmed" | "cancelled";
@@ -151,7 +157,7 @@ export async function createReservation(reservation: ReservationInsert): Promise
 export async function fetchReservationsAdmin(): Promise<ReservationRow[]> {
   const { data, error } = await supabase
     .from("reservations")
-    .select("id,created_at,name,phone,date,time,guests,occasion,message,status")
+    .select("id,created_at,name,phone,email,date,time,guests,occasion,message,status")
     .order("date", { ascending: true })
     .order("time", { ascending: true })
     .limit(1000);
@@ -161,6 +167,18 @@ export async function fetchReservationsAdmin(): Promise<ReservationRow[]> {
 
 export async function updateReservationStatus(id: string, status: ReservationRow["status"]) {
   const { error } = await supabase.from("reservations").update({ status }).eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export type ReservationDetailsUpdate = Partial<
+  Pick<
+    ReservationInsert,
+    "name" | "phone" | "email" | "date" | "time" | "guests" | "occasion" | "message"
+  >
+>;
+
+export async function updateReservationDetails(id: string, details: ReservationDetailsUpdate) {
+  const { error } = await supabase.from("reservations").update(details).eq("id", id);
   if (error) throw new Error(error.message);
 }
 
@@ -176,7 +194,11 @@ export type CustomerRow = {
 };
 
 export async function registerCustomer(customer: CustomerInput) {
-  const { error } = await supabase.from("customers").insert(customer);
+  const result =
+    customer.phone === "non renseigné"
+      ? await supabase.from("customers").insert(customer)
+      : await supabase.from("customers").upsert(customer, { onConflict: "phone" });
+  const { error } = result;
   if (error && !error.message.toLowerCase().includes("duplicate")) throw new Error(error.message);
 }
 

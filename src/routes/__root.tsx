@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { CookieConsentManager } from "@/components/CookieConsentManager";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -128,6 +129,7 @@ function RootComponent() {
         <AdminProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
+          <CookieConsentManager />
           <Toaster position="top-center" />
         </AdminProvider>
       </AuthProvider>

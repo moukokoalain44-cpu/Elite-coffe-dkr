@@ -50,6 +50,7 @@ function ReservationPage() {
       const reservation = {
         name: data.get("name") as string,
         phone: data.get("phone") as string,
+        email: String(data.get("email") ?? "").trim(),
         date: data.get("date") as string,
         time: data.get("time") as string,
         guests: parseInt(guests),
@@ -62,6 +63,7 @@ function ReservationPage() {
       await Promise.allSettled([
         registerCustomer({
           name: reservation.name,
+          email: reservation.email,
           phone: reservation.phone,
           source: "reservation",
         }),
@@ -137,6 +139,16 @@ function ReservationPage() {
                   />
                 </label>
                 <label className="text-sm font-semibold">
+                  Adresse e-mail
+                  <input
+                    required
+                    type="email"
+                    autoComplete="email"
+                    name="email"
+                    className="mt-2 w-full rounded-xl border border-input bg-background px-3 py-3 font-normal outline-none ring-ring focus:ring-2"
+                  />
+                </label>
+                <label className="text-sm font-semibold">
                   Date
                   <input
                     required
@@ -198,6 +210,14 @@ function ReservationPage() {
                   className="mt-2 w-full rounded-xl border border-input bg-background px-3 py-3 font-normal outline-none ring-ring focus:ring-2"
                 />
               </label>
+              <p className="mt-4 text-xs leading-5 text-muted-foreground">
+                Vos coordonnées servent à traiter et confirmer cette demande, sans inscription à la
+                newsletter.{" "}
+                <Link to="/confidentialite" className="underline">
+                  En savoir plus
+                </Link>
+                .
+              </p>
               <button
                 type="submit"
                 disabled={loading}

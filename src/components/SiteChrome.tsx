@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { BookOpen, HelpCircle, Images, Info, Menu, MessageCircle, Utensils, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { WHATSAPP_CONTACT_URL } from "@/data/site";
+import { OPEN_COOKIE_SETTINGS_EVENT } from "@/components/CookieConsentManager";
 
 const navLinks = [
   ["Carte", "/menu"],
@@ -183,6 +184,19 @@ export function PageShell({
             <Link to="/faq" className="hover:text-primary">
               FAQ
             </Link>
+            <Link to="/confidentialite" className="hover:text-primary">
+              Confidentialité
+            </Link>
+            <Link to="/cookies" className="hover:text-primary">
+              Cookies
+            </Link>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event(OPEN_COOKIE_SETTINGS_EVENT))}
+              className="text-left hover:text-primary"
+            >
+              Préférences cookies
+            </button>
           </div>
         </div>
       </footer>

@@ -35,6 +35,7 @@ create table if not exists public.reservations (
   created_at  timestamptz not null default now(),
   name        text not null,
   phone       text not null,
+  email       text,
   date        date not null,
   time        time not null,
   guests      integer not null check (guests > 0),
@@ -43,6 +44,7 @@ create table if not exists public.reservations (
   status      text not null default 'pending'
                 check (status in ('pending','confirmed','cancelled'))
 );
+alter table public.reservations add column if not exists email text;
 
 -- Une réservation confirmée peut seulement être annulée ; une réservation annulée
 -- ne peut jamais être réouverte. Cette règle est appliquée côté serveur, pas seulement dans l'UI.

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AdminCard, AdminPageHeader, AdminPagination, StatusBadge } from "@/components/AdminChrome";
 import { useAdmin, type Registration, type RegistrationStatus } from "@/contexts/AdminContext";
-import { updateReservationStatus } from "@/lib/supabase";
+import { updateReservationDetails, updateReservationStatus } from "@/lib/supabase";
 
 function canTransition(from: RegistrationStatus, to: RegistrationStatus) {
   if (from === to) return true;
@@ -25,7 +25,7 @@ function RegistrationsPage() {
     () =>
       registrations.filter(
         (item) =>
-          `${item.name} ${item.phone} ${item.occasion}`
+          `${item.name} ${item.phone} ${item.email ?? ""} ${item.occasion}`
             .toLowerCase()
             .includes(query.toLowerCase()) &&
           (status === "all" || item.status === status),
@@ -140,6 +140,9 @@ function RegistrationsPage() {
                     <span className="mt-1 block text-xs text-[#9b8d91]">
                       {row.phone || "Téléphone à compléter"}
                     </span>
+                    {row.email && (
+                      <span className="mt-1 block text-xs text-[#9b8d91]">{row.email}</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 text-[#665b60]">
                     {row.date} · {row.time}
@@ -222,8 +225,25 @@ function RegistrationsPage() {
         <RegistrationModal
           registration={editing}
           onClose={() => setEditing(null)}
-          onSave={(patch) => {
+          onSave={async (patch) => {
             const exists = registrations.some((item) => item.id === editing.id);
+            if (exists && editing.id.length > 20) {
+              try {
+                await updateReservationDetails(editing.id, {
+                  name: patch.name ?? editing.name,
+                  phone: patch.phone ?? editing.phone,
+                  email: patch.email ?? editing.email ?? "",
+                  date: patch.date ?? editing.date,
+                  time: patch.time ?? editing.time,
+                  guests: patch.guests ?? editing.guests,
+                  occasion: patch.occasion ?? editing.occasion,
+                  message: patch.message ?? editing.message,
+                });
+              } catch {
+                toast.error("Les modifications n’ont pas pu être enregistrées.");
+                return;
+              }
+            }
             if (exists) updateRegistration(editing.id, patch);
             else addRegistration({ ...editing, ...patch });
             toast.success(exists ? "Réservation modifiée" : "Réservation créée");
@@ -326,7 +346,7 @@ function RegistrationModal({
 }: {
   registration: Registration;
   onClose: () => void;
-  onSave: (patch: Partial<Registration>) => void;
+  onSave: (patch: Partial<Registration>) => void | Promise<void>;
 }) {
   const [draft, setDraft] = useState(registration);
   const field = (key: keyof Registration, value: string | number) =>
@@ -370,6 +390,16 @@ function RegistrationModal({
             </label>
           ))}
           <label className="text-xs font-bold text-[#756b72]">
+            Adresse e-mail
+            <input
+              type="email"
+              autoComplete="email"
+              value={draft.email ?? ""}
+              onChange={(event) => field("email", event.target.value)}
+              className="mt-2 w-full rounded-xl border border-[#e7e2e5] bg-[#fdfbfc] px-3 py-3 text-sm font-normal outline-none focus:border-[#d85f82]"
+            />
+          </label>
+          <label className="text-xs font-bold text-[#756b72]">
             Convives
             <input
               type="number"
@@ -412,7 +442,7 @@ function RegistrationModal({
             Annuler
           </button>
           <button
-            onClick={() => onSave(draft)}
+            onClick={() => void onSave(draft)}
             className="flex items-center gap-2 rounded-xl bg-[#3a2d33] px-4 py-3 text-sm font-bold text-white"
           >
             <Check size={16} /> Enregistrer

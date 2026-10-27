@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Clock3, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -36,9 +36,11 @@ function InfosPage() {
     { icon: Clock3, label: "Horaires", value: CONTACT.hours.join(" · ") },
   ];
   const [errors, setErrors] = useState<Record<string, string>>({});
+
   const submit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const data = new FormData(form);
     const value = (key: string) => String(data.get(key) ?? "").trim();
     const next: Record<string, string> = {};
     if (value("name").length < 2) next["name"] = "Veuillez saisir votre nom";
@@ -51,34 +53,32 @@ function InfosPage() {
       toast.error("Veuillez corriger les champs en surbrillance");
       return;
     }
-    await Promise.allSettled([
-      registerCustomer({
-        name: value("name"),
-        email: value("email"),
-        phone: value("phone") || "non renseigné",
-        source: "contact",
-      }),
-      createContactMessage({
-        name: value("name"),
-        email: value("email"),
-        phone: value("phone"),
-        subject: value("subject"),
-        message: value("message"),
-      }),
-    ]);
-    toast.success("Merci ! Nous vous répondrons sous 24 heures.");
-    event.currentTarget.reset();
-  };
-  const subscribe = (event: React.FormEvent<HTMLFormElement>): void => {
-    event.preventDefault();
-    const email = String(new FormData(event.currentTarget).get("email") ?? "");
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      toast.error("Veuillez saisir un e-mail valide");
-      return;
+
+    try {
+      await Promise.all([
+        registerCustomer({
+          name: value("name"),
+          email: value("email"),
+          phone: value("phone") || "non renseigné",
+          source: "contact",
+        }),
+        createContactMessage({
+          name: value("name"),
+          email: value("email"),
+          phone: value("phone"),
+          subject: value("subject"),
+          message: value("message"),
+        }),
+      ]);
+      toast.success("Merci ! Nous vous répondrons sous 24 heures.");
+      form.reset();
+    } catch {
+      toast.error(
+        "Votre message n’a pas pu être enregistré. Réessayez ou contactez-nous par téléphone.",
+      );
     }
-    toast.success("Vous êtes inscrit !");
-    event.currentTarget.reset();
   };
+
   return (
     <PageShell
       eyebrow="Infos pratiques"
@@ -123,7 +123,7 @@ function InfosPage() {
                   />
                 </Field>
                 <Field label="Téléphone (facultatif)">
-                  <input name="phone" className={input} placeholder="+221 …" />
+                  <input name="phone" type="tel" className={input} placeholder="+221 …" />
                 </Field>
                 <Field label="Objet" error={errors["subject"]}>
                   <input
@@ -147,6 +147,14 @@ function InfosPage() {
               >
                 Envoyer le message
               </button>
+              <p className="text-xs leading-5 text-muted-foreground">
+                Votre adresse e-mail et votre message servent à répondre à votre demande. Consultez
+                la{" "}
+                <Link to="/confidentialite" className="underline">
+                  politique de confidentialité
+                </Link>
+                .
+              </p>
             </form>
           </div>
           <div className="space-y-6 lg:col-span-2">
@@ -158,21 +166,17 @@ function InfosPage() {
               <p className="mt-5 font-semibold">{CONTACT.phones.join(" · ")}</p>
             </div>
             <div className="rounded-2xl bg-primary p-6 text-primary-foreground shadow-lift">
-              <h3 className="text-2xl font-bold">Rejoignez notre newsletter</h3>
-              <p className="mt-2 text-sm text-primary-foreground/75">
-                Nouvelles boissons, spécialités de saison et offres réservées aux membres.
+              <h3 className="text-2xl font-bold">Newsletter bientôt disponible</h3>
+              <p className="mt-2 text-sm leading-6 text-primary-foreground/75">
+                L’inscription en ligne n’est pas encore activée. Aucune adresse ne sera collectée à
+                des fins promotionnelles par ce formulaire.
               </p>
-              <form onSubmit={subscribe} className="mt-5 flex flex-col gap-2 sm:flex-row">
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="Votre e-mail"
-                  className="min-w-0 flex-1 rounded-full bg-primary-foreground/10 px-5 py-3 text-sm outline-none placeholder:text-primary-foreground/60"
-                />
-                <button className="rounded-full bg-card px-5 py-3 text-sm font-semibold text-primary">
-                  S’inscrire
-                </button>
-              </form>
+              <a
+                href={`mailto:${CONTACT.email}`}
+                className="mt-4 inline-flex rounded-full bg-card px-5 py-3 text-sm font-semibold text-primary"
+              >
+                Nous contacter
+              </a>
             </div>
           </div>
         </div>

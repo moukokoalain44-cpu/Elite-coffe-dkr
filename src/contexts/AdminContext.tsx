@@ -15,6 +15,7 @@ export type Registration = {
   id: string;
   name: string;
   phone: string;
+  email?: string;
   date: string;
   time: string;
   guests: number;
@@ -136,6 +137,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
             id: row.id,
             name: row.name,
             phone: row.phone,
+            email: row.email ?? "",
             date: row.date,
             time: row.time,
             guests: row.guests,
