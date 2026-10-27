@@ -206,6 +206,35 @@
   }
 }
 
+@layer base {
+  button:not(:disabled),
+  [role="button"],
+  summary {
+    cursor: pointer;
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease;
+  }
+  button:not(:disabled):hover,
+  [role="button"]:hover,
+  summary:hover {
+    transform: translateY(-1px);
+  }
+  a[href] {
+    cursor: pointer;
+  }
+  button:focus-visible,
+  a[href]:focus-visible,
+  [role="button"]:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+}
+
 /* Admin studio theme: scoped so the public storefront keeps its warm light theme. */
 [data-admin-theme="dark"] {
   background: #171411 !important;

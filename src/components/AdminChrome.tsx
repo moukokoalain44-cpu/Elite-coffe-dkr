@@ -61,11 +61,11 @@ export function AdminLayout() {
   const pendingReservations = registrations.filter((item) => item.status === "pending");
   useEffect(() => {
     setDarkMode(window.localStorage.getItem("elite-admin-theme") === "dark");
-    setProfileName(window.localStorage.getItem("elite-admin-name") || "Oripio Studio");
-    setProfileAvatar(window.localStorage.getItem("elite-admin-avatar") || "");
+    setProfileName(String(session?.user.user_metadata?.["full_name"] ?? "Oripio Studio"));
+    setProfileAvatar(String(session?.user.user_metadata?.["avatar_url"] ?? ""));
     const refreshProfile = () => {
-      setProfileName(window.localStorage.getItem("elite-admin-name") || "Oripio Studio");
-      setProfileAvatar(window.localStorage.getItem("elite-admin-avatar") || "");
+      setProfileName(String(session?.user.user_metadata?.["full_name"] ?? "Oripio Studio"));
+      setProfileAvatar(String(session?.user.user_metadata?.["avatar_url"] ?? ""));
     };
     window.addEventListener("elite-admin-profile-updated", refreshProfile);
     const onKeyDown = (event: KeyboardEvent) => {
@@ -79,7 +79,7 @@ export function AdminLayout() {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("elite-admin-profile-updated", refreshProfile);
     };
-  }, []);
+  }, [session]);
   useEffect(() => {
     if (!loading && !session) void navigate({ to: "/admin/login" });
   }, [loading, navigate, session]);

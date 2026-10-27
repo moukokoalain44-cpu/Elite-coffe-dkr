@@ -7,6 +7,7 @@ type AuthContextValue = {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  updateProfile: (profile: { name: string; avatar: string }) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -42,6 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       signOut: async () => {
         const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+      },
+      updateProfile: async ({ name, avatar }) => {
+        const { error } = await supabase.auth.updateUser({
+          data: { full_name: name, avatar_url: avatar || null },
+        });
         if (error) throw error;
       },
     }),

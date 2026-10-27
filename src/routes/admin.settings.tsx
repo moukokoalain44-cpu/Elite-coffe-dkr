@@ -3,21 +3,26 @@ import { Check, ImagePlus, ShieldCheck, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AdminCard, AdminPageHeader } from "@/components/AdminChrome";
+import { useAdminAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/admin/settings")({ component: SettingsPage });
 
 function SettingsPage() {
+  const { session, updateProfile } = useAdminAuth();
   const [name, setName] = useState("Oripio Studio");
   const [avatar, setAvatar] = useState("");
   useEffect(() => {
-    setName(localStorage.getItem("elite-admin-name") || "Oripio Studio");
-    setAvatar(localStorage.getItem("elite-admin-avatar") || "");
-  }, []);
-  const save = () => {
-    localStorage.setItem("elite-admin-name", name.trim() || "Administrateur");
-    localStorage.setItem("elite-admin-avatar", avatar);
-    window.dispatchEvent(new Event("elite-admin-profile-updated"));
-    toast.success("Profil administrateur enregistré");
+    const metadata = session?.user.user_metadata ?? {};
+    setName(String(metadata["full_name"] ?? "Oripio Studio"));
+    setAvatar(String(metadata["avatar_url"] ?? ""));
+  }, [session]);
+  const save = async () => {
+    try {
+      await updateProfile({ name: name.trim() || "Administrateur", avatar });
+      toast.success("Profil administrateur enregistré dans votre compte");
+    } catch {
+      toast.error("Impossible d’enregistrer le profil administrateur");
+    }
   };
   const chooseAvatar = (file: File | undefined) => {
     if (!file) return;
@@ -37,7 +42,8 @@ function SettingsPage() {
         description="Personnalisez l’identité affichée dans le back-office Elite Coffee."
         action={
           <button
-            onClick={save}
+            type="button"
+            onClick={() => void save()}
             className="flex items-center gap-2 rounded-2xl bg-[#3a2d33] px-4 py-3 text-sm font-bold text-white"
           >
             <Check size={16} /> Enregistrer
@@ -112,7 +118,7 @@ function SettingsPage() {
             </div>
           </div>
           <p className="mt-6 rounded-2xl bg-[#fff3d9] p-4 text-sm leading-6 text-[#8e681f]">
-            Les préférences de profil sont conservées sur cet appareil. La session et les droits
+            Le nom et l’avatar sont liés à votre compte administrateur. La session et les droits
             d’accès restent gérés par Supabase.
           </p>
         </AdminCard>

@@ -137,6 +137,16 @@ export const DEFAULT_SITE_MEDIA: SiteMediaRow[] = [
     sort_order: 8,
   },
   {
+    id: "bon-plan-brunch",
+    label: "Bon plan — visuel brunch",
+    slot: "bon-plan-brunch",
+    media_type: "image",
+    url: "/assets/instagram/brunch-table.jpg",
+    alt_text: "Assiette de brunch Elite Coffee",
+    is_visible: true,
+    sort_order: 8.5,
+  },
+  {
     id: "reservation-main",
     label: "Page réservation",
     slot: "reservation-main",
@@ -148,12 +158,18 @@ export const DEFAULT_SITE_MEDIA: SiteMediaRow[] = [
   },
 ];
 
+export function mergeSiteMediaDefaults(rows: SiteMediaRow[]) {
+  const merged = new Map(DEFAULT_SITE_MEDIA.map((item) => [item.id, item]));
+  rows.forEach((item) => merged.set(item.id, item));
+  return [...merged.values()].sort((first, second) => first.sort_order - second.sort_order);
+}
+
 export function useSiteMedia() {
   const [media, setMedia] = useState(DEFAULT_SITE_MEDIA);
   useEffect(() => {
     let active = true;
     fetchSiteMedia()
-      .then((rows) => active && rows.length && setMedia(rows))
+      .then((rows) => active && rows.length && setMedia(mergeSiteMediaDefaults(rows)))
       .catch(() => undefined);
     return () => {
       active = false;

@@ -7,6 +7,7 @@ import {
   ADMIN_LOGIN_MEDIA_ID,
   DEFAULT_ADMIN_LOGIN_MEDIA,
   DEFAULT_SITE_MEDIA,
+  mergeSiteMediaDefaults,
 } from "@/hooks/use-site-media";
 import { fetchSiteMedia, saveSiteMedia, type SiteMediaRow, uploadSiteMedia } from "@/lib/supabase";
 import {
@@ -64,7 +65,7 @@ function GalleryAdminPage() {
     fetchSiteMedia()
       .then((rows) => {
         if (!rows.length) return;
-        const withLoginCover = keepLoginCover(rows);
+        const withLoginCover = keepLoginCover(mergeSiteMediaDefaults(rows));
         setMedia(withLoginCover);
         setDraft((current) => ({ ...current, id: createGalleryKey(withLoginCover) }));
       })

@@ -3,6 +3,7 @@ import { ArrowRight, Check, Loader2, Sparkles, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageShell } from "@/components/SiteChrome";
+import { useSiteMedia } from "@/hooks/use-site-media";
 import { createReservation, registerCustomer } from "@/lib/supabase";
 
 export const Route = createFileRoute("/bon-plan")({ component: GoodPlanPage });
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/bon-plan")({ component: GoodPlanPage });
 function GoodPlanPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const brunchMedia = useSiteMedia().find((item) => item.slot === "bon-plan-brunch");
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -65,6 +67,18 @@ function GoodPlanPage() {
             Réserver une table <ArrowRight size={16} />
           </Link>
         </article>
+        {brunchMedia?.is_visible && (
+          <figure className="overflow-hidden rounded-[2rem] bg-card shadow-soft">
+            <img
+              src={brunchMedia.url}
+              alt={brunchMedia.alt_text}
+              className="max-h-[28rem] w-full object-cover transition duration-500 hover:scale-[1.02]"
+            />
+            <figcaption className="px-6 py-4 text-sm font-semibold text-muted-foreground md:px-8">
+              Le brunch Elite Coffee, servi chaque jour.
+            </figcaption>
+          </figure>
+        )}
         <article className="grid gap-8 rounded-[2rem] bg-card p-6 shadow-soft md:grid-cols-[.9fr_1.1fr] md:p-10">
           <div>
             <Users className="text-accent" size={28} />
