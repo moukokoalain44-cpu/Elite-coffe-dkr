@@ -1,7 +1,21 @@
 import { useEffect, useState } from "react";
 import { fetchSiteMedia, type SiteMediaRow } from "@/lib/supabase";
 
+export const ADMIN_LOGIN_MEDIA_ID = "admin-login-cover";
+
+export const DEFAULT_ADMIN_LOGIN_MEDIA: SiteMediaRow = {
+  id: ADMIN_LOGIN_MEDIA_ID,
+  label: "Visuel de connexion administrateur",
+  slot: ADMIN_LOGIN_MEDIA_ID,
+  media_type: "image",
+  url: "/assets/instagram/hero-brunch.jpg",
+  alt_text: "Une table brunch chez Elite Coffee",
+  is_visible: true,
+  sort_order: 0,
+};
+
 export const DEFAULT_SITE_MEDIA: SiteMediaRow[] = [
+  DEFAULT_ADMIN_LOGIN_MEDIA,
   {
     id: "hero-main",
     label: "Hero principal",

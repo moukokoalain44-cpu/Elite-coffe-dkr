@@ -65,3 +65,17 @@
 - [ ] Réutiliser Radix UI, les tokens Elite Coffee et Recharts déjà présents.
 - [ ] Ajouter `public/manus-routes.json` pour les routes publiques et administrateur.
 - [ ] Ne pas modifier les corrections de l’audit déjà identifiées dans cette phase.
+
+## Connexion administrateur et gestion des médias
+
+- [x] Ajouter les nouveaux médias depuis un panneau latéral dans l’administration de la galerie.
+  - Le formulaire d’ajout s’ouvre sur le côté de la page et ne remplace plus le contenu par une fenêtre modale centrée.
+  - Conserver la clé stable, le nom, le texte alternatif et les choix d’import depuis un fichier ou par URL.
+  - Enregistrer le média dans le stockage et les données déjà utilisés par la galerie publique, puis refermer le panneau et afficher un retour de réussite ou d’erreur.
+
+- [x] Moderniser et embellir le formulaire de connexion à l’administration avec un média administrable depuis la galerie.
+  - Présenter une connexion responsive, lisible et cohérente avec l’identité café d’Elite Coffee.
+  - Préserver l’authentification Supabase existante, les messages d’erreur, les champs accessibles et l’affichage/masquage du mot de passe.
+  - Permettre de définir depuis la galerie une image de celle-ci comme visuel de la page de connexion, avec un visuel de repli si aucun choix n’a été enregistré.
+  - Afficher l’image choisie en aperçu avant de l’enregistrer ; l’aperçu ne remplace pas le visuel enregistré avant confirmation explicite.
+  - Indiquer dans l’administration la clé stable `admin-login-cover` utilisée par la page de connexion.

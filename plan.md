@@ -105,6 +105,11 @@ Table responsive avec : nom, téléphone, date, créneau, nombre de personnes, o
 
 Éditeur par sections : identité/coordonnées, horaires, hero, offres mises en avant, texte À propos et liens sociaux. Les champs auront un aperçu de la valeur publique et une sauvegarde explicite.
 
+### Connexion administrateur et gestion des médias
+
+- Moderniser `/admin/login` avec une composition éditoriale responsive, une palette café/crème et un visuel de marque. Le visuel de connexion est piloté par l’entrée stable `admin-login-cover`, dont la clé est affichée dans la galerie ; une image choisie dans la galerie s’affiche d’abord en aperçu et ne remplace le visuel enregistré qu’après confirmation explicite. Supabase Auth reste le mécanisme de connexion.
+- Dans `/admin/gallery`, ouvrir l’ajout d’image dans un panneau latéral accessible, sans quitter la médiathèque. Conserver la clé stable, le nom, le texte alternatif et les modes d’import fichier/URL déjà pris en charge.
+
 ## Approche technique
 
 - créer un layout `AdminShell` indépendant de `SiteHeader` ;
