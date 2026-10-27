@@ -114,6 +114,12 @@ export type ReservationInsert = {
   message?: string;
 };
 
+export type ReservationRow = ReservationInsert & {
+  id: string;
+  created_at: string;
+  status: "pending" | "confirmed" | "cancelled";
+};
+
 export async function createOrder(
   order: OrderInsert,
   items: Omit<OrderItemInsert, "order_id">[],
@@ -140,6 +146,178 @@ export async function createReservation(reservation: ReservationInsert): Promise
 
   if (error) throw new Error(error.message);
   return data.id as string;
+}
+
+export async function fetchReservationsAdmin(): Promise<ReservationRow[]> {
+  const { data, error } = await supabase
+    .from("reservations")
+    .select("id,created_at,name,phone,date,time,guests,occasion,message,status")
+    .order("date", { ascending: true })
+    .order("time", { ascending: true })
+    .limit(1000);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as ReservationRow[];
+}
+
+export async function updateReservationStatus(id: string, status: ReservationRow["status"]) {
+  const { error } = await supabase.from("reservations").update({ status }).eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export type CustomerInput = { name: string; email?: string; phone: string; source: string };
+export type CustomerRow = {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string;
+  source: string;
+  created_at: string;
+  last_contact_at: string | null;
+};
+
+export async function registerCustomer(customer: CustomerInput) {
+  const { error } = await supabase.from("customers").insert(customer);
+  if (error && !error.message.toLowerCase().includes("duplicate")) throw new Error(error.message);
+}
+
+export async function createContactMessage(input: {
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+}) {
+  const { error } = await supabase.from("contact_messages").insert(input);
+  if (error) throw new Error(error.message);
+}
+
+export async function fetchCustomersAdmin(): Promise<CustomerRow[]> {
+  const { data, error } = await supabase
+    .from("customers")
+    .select("id,name,email,phone,source,created_at,last_contact_at")
+    .order("created_at", { ascending: false })
+    .limit(1000);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as CustomerRow[];
+}
+
+export type CommunicationCampaign = {
+  id: string;
+  name: string;
+  audience: string;
+  channel: string;
+  message: string;
+  status: string;
+  scheduled_for: string | null;
+  total_recipients: number;
+  created_at: string;
+};
+
+export async function fetchCommunicationCampaigns(): Promise<CommunicationCampaign[]> {
+  const { data, error } = await supabase
+    .from("communication_campaigns")
+    .select("id,name,audience,channel,message,status,scheduled_for,total_recipients,created_at")
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as CommunicationCampaign[];
+}
+
+export async function saveCommunicationCampaign(input: {
+  id?: string;
+  name: string;
+  audience: string;
+  channel: string;
+  message: string;
+  status: string;
+  scheduled_for?: string | null;
+  total_recipients?: number;
+}) {
+  const { data, error } = await supabase
+    .from("communication_campaigns")
+    .upsert(input)
+    .select("id,name,audience,channel,message,status,scheduled_for,total_recipients,created_at")
+    .single();
+  if (error) throw new Error(error.message);
+  return data as CommunicationCampaign;
+}
+
+export async function sendUltramsgMessage(input: {
+  phone: string;
+  message: string;
+  campaignId?: string | null;
+}) {
+  const { data, error } = await supabase.rpc("send_ultramsg_message", {
+    p_phone: input.phone,
+    p_message: input.message,
+    p_campaign_id: input.campaignId ?? null,
+  });
+  if (error) throw new Error(error.message);
+  return data as number;
+}
+
+export async function createReservationFollowup(input: {
+  reservation_id: string;
+  customer_id?: string;
+  kind: string;
+  scheduled_for?: string;
+}) {
+  const { error } = await supabase
+    .from("reservation_followups")
+    .upsert(
+      { ...input, channel: "whatsapp", status: "pending" },
+      { onConflict: "reservation_id,kind" },
+    );
+  if (error) throw new Error(error.message);
+}
+
+export type ReservationFollowup = {
+  id: string;
+  reservation_id: string;
+  kind: string;
+  channel: string;
+  scheduled_for: string;
+  status: string;
+  sent_at: string | null;
+};
+export async function fetchReservationFollowups(): Promise<ReservationFollowup[]> {
+  const { data, error } = await supabase
+    .from("reservation_followups")
+    .select("id,reservation_id,kind,channel,scheduled_for,status,sent_at")
+    .order("scheduled_for", { ascending: true })
+    .limit(500);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as ReservationFollowup[];
+}
+export async function markFollowupSent(id: string) {
+  const { error } = await supabase
+    .from("reservation_followups")
+    .update({ status: "sent", sent_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export type ReservationMessageLog = {
+  id: string;
+  reservation_id: string;
+  event_type: "request_received" | "confirmed" | "cancelled";
+  phone: string;
+  message: string;
+  ultramsg_request_id: number | null;
+  status: "queued" | "failed";
+  error_message: string | null;
+  created_at: string;
+};
+export async function fetchReservationMessageLogs(): Promise<ReservationMessageLog[]> {
+  const { data, error } = await supabase
+    .from("reservation_message_log")
+    .select(
+      "id,reservation_id,event_type,phone,message,ultramsg_request_id,status,error_message,created_at",
+    )
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as ReservationMessageLog[];
 }
 
 export type SiteMediaRow = {

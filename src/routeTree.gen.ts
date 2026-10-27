@@ -22,6 +22,8 @@ import { Route as MenuRouteImport } from './routes/menu'
 import { Route as ReserverRouteImport } from './routes/reserver'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
+import { Route as AdminClientsRouteImport } from './routes/admin.clients'
+import { Route as AdminCommunicationRouteImport } from './routes/admin.communication'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
@@ -94,6 +96,16 @@ const AdminCatalogRoute = AdminCatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminClientsRoute = AdminClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCommunicationRoute = AdminCommunicationRouteImport.update({
+  id: '/communication',
+  path: '/communication',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminContentRoute = AdminContentRouteImport.update({
   id: '/content',
   path: '/content',
@@ -138,6 +150,8 @@ export interface FileRoutesByFullPath {
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/clients': typeof AdminClientsRoute
+  '/admin/communication': typeof AdminCommunicationRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/login': typeof AdminLoginRoute
@@ -158,6 +172,8 @@ export interface FileRoutesByTo {
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/clients': typeof AdminClientsRoute
+  '/admin/communication': typeof AdminCommunicationRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/login': typeof AdminLoginRoute
@@ -180,6 +196,8 @@ export interface FileRoutesById {
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/clients': typeof AdminClientsRoute
+  '/admin/communication': typeof AdminCommunicationRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/login': typeof AdminLoginRoute
@@ -203,6 +221,8 @@ export interface FileRouteTypes {
     | '/menu'
     | '/reserver'
     | '/admin/catalog'
+    | '/admin/clients'
+    | '/admin/communication'
     | '/admin/content'
     | '/admin/gallery'
     | '/admin/login'
@@ -223,6 +243,8 @@ export interface FileRouteTypes {
     | '/menu'
     | '/reserver'
     | '/admin/catalog'
+    | '/admin/clients'
+    | '/admin/communication'
     | '/admin/content'
     | '/admin/gallery'
     | '/admin/login'
@@ -244,6 +266,8 @@ export interface FileRouteTypes {
     | '/menu'
     | '/reserver'
     | '/admin/catalog'
+    | '/admin/clients'
+    | '/admin/communication'
     | '/admin/content'
     | '/admin/gallery'
     | '/admin/login'
@@ -360,6 +384,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCatalogRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/clients': {
+      id: '/admin/clients'
+      path: '/clients'
+      fullPath: '/admin/clients'
+      preLoaderRoute: typeof AdminClientsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/communication': {
+      id: '/admin/communication'
+      path: '/communication'
+      fullPath: '/admin/communication'
+      preLoaderRoute: typeof AdminCommunicationRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/content': {
       id: '/admin/content'
       path: '/content'
@@ -407,6 +445,8 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminCatalogRoute: typeof AdminCatalogRoute
+  AdminClientsRoute: typeof AdminClientsRoute
+  AdminCommunicationRoute: typeof AdminCommunicationRoute
   AdminContentRoute: typeof AdminContentRoute
   AdminGalleryRoute: typeof AdminGalleryRoute
   AdminLoginRoute: typeof AdminLoginRoute
@@ -417,6 +457,8 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogRoute: AdminCatalogRoute,
+  AdminClientsRoute: AdminClientsRoute,
+  AdminCommunicationRoute: AdminCommunicationRoute,
   AdminContentRoute: AdminContentRoute,
   AdminGalleryRoute: AdminGalleryRoute,
   AdminLoginRoute: AdminLoginRoute,

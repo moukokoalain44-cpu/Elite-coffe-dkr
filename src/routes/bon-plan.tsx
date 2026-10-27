@@ -3,7 +3,7 @@ import { ArrowRight, Check, Loader2, Sparkles, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageShell } from "@/components/SiteChrome";
-import { createReservation } from "@/lib/supabase";
+import { createReservation, registerCustomer } from "@/lib/supabase";
 
 export const Route = createFileRoute("/bon-plan")({ component: GoodPlanPage });
 
@@ -26,7 +26,10 @@ function GoodPlanPage() {
           ? { message: String(data.get("message") ?? "").trim() }
           : {}),
       } satisfies Parameters<typeof createReservation>[0];
-      await createReservation(reservation);
+      const id = await createReservation(reservation);
+      await Promise.allSettled([
+        registerCustomer({ name: reservation.name, phone: reservation.phone, source: "buffet" }),
+      ]);
       setSent(true);
       toast.success("Votre demande pour le buffet est enregistrée");
     } catch {

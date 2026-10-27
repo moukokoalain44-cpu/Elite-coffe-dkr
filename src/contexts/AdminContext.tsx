@@ -1,5 +1,6 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { PRODUCT_CATALOG, type Product } from "@/data/catalog";
+import { fetchReservationsAdmin } from "@/lib/supabase";
 
 export type RegistrationStatus = "pending" | "confirmed" | "cancelled";
 
@@ -127,6 +128,26 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [registrations, setRegistrations] = useState(seedRegistrations);
   const [products, setProducts] = useState(PRODUCT_CATALOG);
   const [content, setContent] = useState(initialContent);
+  useEffect(() => {
+    void fetchReservationsAdmin()
+      .then((rows) =>
+        setRegistrations(
+          rows.map((row) => ({
+            id: row.id,
+            name: row.name,
+            phone: row.phone,
+            date: row.date,
+            time: row.time,
+            guests: row.guests,
+            occasion: row.occasion ?? "Table classique",
+            message: row.message ?? "",
+            status: row.status,
+            createdAt: row.created_at,
+          })),
+        ),
+      )
+      .catch(() => undefined);
+  }, []);
   const value = useMemo<AdminContextValue>(
     () => ({
       registrations,
@@ -137,7 +158,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         setRegistrations((items) =>
           items.map((item) => {
             if (item.id !== id) return item;
-            if (patch.status && !canUpdateRegistrationStatus(item.status, patch.status)) return item;
+            if (patch.status && !canUpdateRegistrationStatus(item.status, patch.status))
+              return item;
             return { ...item, ...patch };
           }),
         ),

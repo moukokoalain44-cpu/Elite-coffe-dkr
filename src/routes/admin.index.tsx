@@ -1,12 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarDays, ChevronRight, Image, Utensils } from "lucide-react";
+import { CalendarDays, ChevronRight, Image, MessageCircle, Users, Utensils } from "lucide-react";
+import { useEffect, useState } from "react";
 import { AdminCard, AdminPageHeader } from "@/components/AdminChrome";
 import { useAdmin } from "@/contexts/AdminContext";
+import { fetchCustomersAdmin, fetchReservationMessageLogs } from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin/")({ component: AdminDashboard });
 
 function AdminDashboard() {
   const { registrations, products } = useAdmin();
+  const [customerCount, setCustomerCount] = useState<number | null>(null);
+  const [followupCount, setFollowupCount] = useState<number | null>(null);
+  useEffect(() => {
+    void Promise.all([fetchCustomersAdmin(), fetchReservationMessageLogs()])
+      .then(([customers, messages]) => {
+        setCustomerCount(customers.length);
+        setFollowupCount(messages.length);
+      })
+      .catch(() => {
+        setCustomerCount(0);
+        setFollowupCount(0);
+      });
+  }, []);
   const pending = registrations.filter((item) => item.status === "pending").length;
   const categories = new Set(products.map((item) => item.category)).size;
   const cards = [
@@ -34,6 +49,22 @@ function AdminDashboard() {
       to: "/admin/content",
       tone: "bg-[#eef4f2] text-[#4d8973]",
     },
+    {
+      label: "Clients CRM",
+      value: customerCount ?? "—",
+      text: "Contacts issus des formulaires publics",
+      icon: Users,
+      to: "/admin/clients",
+      tone: "bg-[#f5f0e8] text-[#9b7140]",
+    },
+    {
+      label: "Messages automatiques",
+      value: followupCount ?? "—",
+      text: "Demandes, confirmations et annulations envoyées",
+      icon: MessageCircle,
+      to: "/admin/communication",
+      tone: "bg-[#edf3f8] text-[#4a759b]",
+    },
   ];
   return (
     <>
@@ -42,7 +73,7 @@ function AdminDashboard() {
         title="Votre espace restaurant"
         description="Une vue simple et utile sur les réservations, la carte et les contenus publiés."
       />
-      <div className="grid gap-5 md:grid-cols-3">
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
         {cards.map(({ label, value, text, icon: Icon, to, tone }) => (
           <Link key={label} to={to} className="group">
             <AdminCard className="h-full transition hover:-translate-y-1 hover:border-[#e1a8b9]">

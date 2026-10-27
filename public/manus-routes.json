@@ -71,6 +71,14 @@
     {
       "path": "/admin/gallery",
       "title": "Galerie"
+    },
+    {
+      "path": "/admin/clients",
+      "title": "Clients"
+    },
+    {
+      "path": "/admin/communication",
+      "title": "Communication"
     }
   ]
 }

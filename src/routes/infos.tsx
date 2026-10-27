@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { PageShell } from "@/components/SiteChrome";
 import { CONTACT } from "@/data/site";
+import { createContactMessage, registerCustomer } from "@/lib/supabase";
 
 export const Route = createFileRoute("/infos")({ component: InfosPage });
 const input =
@@ -35,7 +36,7 @@ function InfosPage() {
     { icon: Clock3, label: "Horaires", value: CONTACT.hours.join(" · ") },
   ];
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const submit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const submit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const value = (key: string) => String(data.get(key) ?? "").trim();
@@ -50,6 +51,21 @@ function InfosPage() {
       toast.error("Veuillez corriger les champs en surbrillance");
       return;
     }
+    await Promise.allSettled([
+      registerCustomer({
+        name: value("name"),
+        email: value("email"),
+        phone: value("phone") || "non renseigné",
+        source: "contact",
+      }),
+      createContactMessage({
+        name: value("name"),
+        email: value("email"),
+        phone: value("phone"),
+        subject: value("subject"),
+        message: value("message"),
+      }),
+    ]);
     toast.success("Merci ! Nous vous répondrons sous 24 heures.");
     event.currentTarget.reset();
   };

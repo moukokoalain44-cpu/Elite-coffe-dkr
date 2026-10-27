@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AdminCard, AdminPageHeader, AdminPagination, StatusBadge } from "@/components/AdminChrome";
 import { useAdmin, type Registration, type RegistrationStatus } from "@/contexts/AdminContext";
+import { updateReservationStatus } from "@/lib/supabase";
 
 function canTransition(from: RegistrationStatus, to: RegistrationStatus) {
   if (from === to) return true;
@@ -70,8 +71,16 @@ function RegistrationsPage() {
       />
       <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-[#e7e2e5] bg-white p-4 shadow-sm">
         <label className="text-sm font-bold text-[#665b60]">Télécharger la liste du</label>
-        <input type="date" value={exportDate} onChange={(event) => setExportDate(event.target.value)} className="rounded-xl border border-[#e7e2e5] bg-[#fdfbfc] px-3 py-2 text-sm outline-none focus:border-[#d85f82]" />
-        <button onClick={() => void downloadReservationsPdf(registrations, exportDate)} className="flex items-center gap-2 rounded-xl bg-[#3a2d33] px-4 py-2.5 text-sm font-bold text-white">
+        <input
+          type="date"
+          value={exportDate}
+          onChange={(event) => setExportDate(event.target.value)}
+          className="rounded-xl border border-[#e7e2e5] bg-[#fdfbfc] px-3 py-2 text-sm outline-none focus:border-[#d85f82]"
+        />
+        <button
+          onClick={() => void downloadReservationsPdf(registrations, exportDate)}
+          className="flex items-center gap-2 rounded-xl bg-[#3a2d33] px-4 py-2.5 text-sm font-bold text-white"
+        >
           <Download size={16} /> Télécharger le PDF
         </button>
         <span className="text-xs text-[#93878d]">Document organisé pour l’équipe en salle.</span>
@@ -146,14 +155,31 @@ function RegistrationsPage() {
                           toast.error("Ce statut ne peut plus être réouvert.");
                           return;
                         }
-                        updateRegistration(row.id, { status: next });
-                        toast.success("Statut de la réservation mis à jour");
+                        const persist =
+                          row.id.length > 20
+                            ? updateReservationStatus(row.id, next)
+                            : Promise.resolve();
+                        void persist
+                          .then(() => {
+                            updateRegistration(row.id, { status: next });
+                            toast.success("Statut de la réservation mis à jour");
+                          })
+                          .catch(() => toast.error("Le statut n’a pas pu être enregistré."));
                       }}
                       className="rounded-lg border-0 bg-transparent p-0 text-xs font-bold outline-none"
                     >
-                      <option value="pending" disabled={row.status !== "pending"}>En attente</option>
-                      <option value="confirmed" disabled={row.status === "confirmed" || row.status === "cancelled"}>Confirmée</option>
-                      <option value="cancelled" disabled={row.status === "cancelled"}>Annulée</option>
+                      <option value="pending" disabled={row.status !== "pending"}>
+                        En attente
+                      </option>
+                      <option
+                        value="confirmed"
+                        disabled={row.status === "confirmed" || row.status === "cancelled"}
+                      >
+                        Confirmée
+                      </option>
+                      <option value="cancelled" disabled={row.status === "cancelled"}>
+                        Annulée
+                      </option>
                     </select>
                   </td>
                   <td className="px-6 py-4">
@@ -226,17 +252,27 @@ async function downloadReservationsPdf(rows: Registration[], selectedDate: strin
   pdf.text("Elite Coffee — Réservations", margin, 12);
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(9);
-  pdf.text(selectedDate ? `Service du ${selectedDate}` : "Liste complète des réservations", margin, 20);
+  pdf.text(
+    selectedDate ? `Service du ${selectedDate}` : "Liste complète des réservations",
+    margin,
+    20,
+  );
   pdf.setTextColor(44, 37, 42);
   pdf.setFontSize(10);
-  pdf.text(`Document préparé le ${new Date().toLocaleDateString("fr-FR")} · ${reservations.length} réservation(s)`, margin, 39);
+  pdf.text(
+    `Document préparé le ${new Date().toLocaleDateString("fr-FR")} · ${reservations.length} réservation(s)`,
+    margin,
+    39,
+  );
   let y = 49;
   const columns: [number, number, number, number, number, number] = [16, 50, 88, 108, 126, 174];
   pdf.setFillColor(249, 242, 245);
   pdf.roundedRect(margin, y - 6, pageWidth - margin * 2, 10, 2, 2, "F");
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
-  ["Heure", "Client / téléphone", "Convives", "Occasion", "Statut"].forEach((label, index) => pdf.text(label, columns[index]!, y));
+  ["Heure", "Client / téléphone", "Convives", "Occasion", "Statut"].forEach((label, index) =>
+    pdf.text(label, columns[index]!, y),
+  );
   y += 11;
   pdf.setFont("helvetica", "normal");
   if (!reservations.length) {
@@ -252,10 +288,22 @@ async function downloadReservationsPdf(rows: Registration[], selectedDate: strin
     pdf.line(margin, y + 4, pageWidth - margin, y + 4);
     pdf.setFontSize(9);
     pdf.text(row.time || "—", columns[0], y);
-    pdf.text(`${row.name || "Sans nom"} · ${row.phone || "Téléphone à compléter"}`.slice(0, 36), columns[1], y);
+    pdf.text(
+      `${row.name || "Sans nom"} · ${row.phone || "Téléphone à compléter"}`.slice(0, 36),
+      columns[1],
+      y,
+    );
     pdf.text(String(row.guests), columns[2], y);
     pdf.text((row.occasion || "Table classique").slice(0, 22), columns[3], y);
-    pdf.text(row.status === "confirmed" ? "Confirmée" : row.status === "cancelled" ? "Annulée" : "En attente", columns[4], y);
+    pdf.text(
+      row.status === "confirmed"
+        ? "Confirmée"
+        : row.status === "cancelled"
+          ? "Annulée"
+          : "En attente",
+      columns[4],
+      y,
+    );
     if (row.message) {
       pdf.setTextColor(110, 98, 105);
       pdf.setFontSize(8);

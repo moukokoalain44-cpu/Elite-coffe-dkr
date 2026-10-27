@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
+  MessageCircle,
   ChevronDown,
   Coffee,
   LayoutDashboard,
@@ -16,6 +17,7 @@ import {
   Settings,
   Sun,
   Users,
+  UsersRound,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -25,14 +27,16 @@ import { useAdminAuth } from "@/contexts/AuthContext";
 const nav = [
   { label: "Vue d’ensemble", to: "/admin", icon: LayoutDashboard },
   { label: "Réservations", to: "/admin/registrations", icon: Users },
+  { label: "Clients", to: "/admin/clients", icon: UsersRound },
+  { label: "Communication", to: "/admin/communication", icon: MessageCircle },
   { label: "Catalogue", to: "/admin/catalog", icon: Package },
   { label: "Galerie", to: "/admin/gallery", icon: Image },
   { label: "Contenu", to: "/admin/content", icon: FileText },
 ];
 
 const navGroups = [
-  { label: "Pilotage", items: nav.slice(0, 3) },
-  { label: "Gestion du restaurant", items: nav.slice(3) },
+  { label: "Pilotage", items: nav.slice(0, 5) },
+  { label: "Gestion du restaurant", items: nav.slice(5) },
 ];
 
 export function AdminLayout() {
