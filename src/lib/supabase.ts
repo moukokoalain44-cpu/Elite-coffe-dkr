@@ -223,6 +223,24 @@ export async function fetchCommunicationCampaigns(): Promise<CommunicationCampai
   return (data ?? []) as CommunicationCampaign[];
 }
 
+export type CommunicationDeliveryLog = {
+  id: string;
+  campaign_id: string | null;
+  phone: string;
+  message: string;
+  status: "queued" | "sent" | "delivered" | "read" | "failed";
+  created_at: string;
+};
+export async function fetchCommunicationDeliveryLogs(): Promise<CommunicationDeliveryLog[]> {
+  const { data, error } = await supabase
+    .from("communication_delivery_log")
+    .select("id,campaign_id,phone,message,status,created_at")
+    .order("created_at", { ascending: false })
+    .limit(2000);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as CommunicationDeliveryLog[];
+}
+
 export async function saveCommunicationCampaign(input: {
   id?: string;
   name: string;

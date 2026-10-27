@@ -159,7 +159,7 @@ create table if not exists public.communication_delivery_log (
   phone               text not null,
   message             text not null,
   ultramsg_request_id bigint,
-  status              text not null default 'queued' check (status in ('queued','failed')),
+  status              text not null default 'queued' check (status in ('queued','sent','delivered','read','failed')),
   error_message       text,
   created_at          timestamptz not null default now()
 );

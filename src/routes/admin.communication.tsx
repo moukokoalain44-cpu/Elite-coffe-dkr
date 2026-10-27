@@ -6,9 +6,11 @@ import { AdminCard, AdminPageHeader } from "@/components/AdminChrome";
 import {
   fetchCustomersAdmin,
   fetchCommunicationCampaigns,
+  fetchCommunicationDeliveryLogs,
   saveCommunicationCampaign,
   sendUltramsgMessage,
   type CommunicationCampaign,
+  type CommunicationDeliveryLog,
 } from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin/communication")({ component: CommunicationPage });
@@ -25,6 +27,7 @@ const templates = {
 
 function CommunicationPage() {
   const [campaigns, setCampaigns] = useState<CommunicationCampaign[]>([]);
+  const [deliveryLogs, setDeliveryLogs] = useState<CommunicationDeliveryLog[]>([]);
   const [tab, setTab] = useState<"direct" | "campaigns">("direct");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState(templates.accueil);
@@ -37,13 +40,36 @@ function CommunicationPage() {
   });
 
   const reload = () =>
-    fetchCommunicationCampaigns()
-      .then(setCampaigns)
+    Promise.all([fetchCommunicationCampaigns(), fetchCommunicationDeliveryLogs()])
+      .then(([nextCampaigns, nextLogs]) => {
+        setCampaigns(nextCampaigns);
+        setDeliveryLogs(nextLogs);
+      })
       .catch(() => toast.error("Impossible de charger les campagnes."));
 
   useEffect(() => {
     void reload();
   }, []);
+
+  const totalMessages = deliveryLogs.length;
+  const successfulMessages = deliveryLogs.filter((item) =>
+    ["sent", "delivered", "read"].includes(item.status),
+  ).length;
+  const deliveredMessages = deliveryLogs.filter((item) =>
+    ["delivered", "read"].includes(item.status),
+  ).length;
+  const readMessages = deliveryLogs.filter((item) => item.status === "read").length;
+  const failedMessages = deliveryLogs.filter((item) => item.status === "failed").length;
+  const successRate = totalMessages ? Math.round((successfulMessages / totalMessages) * 100) : 0;
+  const campaignStats = (campaignId: string) => {
+    const rows = deliveryLogs.filter((item) => item.campaign_id === campaignId);
+    const delivered = rows.filter((item) => ["delivered", "read"].includes(item.status)).length;
+    return {
+      total: rows.length,
+      delivered,
+      rate: rows.length ? Math.round((delivered / rows.length) * 100) : 0,
+    };
+  };
 
   const sendWhatsApp = async () => {
     const clean = phone.replace(/\D/g, "");
@@ -143,6 +169,23 @@ function CommunicationPage() {
           Campagnes
         </button>
       </div>
+      <section className="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          ["Messages envoyés", successfulMessages, "sur " + totalMessages + " tentés"],
+          ["Taux de réussite", successRate + "%", "file UltraMsg"],
+          ["Messages délivrés", deliveredMessages, readMessages + " lus"],
+          ["Échecs", failedMessages, "à vérifier"],
+        ].map(([label, value, detail]) => (
+          <div
+            key={String(label)}
+            className="rounded-2xl border border-[#eee8e8] bg-white p-5 shadow-sm"
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#93878d]">{label}</p>
+            <p className="mt-2 font-display text-3xl font-bold text-[#3a2d33]">{value}</p>
+            <p className="mt-1 text-xs text-[#93878d]">{detail}</p>
+          </div>
+        ))}
+      </section>
       {tab === "direct" && (
         <AdminCard>
           <div className="flex items-center gap-3">
@@ -292,6 +335,14 @@ function CommunicationPage() {
                   <p className="mt-1 text-xs text-[#93878d]">
                     {item.channel} · {item.audience} · {item.status}
                   </p>
+                  {(() => {
+                    const stats = campaignStats(item.id);
+                    return stats.total ? (
+                      <p className="mt-2 text-xs font-semibold text-[#237747]">
+                        {stats.delivered}/{stats.total} délivrés · {stats.rate}% de réussite
+                      </p>
+                    ) : null;
+                  })()}
                 </div>
               ))}
               {!campaigns.length && (
