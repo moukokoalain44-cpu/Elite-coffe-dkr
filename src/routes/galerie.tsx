@@ -6,7 +6,7 @@ import { useSiteMedia } from "@/hooks/use-site-media";
 
 export const Route = createFileRoute("/galerie")({ component: GalleryPage });
 function GalleryPage() {
-  const media = useSiteMedia().filter((item) => item.slot.startsWith("gallery-"));
+  const media = useSiteMedia().filter((item) => !item.id.startsWith("admin-"));
   return (
     <PageShell
       eyebrow="Galerie"
@@ -15,7 +15,8 @@ function GalleryPage() {
     >
       <section className="mx-auto max-w-7xl px-4 pb-24 md:px-6">
         <div className="mb-8 flex items-center gap-3 text-sm text-muted-foreground">
-          <Image size={18} className="text-accent" /> Images sélectionnées par l’équipe Elite Coffee
+          <Image size={18} className="text-accent" /> Tous les médias publics sélectionnés par l’équipe
+          Elite Coffee
         </div>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {media.map((item) => (
