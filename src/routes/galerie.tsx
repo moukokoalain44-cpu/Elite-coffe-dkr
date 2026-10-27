@@ -19,11 +19,24 @@ function GalleryPage() {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {media.map((item) => (
             <figure key={item.id} className="group overflow-hidden rounded-2xl bg-card shadow-soft">
-              <img
-                src={item.url}
-                alt={item.alt_text}
-                className="aspect-square w-full object-cover transition duration-500 group-hover:scale-105"
-              />
+              {item.media_type === "video" ? (
+                <video
+                  src={item.url}
+                  muted
+                  autoPlay
+                  loop
+                  playsInline
+                  aria-label={item.alt_text}
+                  className="aspect-square w-full object-cover transition duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <img
+                  src={item.url}
+                  alt={item.alt_text}
+                  loading="lazy"
+                  className="aspect-square w-full object-cover transition duration-500 group-hover:scale-105"
+                />
+              )}
               <figcaption className="p-3 text-sm font-semibold">{item.alt_text}</figcaption>
             </figure>
           ))}

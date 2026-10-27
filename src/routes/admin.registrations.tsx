@@ -286,6 +286,7 @@ async function downloadReservationsPdf(rows: Registration[], selectedDate: strin
   );
   let y = 49;
   const columns: [number, number, number, number, number, number] = [16, 50, 88, 108, 126, 174];
+  const arrivalBoxX = pageWidth - margin - 5;
   pdf.setFillColor(249, 242, 245);
   pdf.roundedRect(margin, y - 6, pageWidth - margin * 2, 10, 2, 2, "F");
   pdf.setFont("helvetica", "bold");
@@ -293,6 +294,7 @@ async function downloadReservationsPdf(rows: Registration[], selectedDate: strin
   ["Heure", "Client / téléphone", "Convives", "Occasion", "Statut"].forEach((label, index) =>
     pdf.text(label, columns[index]!, y),
   );
+  pdf.text("Arrivé", arrivalBoxX - 7, y);
   y += 11;
   pdf.setFont("helvetica", "normal");
   if (!reservations.length) {
@@ -324,6 +326,10 @@ async function downloadReservationsPdf(rows: Registration[], selectedDate: strin
       columns[4],
       y,
     );
+    pdf.setDrawColor(120, 108, 116);
+    pdf.setLineWidth(0.35);
+    pdf.rect(arrivalBoxX, y - 4, 5, 5);
+    pdf.setLineWidth(0.2);
     if (row.message) {
       pdf.setTextColor(110, 98, 105);
       pdf.setFontSize(8);

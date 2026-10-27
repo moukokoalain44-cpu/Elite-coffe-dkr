@@ -39,6 +39,10 @@ function normalizeGalleryKey(value: string) {
   return normalized.startsWith("gallery-") ? normalized : `gallery-${normalized}`;
 }
 
+function inferMediaType(url: string): SiteMediaRow["media_type"] {
+  return /\.(mp4|webm|mov|m4v)(?:[?#].*)?$/i.test(url.trim()) ? "video" : "image";
+}
+
 function keepLoginCover(rows: SiteMediaRow[]) {
   if (rows.some((item) => item.id === ADMIN_LOGIN_MEDIA_ID)) return rows;
   return [...rows, DEFAULT_ADMIN_LOGIN_MEDIA].sort(
@@ -55,7 +59,7 @@ function GalleryAdminPage() {
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState({
     id: createGalleryKey(DEFAULT_SITE_MEDIA),
-    label: "Nouvelle image galerie",
+    label: "Nouveau média galerie",
     alt_text: "Image Elite Coffee",
     url: "",
     file: null as File | null,
@@ -98,7 +102,17 @@ function GalleryAdminPage() {
       setLoginCoverPreview((current) => ({ ...(current ?? loginCover), [key]: value }));
       return;
     }
-    setMedia((items) => items.map((item) => (item.id === id ? { ...item, [key]: value } : item)));
+    setMedia((items) =>
+      items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              [key]: value,
+              ...(key === "url" ? { media_type: inferMediaType(value) } : {}),
+            }
+          : item,
+      ),
+    );
   };
 
   const save = async (item: SiteMediaRow) => {
@@ -177,10 +191,10 @@ function GalleryAdminPage() {
     }
   };
 
-  const addImage = async () => {
+  const addMedia = async () => {
     const id = normalizeGalleryKey(draft.id);
     if (!draft.label.trim() || !draft.alt_text.trim()) {
-      toast.error("Renseignez le nom et le texte alternatif de l’image.");
+      toast.error("Renseignez le nom et le texte alternatif du média.");
       return;
     }
     if (media.some((item) => item.id === id)) {
@@ -188,7 +202,7 @@ function GalleryAdminPage() {
       return;
     }
     if (!draft.file && !draft.url.trim()) {
-      toast.error("Importez une image ou renseignez une URL.");
+      toast.error("Importez une photo ou une vidéo, ou renseignez une URL.");
       return;
     }
 
@@ -199,7 +213,7 @@ function GalleryAdminPage() {
         id,
         label: draft.label.trim(),
         slot: id,
-        media_type: "image",
+        media_type: draft.file?.type.startsWith("video/") ? "video" : inferMediaType(draft.url),
         url,
         alt_text: draft.alt_text.trim(),
         is_visible: true,
@@ -211,13 +225,13 @@ function GalleryAdminPage() {
       );
       setDraft({
         id: createGalleryKey([...media, item]),
-        label: "Nouvelle image galerie",
+        label: "Nouveau média galerie",
         alt_text: "Image Elite Coffee",
         url: "",
         file: null,
       });
       setAdding(false);
-      toast.success("Image ajoutée à la galerie publique");
+      toast.success("Média ajouté à la galerie publique");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Impossible d’ajouter cette image");
     } finally {
@@ -237,7 +251,7 @@ function GalleryAdminPage() {
             onClick={() => setAdding(true)}
             className="inline-flex items-center gap-2 rounded-2xl bg-[#d85f82] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#bd496c]"
           >
-            <Plus size={17} /> Ajouter une image
+            <Plus size={17} /> Ajouter un média
           </button>
         }
       />
@@ -323,9 +337,9 @@ function GalleryAdminPage() {
                     <input
                       type="file"
                       accept={
-                        cardItem.media_type === "video"
-                          ? "video/mp4,video/webm,video/quicktime"
-                          : "image/jpeg,image/png,image/webp,image/avif"
+                        isLoginCover
+                          ? "image/jpeg,image/png,image/webp,image/avif"
+                          : "image/jpeg,image/png,image/webp,image/avif,video/mp4,video/webm,video/quicktime"
                       }
                       className="sr-only"
                       disabled={uploadingId !== null}
@@ -416,10 +430,10 @@ function GalleryAdminPage() {
               Galerie publique
             </p>
             <SheetTitle className="mt-1 font-display text-3xl font-bold text-[#2a211b]">
-              Ajouter une image
+              Ajouter un média
             </SheetTitle>
             <SheetDescription className="text-sm leading-6 text-[#887b70]">
-              Le panneau s’ouvre à côté de votre médiathèque. La clé stable relie l’image à la
+              Le panneau s’ouvre à côté de votre médiathèque. La clé stable relie le média à la
               galerie publique.
             </SheetDescription>
           </SheetHeader>
@@ -440,7 +454,7 @@ function GalleryAdminPage() {
               </span>
             </label>
             <label className="block text-sm font-bold text-[#57483c]">
-              Nom de l’image
+              Nom du média
               <input
                 value={draft.label}
                 onChange={(event) => setDraft({ ...draft, label: event.target.value })}
@@ -459,11 +473,13 @@ function GalleryAdminPage() {
               <span className="grid size-10 place-items-center rounded-xl bg-white text-[#a36b4b] shadow-sm">
                 <Upload size={18} />
               </span>
-              <span>{draft.file?.name ?? "Choisir une image depuis les fichiers"}</span>
-              <span className="text-xs font-normal text-[#9a8b7c]">JPG, PNG, WebP ou AVIF</span>
+              <span>{draft.file?.name ?? "Choisir une photo ou une vidéo"}</span>
+              <span className="text-xs font-normal text-[#9a8b7c]">
+                JPG, PNG, WebP, AVIF, MP4, WebM ou MOV
+              </span>
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/avif"
+                accept="image/jpeg,image/png,image/webp,image/avif,video/mp4,video/webm,video/quicktime"
                 className="sr-only"
                 onChange={(event) =>
                   setDraft((current) => ({ ...current, file: event.target.files?.[0] ?? null }))
@@ -476,7 +492,7 @@ function GalleryAdminPage() {
               <span className="h-px flex-1 bg-[#e9e0d6]" />
             </div>
             <label className="block text-sm font-bold text-[#57483c]">
-              URL de l’image
+              URL de la photo ou de la vidéo
               <input
                 type="url"
                 value={draft.url}
@@ -500,7 +516,7 @@ function GalleryAdminPage() {
             </button>
             <button
               type="button"
-              onClick={() => void addImage()}
+              onClick={() => void addMedia()}
               disabled={uploadingId === "new-gallery-image"}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4b3021] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#352115] disabled:cursor-not-allowed disabled:opacity-60"
             >
