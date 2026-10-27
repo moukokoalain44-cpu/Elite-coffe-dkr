@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { BookOpen, HelpCircle, Images, Info, Menu, MessageCircle, Utensils, X } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { WHATSAPP_CONTACT_URL } from "@/data/site";
 import { OPEN_COOKIE_SETTINGS_EVENT } from "@/components/CookieConsentManager";
 
@@ -152,18 +152,42 @@ export function PageShell({
   title: string;
   description: string;
 }) {
+  const introRef = useRef<HTMLElement>(null);
+  const parallaxRef = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const parallax = parallaxRef.current;
+    if (!parallax) return;
+    let frame = 0;
+    const updateParallax = () => {
+      frame = 0;
+      parallax.style.transform = `translate3d(0, ${Math.min(window.scrollY * 0.08, 28)}px, 0)`;
+    };
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateParallax);
+    };
+    updateParallax();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
   return (
-    <div className="min-h-screen bg-background">
+    <div className="page-shell min-h-screen bg-background">
       <SiteHeader />
       <main>
-        <section className="mx-auto max-w-7xl px-4 pb-12 pt-32 md:px-6 md:pb-16 md:pt-40">
+        <section
+          ref={introRef}
+          className="page-intro mx-auto max-w-7xl px-4 pb-12 pt-32 md:px-6 md:pb-16 md:pt-40"
+        >
+          <span ref={parallaxRef} className="page-parallax-orb" aria-hidden="true" />
           <p className="text-xs font-bold uppercase tracking-[0.28em] text-accent">{eyebrow}</p>
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-bold leading-[1.05] text-foreground md:text-7xl">
             {title}
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted-foreground">{description}</p>
         </section>
-        {children}
+        <div className="page-content">{children}</div>
       </main>
       <footer className="border-t border-border bg-secondary/50">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between md:px-6">
