@@ -103,6 +103,8 @@ export const CONTACT = {
     "Horaires et coordonnées vérifiés sur les canaux publics d’Elite Coffee en octobre 2026.",
 };
 
+export const WHATSAPP_CONTACT_URL = `https://wa.me/${CONTACT.phone.replace(/\D/g, "")}?text=${encodeURIComponent("Bonjour Elite Coffee, je souhaite obtenir des informations sur votre restaurant.")}`;
+
 export const FOOTER = {
   Explorer: ["Carte", "Adresses", "Traiteur"],
   Aide: ["FAQ", "Contact"],

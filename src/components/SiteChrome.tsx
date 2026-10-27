@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, HelpCircle, Images, Info, Menu, Utensils, X } from "lucide-react";
+import { BookOpen, HelpCircle, Images, Info, Menu, MessageCircle, Utensils, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { WHATSAPP_CONTACT_URL } from "@/data/site";
 
 const navLinks = [
   ["Carte", "/menu"],
@@ -59,6 +60,14 @@ export function SiteHeader() {
             ))}
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
+            <a
+              href={WHATSAPP_CONTACT_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="hidden items-center gap-1.5 rounded-sm border border-[#6ed59a]/70 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#bdf3ce] transition-all hover:-translate-y-0.5 hover:bg-[#6ed59a]/15 sm:inline-flex"
+            >
+              <MessageCircle size={14} /> Nous contacter
+            </a>
             <Link
               to="/reserver"
               className="hidden rounded-sm bg-accent px-4 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-primary shadow-[0_5px_16px_rgba(216,137,74,.18)] transition-all hover:-translate-y-0.5 hover:bg-primary-foreground sm:inline-flex"
@@ -86,6 +95,15 @@ export function SiteHeader() {
               >
                 Réserver une table
               </Link>
+              <a
+                href={WHATSAPP_CONTACT_URL}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => setMobileOpen(false)}
+                className="mb-2 inline-flex items-center justify-center gap-2 rounded-xl border border-[#6ed59a]/70 px-4 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[#bdf3ce]"
+              >
+                <MessageCircle size={15} /> Nous contacter
+              </a>
               {navLinks.map(([label, to]) => (
                 <Link
                   key={to}
