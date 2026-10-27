@@ -16,6 +16,7 @@ function SettingsPage() {
   const save = () => {
     localStorage.setItem("elite-admin-name", name.trim() || "Administrateur");
     localStorage.setItem("elite-admin-avatar", avatar);
+    window.dispatchEvent(new Event("elite-admin-profile-updated"));
     toast.success("Profil administrateur enregistré");
   };
   const chooseAvatar = (file: File | undefined) => {

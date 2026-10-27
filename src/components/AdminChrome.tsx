@@ -59,6 +59,11 @@ export function AdminLayout() {
     setDarkMode(window.localStorage.getItem("elite-admin-theme") === "dark");
     setProfileName(window.localStorage.getItem("elite-admin-name") || "Oripio Studio");
     setProfileAvatar(window.localStorage.getItem("elite-admin-avatar") || "");
+    const refreshProfile = () => {
+      setProfileName(window.localStorage.getItem("elite-admin-name") || "Oripio Studio");
+      setProfileAvatar(window.localStorage.getItem("elite-admin-avatar") || "");
+    };
+    window.addEventListener("elite-admin-profile-updated", refreshProfile);
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
@@ -66,7 +71,10 @@ export function AdminLayout() {
       }
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("elite-admin-profile-updated", refreshProfile);
+    };
   }, []);
   useEffect(() => {
     if (!loading && !session) void navigate({ to: "/admin/login" });
