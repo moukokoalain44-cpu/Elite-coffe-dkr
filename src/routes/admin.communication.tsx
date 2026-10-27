@@ -52,22 +52,17 @@ function CommunicationPage() {
   }, []);
 
   const totalMessages = deliveryLogs.length;
-  const successfulMessages = deliveryLogs.filter((item) =>
-    ["sent", "delivered", "read"].includes(item.status),
-  ).length;
   const deliveredMessages = deliveryLogs.filter((item) =>
     ["delivered", "read"].includes(item.status),
   ).length;
   const readMessages = deliveryLogs.filter((item) => item.status === "read").length;
   const failedMessages = deliveryLogs.filter((item) => item.status === "failed").length;
-  const successRate = totalMessages ? Math.round((successfulMessages / totalMessages) * 100) : 0;
   const campaignStats = (campaignId: string) => {
     const rows = deliveryLogs.filter((item) => item.campaign_id === campaignId);
     const delivered = rows.filter((item) => ["delivered", "read"].includes(item.status)).length;
     return {
       total: rows.length,
       delivered,
-      rate: rows.length ? Math.round((delivered / rows.length) * 100) : 0,
     };
   };
 
@@ -153,7 +148,7 @@ function CommunicationPage() {
       <AdminPageHeader
         eyebrow="Communication relationnelle"
         title="Campagnes & messages personnalisés"
-        description="Contactez directement vos clients et préparez vos campagnes. Les messages automatiques de réservation sont déclenchés séparément par Supabase."
+        description="Contactez directement vos clients et préparez vos campagnes. Les indicateurs affichés proviennent uniquement du journal Supabase et des accusés ACK UltraMsg reçus."
       />
       <div className="mb-5 flex flex-wrap gap-2">
         <button
@@ -171,10 +166,10 @@ function CommunicationPage() {
       </div>
       <section className="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          ["Messages envoyés", successfulMessages, "sur " + totalMessages + " tentés"],
-          ["Taux de réussite", successRate + "%", "file UltraMsg"],
-          ["Messages délivrés", deliveredMessages, readMessages + " lus"],
-          ["Échecs", failedMessages, "à vérifier"],
+          ["Tentatives enregistrées", totalMessages, "journal Supabase"],
+          ["Délivrés confirmés", deliveredMessages, "accusé UltraMsg reçu"],
+          ["Lus confirmés", readMessages, "accusé de lecture reçu"],
+          ["Échecs enregistrés", failedMessages, "erreur d’envoi journalisée"],
         ].map(([label, value, detail]) => (
           <div
             key={String(label)}
@@ -339,7 +334,8 @@ function CommunicationPage() {
                     const stats = campaignStats(item.id);
                     return stats.total ? (
                       <p className="mt-2 text-xs font-semibold text-[#237747]">
-                        {stats.delivered}/{stats.total} délivrés · {stats.rate}% de réussite
+                        {stats.delivered} délivré(s) confirmé(s) sur {stats.total} tentative(s)
+                        journalisée(s)
                       </p>
                     ) : null;
                   })()}
