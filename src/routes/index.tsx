@@ -19,6 +19,7 @@ import { useMenuCatalog } from "@/hooks/use-menu-catalog";
 import { useSiteMedia } from "@/hooks/use-site-media";
 import { useAdmin } from "@/contexts/AdminContext";
 import { SiteHeader } from "@/components/SiteChrome";
+import { MediaRenderer } from "@/components/MediaRenderer";
 import { formatCFA } from "@/lib/currency";
 
 export const Route = createFileRoute("/")({
@@ -303,10 +304,8 @@ function FavoriteSpace() {
         {media.map((item, index) => (
           <Reveal key={item.id} className="group overflow-hidden rounded-[1.75rem]">
             <div className="relative overflow-hidden">
-              <img
-                src={item.url}
-                alt={item.alt_text}
-                loading="lazy"
+              <MediaRenderer
+                media={item}
                 className={`aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-110 ${index === 1 ? "md:translate-y-8" : ""}`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent opacity-70" />
@@ -381,10 +380,8 @@ function Gallery() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
         {media.map((item) => (
           <div key={item.id} className="group relative overflow-hidden rounded-2xl">
-            <img
-              src={item.url}
-              alt={item.alt_text}
-              loading="lazy"
+            <MediaRenderer
+              media={item}
               className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>

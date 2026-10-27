@@ -56,6 +56,9 @@ function GalleryAdminPage() {
   const [loginCoverPreview, setLoginCoverPreview] = useState<SiteMediaRow | null>(null);
   const [loginCoverFile, setLoginCoverFile] = useState<File | null>(null);
   const [loginCoverPreviewUrl, setLoginCoverPreviewUrl] = useState<string | null>(null);
+  const [replaceTarget, setReplaceTarget] = useState<SiteMediaRow | null>(null);
+  const [replaceFile, setReplaceFile] = useState<File | null>(null);
+  const [replacePreviewUrl, setReplacePreviewUrl] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState({
     id: createGalleryKey(DEFAULT_SITE_MEDIA),
@@ -85,6 +88,16 @@ function GalleryAdminPage() {
     setLoginCoverPreviewUrl(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
   }, [loginCoverFile]);
+
+  useEffect(() => {
+    if (!replaceFile) {
+      setReplacePreviewUrl(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(replaceFile);
+    setReplacePreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [replaceFile]);
 
   const galleryMedia = useMemo(
     () => media.filter((item) => item.slot.startsWith("gallery-")),
@@ -151,6 +164,19 @@ function GalleryAdminPage() {
     } finally {
       setUploadingId(null);
     }
+  };
+
+  const closeReplacePanel = () => {
+    if (uploadingId) return;
+    setReplaceTarget(null);
+    setReplaceFile(null);
+  };
+
+  const confirmReplace = async () => {
+    if (!replaceTarget || !replaceFile) return;
+    await replace(replaceTarget, replaceFile);
+    setReplaceTarget(null);
+    setReplaceFile(null);
   };
 
   const previewLoginCoverFromGallery = (source: SiteMediaRow) => {
@@ -331,24 +357,18 @@ function GalleryAdminPage() {
                   </div>
                 )}
                 <div className="mt-4 space-y-3">
-                  <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-[#d85f82] bg-[#fff7f9] px-3 py-3 text-xs font-bold text-[#a5365f]">
+                  <button
+                    type="button"
+                    disabled={uploadingId !== null}
+                    onClick={() => {
+                      setReplaceTarget(item);
+                      setReplaceFile(null);
+                    }}
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-[#d85f82] bg-[#fff7f9] px-3 py-3 text-xs font-bold text-[#a5365f] transition hover:bg-[#ffeff4] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
                     <Upload size={14} />
                     {uploadingId === item.id ? "Import en cours…" : "Remplacer le média"}
-                    <input
-                      type="file"
-                      accept={
-                        isLoginCover
-                          ? "image/jpeg,image/png,image/webp,image/avif"
-                          : "image/jpeg,image/png,image/webp,image/avif,video/mp4,video/webm,video/quicktime"
-                      }
-                      className="sr-only"
-                      disabled={uploadingId !== null}
-                      onChange={(event) => {
-                        void replace(cardItem, event.target.files?.[0]);
-                        event.currentTarget.value = "";
-                      }}
-                    />
-                  </label>
+                  </button>
                   <label className="block text-xs font-bold text-[#665b60]">
                     URL
                     <input
@@ -522,6 +542,111 @@ function GalleryAdminPage() {
             >
               <Plus size={16} />
               {uploadingId === "new-gallery-image" ? "Ajout en cours…" : "Ajouter à la galerie"}
+            </button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+
+      <Sheet
+        open={replaceTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) closeReplacePanel();
+        }}
+      >
+        <SheetContent
+          side="right"
+          className="flex w-full flex-col gap-0 overflow-y-auto border-l border-[#eadfd4] bg-[#fcfbf9] p-0 sm:max-w-xl"
+        >
+          <SheetHeader className="border-b border-[#eee6dc] bg-white px-6 py-6 pr-14 text-left sm:px-8">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#b25c72]">
+              Médiathèque
+            </p>
+            <SheetTitle className="mt-1 font-display text-3xl font-bold text-[#2a211b]">
+              Remplacer un média
+            </SheetTitle>
+            <SheetDescription className="text-sm leading-6 text-[#887b70]">
+              Sélectionnez un nouveau fichier sans quitter la liste des médias. Le remplacement est
+              enregistré uniquement après confirmation.
+            </SheetDescription>
+          </SheetHeader>
+
+          <div className="flex-1 space-y-5 px-6 py-6 sm:px-8">
+            {replaceTarget && (
+              <div className="rounded-2xl border border-[#eadfd4] bg-white p-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#b25c72]">
+                  Média sélectionné
+                </p>
+                <p className="mt-1 font-display text-xl font-bold text-[#2a211b]">
+                  {replaceTarget.label}
+                </p>
+                <p className="mt-1 text-xs text-[#93877d]">
+                  Clé stable : <code>{replaceTarget.id}</code>
+                </p>
+              </div>
+            )}
+
+            <label className="flex min-h-40 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[#d8b8a4] bg-[#fffaf5] px-5 py-6 text-center text-sm font-bold text-[#895c42] transition hover:border-[#b07657] hover:bg-[#fbf1e7]">
+              <span className="grid size-10 place-items-center rounded-xl bg-white text-[#a36b4b] shadow-sm">
+                <Upload size={18} />
+              </span>
+              <span>{replaceFile?.name ?? "Choisir le nouveau fichier"}</span>
+              <span className="text-xs font-normal text-[#9a8b7c]">
+                {replaceTarget?.id === ADMIN_LOGIN_MEDIA_ID
+                  ? "JPG, PNG, WebP ou AVIF"
+                  : "JPG, PNG, WebP, AVIF, MP4, WebM ou MOV"}
+              </span>
+              <input
+                type="file"
+                accept={
+                  replaceTarget?.id === ADMIN_LOGIN_MEDIA_ID
+                    ? "image/jpeg,image/png,image/webp,image/avif"
+                    : "image/jpeg,image/png,image/webp,image/avif,video/mp4,video/webm,video/quicktime"
+                }
+                className="sr-only"
+                onChange={(event) => setReplaceFile(event.target.files?.[0] ?? null)}
+              />
+            </label>
+
+            {replaceFile && replacePreviewUrl && (
+              <div className="overflow-hidden rounded-2xl border border-[#eadfd4] bg-[#eee8e1]">
+                {replaceFile.type.startsWith("video/") ? (
+                  <video
+                    src={replacePreviewUrl}
+                    muted
+                    autoPlay
+                    loop
+                    playsInline
+                    controls
+                    className="aspect-video w-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={replacePreviewUrl}
+                    alt="Aperçu du nouveau média"
+                    className="aspect-video w-full object-cover"
+                  />
+                )}
+              </div>
+            )}
+          </div>
+
+          <SheetFooter className="sticky bottom-0 flex-row border-t border-[#eee6dc] bg-white px-6 py-4 sm:px-8">
+            <button
+              type="button"
+              onClick={closeReplacePanel}
+              disabled={uploadingId !== null}
+              className="rounded-xl border border-[#e8dfd5] px-4 py-3 text-sm font-semibold text-[#74665b] transition hover:bg-[#f8f4ef] disabled:opacity-60"
+            >
+              Annuler
+            </button>
+            <button
+              type="button"
+              onClick={() => void confirmReplace()}
+              disabled={!replaceFile || uploadingId !== null}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4b3021] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#352115] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Save size={16} />
+              {uploadingId ? "Enregistrement…" : "Confirmer le remplacement"}
             </button>
           </SheetFooter>
         </SheetContent>
