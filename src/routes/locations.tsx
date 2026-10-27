@@ -8,20 +8,33 @@ export const Route = createFileRoute("/locations")({
   head: () => ({
     meta: [
       { property: "og:title", content: "Adresses | Elite Coffee" },
-      { property: "og:description", content: "Retrouvez Elite Coffee à l’entrée de la Cité Keur Gorgui, sur la route du Collège Sacré-Cœur et du BRT." },
+      {
+        property: "og:description",
+        content:
+          "Retrouvez Elite Coffee à l’entrée de la Cité Keur Gorgui, sur la route du Collège Sacré-Cœur et du BRT.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { title: "Adresses | Elite Coffee" },
       {
         name: "description",
-        content: "Retrouvez Elite Coffee à l’entrée de la Cité Keur Gorgui, sur la route du Collège Sacré-Cœur et du BRT.",
+        content:
+          "Retrouvez Elite Coffee à l’entrée de la Cité Keur Gorgui, sur la route du Collège Sacré-Cœur et du BRT.",
       },
     ],
   }),
   component: LocationsPage,
 });
 
-const locations = [{ name: "Elite Coffee — Cité Keur Gorgui", address: CONTACT.address, phone: CONTACT.phone, hours: CONTACT.hours, note: CONTACT.landmark }];
+const locations = [
+  {
+    name: "Elite Coffee — Cité Keur Gorgui",
+    address: CONTACT.address,
+    phone: CONTACT.phone,
+    hours: CONTACT.hours,
+    note: CONTACT.landmark,
+  },
+];
 
 function LocationsPage() {
   const directions = (address: string) => {
@@ -56,7 +69,16 @@ function LocationsPage() {
                   <MapPin size={17} className="shrink-0 text-accent" />
                   {location.address}
                 </p>
-                {CONTACT.phones.map(phone => <a key={phone} href={`tel:${phone.replaceAll(" ", "")}`} className="flex gap-3 hover:text-accent"><Phone size={17} className="shrink-0 text-accent" />{phone}</a>)}
+                {CONTACT.phones.map((phone) => (
+                  <a
+                    key={phone}
+                    href={`tel:${phone.replaceAll(" ", "")}`}
+                    className="flex gap-3 hover:text-accent"
+                  >
+                    <Phone size={17} className="shrink-0 text-accent" />
+                    {phone}
+                  </a>
+                ))}
                 <div className="flex gap-3">
                   <Clock3 size={17} className="shrink-0 text-accent" />
                   <span>

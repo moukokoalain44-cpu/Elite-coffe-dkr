@@ -200,7 +200,7 @@ function CatalogPage() {
           </div>
         </AdminCard>
         <AdminCard className="overflow-hidden p-0">
-          <div className="flex flex-col gap-3 border-b border-[#eee8e2] p-5 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-3 border-b border-[#eee8e8] p-5 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-2 rounded-xl border border-[#e8e0e7] bg-white px-3 py-2.5 md:w-96">
               <Search size={17} className="text-[#9b8d91]" />
               <input
@@ -219,7 +219,7 @@ function CatalogPage() {
             {visible.map((product) => (
               <article
                 key={product.id}
-                className="overflow-hidden rounded-2xl border border-[#eee8e2] bg-[#fdfbfc]"
+                className="overflow-hidden rounded-2xl border border-[#eee8e8] bg-[#fdfbfc]"
               >
                 <div className="relative h-40 bg-[#f5edf0]">
                   {product.image_url ? (
@@ -254,7 +254,7 @@ function CatalogPage() {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center justify-between border-t border-[#eee8e2] px-4 py-3">
+                <div className="flex items-center justify-between border-t border-[#eee8e8] px-4 py-3">
                   <button
                     onClick={() => setDraft(product)}
                     className="flex items-center gap-1 text-xs font-bold text-[#a5365f]"

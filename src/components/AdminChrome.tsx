@@ -63,7 +63,7 @@ export function AdminLayout() {
   }, [loading, navigate, session]);
   if (loading || !session) {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#f7f5f1] text-sm text-[#776d65]">
+      <div className="grid min-h-screen place-items-center bg-[#f4f3f4] text-sm text-[#756b72]">
         Vérification de votre session…
       </div>
     );
@@ -81,11 +81,11 @@ export function AdminLayout() {
   return (
     <div
       data-admin-theme={darkMode ? "dark" : "light"}
-      className="min-h-screen bg-[#f7f5f1] text-[#201a17]"
+      className="min-h-screen bg-[#f4f3f4] text-[#2c252a]"
     >
       <div className="flex min-h-screen">
         <aside
-          className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#e8e0d7] bg-white px-5 py-6 transition-[width,transform] duration-200 lg:static lg:translate-x-0 ${collapsed ? "w-[88px]" : "w-72"} ${open ? "translate-x-0" : "-translate-x-full"}`}
+          className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#e7e2e5] bg-white px-5 py-6 transition-[width,transform] duration-200 lg:static lg:translate-x-0 ${collapsed ? "w-[88px]" : "w-72"} ${open ? "translate-x-0" : "-translate-x-full"}`}
         >
           <div className="flex items-center justify-between px-2">
             <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
@@ -104,7 +104,7 @@ export function AdminLayout() {
               )}
             </Link>
             <button
-              className="rounded-xl p-2 hover:bg-[#f7f5f1] lg:hidden"
+              className="rounded-xl p-2 hover:bg-[#f4f3f4] lg:hidden"
               onClick={() => setOpen(false)}
               aria-label="Fermer la navigation"
             >
@@ -112,7 +112,7 @@ export function AdminLayout() {
             </button>
           </div>
           {!collapsed && (
-            <p className="mb-3 mt-10 px-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#a69a90]">
+            <p className="mb-3 mt-10 px-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#a89aa2]">
               Pilotage
             </p>
           )}
@@ -120,7 +120,7 @@ export function AdminLayout() {
             {navGroups.map((group) => (
               <div key={group.label}>
                 {!collapsed && (
-                  <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#a69a90]">
+                  <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#a89aa2]">
                     {group.label}
                   </p>
                 )}
@@ -144,7 +144,7 @@ export function AdminLayout() {
               </div>
             ))}
           </nav>
-          <div className="mt-auto space-y-1 border-t border-[#eee8e2] pt-5">
+          <div className="mt-auto space-y-1 border-t border-[#eee8e8] pt-5">
             <AdminNavLink
               label="Paramètres"
               to="/admin/settings"
@@ -163,7 +163,7 @@ export function AdminLayout() {
             <button
               type="button"
               onClick={() => setCollapsed((value) => !value)}
-              className={`hidden w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold text-[#776d65] hover:bg-[#f7f5f1] lg:flex ${collapsed ? "justify-center" : ""}`}
+              className={`hidden w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold text-[#756b72] hover:bg-[#f4f3f4] lg:flex ${collapsed ? "justify-center" : ""}`}
               title={collapsed ? "Déplier la barre latérale" : "Replier la barre latérale"}
             >
               {collapsed ? (
@@ -178,39 +178,39 @@ export function AdminLayout() {
         </aside>
         {open && (
           <button
-            className="fixed inset-0 z-40 bg-[#201a17]/25 lg:hidden"
+            className="fixed inset-0 z-40 bg-[#2c252a]/25 lg:hidden"
             onClick={() => setOpen(false)}
             aria-label="Fermer le menu"
           />
         )}
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[#e8e0d7] bg-[#f7f5f1]/90 px-5 backdrop-blur-md md:px-8">
+          <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[#e7e2e5] bg-[#f4f3f4]/90 px-5 backdrop-blur-md md:px-8">
             <div className="relative flex items-center gap-3">
               <button
-                className="rounded-xl border border-[#e8e0d7] bg-white p-2 lg:hidden"
+                className="rounded-xl border border-[#e7e2e5] bg-white p-2 lg:hidden"
                 onClick={() => setOpen(true)}
                 aria-label="Ouvrir la navigation"
               >
                 <Menu size={19} />
               </button>
-              <div className="relative hidden items-center gap-3 rounded-2xl bg-white px-4 py-2.5 text-sm text-[#9b9188] shadow-sm md:flex">
+              <div className="relative hidden items-center gap-3 rounded-2xl bg-white px-4 py-2.5 text-sm text-[#9b8d91] shadow-sm md:flex">
                 <Search size={17} />
                 <input
                   ref={searchRef}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Rechercher dans le back-office"
-                  className="w-72 bg-transparent outline-none placeholder:text-[#9b9188]"
+                  className="w-72 bg-transparent outline-none placeholder:text-[#9b8d91]"
                 />
-                <kbd className="ml-4 rounded-md bg-[#f7f5f1] px-2 py-1 text-[10px]">⌘ K</kbd>
+                <kbd className="ml-4 rounded-md bg-[#f4f3f4] px-2 py-1 text-[10px]">⌘ K</kbd>
                 {results.length > 0 && (
-                  <div className="absolute left-0 top-14 z-50 w-full overflow-hidden rounded-2xl border border-[#e8e0d7] bg-white p-2 shadow-xl">
+                  <div className="absolute left-0 top-14 z-50 w-full overflow-hidden rounded-2xl border border-[#e7e2e5] bg-white p-2 shadow-xl">
                     {results.map((result) => (
                       <Link
                         key={result.to}
                         to={result.to}
                         onClick={() => setQuery("")}
-                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#6f655d] hover:bg-[#f7f5f1]"
+                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#665b60] hover:bg-[#f4f3f4]"
                       >
                         <result.icon size={16} />
                         {result.label}
@@ -224,54 +224,54 @@ export function AdminLayout() {
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="rounded-xl border border-[#e8e0d7] bg-white p-2.5 text-[#6f655d] hover:border-[#d8894a]"
+                className="rounded-xl border border-[#e7e2e5] bg-white p-2.5 text-[#665b60] hover:border-[#d85f82]"
                 aria-label={darkMode ? "Activer le mode clair" : "Activer le mode sombre"}
                 title={darkMode ? "Mode clair" : "Mode sombre"}
               >
                 {darkMode ? <Sun size={18} /> : <Moon size={18} />}
               </button>
               <button
-                className="relative rounded-xl border border-[#e8e0d7] bg-white p-2.5 hover:border-[#d8894a]"
+                className="relative rounded-xl border border-[#e7e2e5] bg-white p-2.5 hover:border-[#d85f82]"
                 aria-label="Notifications"
               >
                 <Bell size={18} />
-                <span className="absolute right-2 top-2 size-1.5 rounded-full bg-[#d8894a]" />
+                <span className="absolute right-2 top-2 size-1.5 rounded-full bg-[#d85f82]" />
               </button>
               <button
                 type="button"
                 onClick={() => setProfileOpen((value) => !value)}
-                className="hidden items-center gap-3 rounded-2xl border border-[#e8e0d7] bg-white px-3 py-2 text-left hover:border-[#d8894a] sm:flex"
+                className="hidden items-center gap-3 rounded-2xl border border-[#e7e2e5] bg-white px-3 py-2 text-left hover:border-[#d85f82] sm:flex"
                 aria-expanded={profileOpen}
               >
-                <span className="grid size-8 place-items-center rounded-xl bg-[#f4e3d3] text-xs font-bold text-[#8c4f2d]">
+                <span className="grid size-8 place-items-center rounded-xl bg-[#fbe9ef] text-xs font-bold text-[#8c4f2d]">
                   OA
                 </span>
                 <span className="leading-tight">
                   <strong className="block text-sm">Oripio Studio</strong>
-                  <small className="text-[11px] text-[#9b9188]">Super admin</small>
+                  <small className="text-[11px] text-[#9b8d91]">Super admin</small>
                 </span>
                 <ChevronDown
                   size={15}
-                  className={`text-[#9b9188] transition-transform ${profileOpen ? "rotate-180" : ""}`}
+                  className={`text-[#9b8d91] transition-transform ${profileOpen ? "rotate-180" : ""}`}
                 />
               </button>
               {profileOpen && (
-                <div className="absolute right-0 top-14 z-50 w-56 rounded-2xl border border-[#e8e0d7] bg-white p-2 shadow-xl">
-                  <div className="border-b border-[#eee8e2] px-3 py-2">
+                <div className="absolute right-0 top-14 z-50 w-56 rounded-2xl border border-[#e7e2e5] bg-white p-2 shadow-xl">
+                  <div className="border-b border-[#eee8e8] px-3 py-2">
                     <strong className="block max-w-[190px] truncate text-sm">{userEmail}</strong>
-                    <span className="text-xs text-[#9b9188]">Compte administrateur</span>
+                    <span className="text-xs text-[#9b8d91]">Compte administrateur</span>
                   </div>
                   <Link
                     to="/admin/settings"
                     onClick={() => setProfileOpen(false)}
-                    className="mt-1 flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#6f655d] hover:bg-[#f7f5f1]"
+                    className="mt-1 flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#665b60] hover:bg-[#f4f3f4]"
                   >
                     <Settings size={16} /> Paramètres
                   </Link>
                   <button
                     type="button"
                     onClick={toggleTheme}
-                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-[#6f655d] hover:bg-[#f7f5f1]"
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-[#665b60] hover:bg-[#f4f3f4]"
                   >
                     {darkMode ? <Sun size={16} /> : <Moon size={16} />}{" "}
                     {darkMode ? "Mode clair" : "Mode sombre"}
@@ -318,13 +318,13 @@ function AdminNavLink({
       to={to}
       onClick={onClick}
       title={collapsed ? label : undefined}
-      className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition-colors ${collapsed ? "justify-center" : ""} ${active ? "bg-[#d85f82] text-white shadow-[0_8px_20px_-12px_#d85f82]" : "text-[#6f655d] hover:bg-[#f7f5f1] hover:text-[#5b3826]"}`}
+      className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition-colors ${collapsed ? "justify-center" : ""} ${active ? "bg-[#d85f82] text-white shadow-[0_8px_20px_-12px_#d85f82]" : "text-[#665b60] hover:bg-[#f4f3f4] hover:text-[#3a2d33]"}`}
     >
       {icon}
       {!collapsed && <span>{label}</span>}
       {!collapsed && count !== undefined && (
         <span
-          className={`ml-auto rounded-full px-2 py-0.5 text-[10px] ${active ? "bg-white/20" : "bg-[#f4e3d3] text-[#a75b35]"}`}
+          className={`ml-auto rounded-full px-2 py-0.5 text-[10px] ${active ? "bg-white/20" : "bg-[#fbe9ef] text-[#a5365f]"}`}
         >
           {count}
         </span>
@@ -393,7 +393,7 @@ export function StatusBadge({ status }: { status: string }) {
   };
   return (
     <span
-      className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-bold ${styles[status] ?? "bg-[#f4f1ed] text-[#776d65]"}`}
+      className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-bold ${styles[status] ?? "bg-[#f4f1ed] text-[#756b72]"}`}
     >
       {labels[status] ?? status}
     </span>
@@ -411,16 +411,16 @@ export function AdminPagination({
 }) {
   if (totalPages <= 1) return null;
   return (
-    <div className="flex items-center justify-between border-t border-[#eee8e2] px-5 py-4 text-sm">
-      <span className="text-[#93877d]">
-        Page <strong className="text-[#5b3826]">{page}</strong> sur{" "}
-        <strong className="text-[#5b3826]">{totalPages}</strong>
+    <div className="flex items-center justify-between border-t border-[#eee8e8] px-5 py-4 text-sm">
+      <span className="text-[#93878d]">
+        Page <strong className="text-[#3a2d33]">{page}</strong> sur{" "}
+        <strong className="text-[#3a2d33]">{totalPages}</strong>
       </span>
       <div className="flex items-center gap-1">
         <button
           disabled={page === 1}
           onClick={() => onPageChange(page - 1)}
-          className="rounded-xl border border-[#e8e0d7] px-3 py-2 font-bold text-[#776d65] disabled:cursor-not-allowed disabled:opacity-40 hover:bg-[#f7f5f1]"
+          className="rounded-xl border border-[#e7e2e5] px-3 py-2 font-bold text-[#756b72] disabled:cursor-not-allowed disabled:opacity-40 hover:bg-[#f4f3f4]"
         >
           Précédent
         </button>
@@ -428,7 +428,7 @@ export function AdminPagination({
           <button
             key={item}
             onClick={() => onPageChange(item)}
-            className={`size-9 rounded-xl text-xs font-bold ${item === page ? "bg-[#5b3826] text-white" : "text-[#776d65] hover:bg-[#f7f5f1]"}`}
+            className={`size-9 rounded-xl text-xs font-bold ${item === page ? "bg-[#3a2d33] text-white" : "text-[#756b72] hover:bg-[#f4f3f4]"}`}
           >
             {item}
           </button>
@@ -436,7 +436,7 @@ export function AdminPagination({
         <button
           disabled={page === totalPages}
           onClick={() => onPageChange(page + 1)}
-          className="rounded-xl border border-[#e8e0d7] px-3 py-2 font-bold text-[#776d65] disabled:cursor-not-allowed disabled:opacity-40 hover:bg-[#f7f5f1]"
+          className="rounded-xl border border-[#e7e2e5] px-3 py-2 font-bold text-[#756b72] disabled:cursor-not-allowed disabled:opacity-40 hover:bg-[#f4f3f4]"
         >
           Suivant
         </button>

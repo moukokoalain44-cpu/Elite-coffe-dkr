@@ -68,7 +68,7 @@ function ContentPage() {
           <button
             onClick={save}
             disabled={saved}
-            className="flex items-center gap-2 rounded-2xl bg-[#5b3826] px-4 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center gap-2 rounded-2xl bg-[#3a2d33] px-4 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Save size={16} /> Enregistrer les textes
           </button>
@@ -76,10 +76,10 @@ function ContentPage() {
       />
       <div className="grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
         <AdminCard>
-          <div className="flex items-start justify-between border-b border-[#eee8e2] pb-5">
+          <div className="flex items-start justify-between border-b border-[#eee8e8] pb-5">
             <div>
               <h2 className="font-display text-2xl font-bold">Messages principaux</h2>
-              <p className="mt-1 text-sm text-[#93877d]">
+              <p className="mt-1 text-sm text-[#93878d]">
                 Ces textes alimentent l’accueil et les pages publiques.
               </p>
             </div>
@@ -121,7 +121,7 @@ function ContentPage() {
         </AdminCard>
         <AdminCard>
           <h2 className="font-display text-2xl font-bold">Coordonnées & horaires</h2>
-          <p className="mt-1 text-sm text-[#93877d]">
+          <p className="mt-1 text-sm text-[#93878d]">
             Les informations affichées dans les pages de contact.
           </p>
           <div className="mt-6 space-y-5">
@@ -146,12 +146,12 @@ function ContentPage() {
       </div>
       <AdminCard className="mt-5">
         <div className="flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-xl bg-[#f4e3d3] text-[#a75b35]">
+          <span className="grid size-10 place-items-center rounded-xl bg-[#fbe9ef] text-[#a5365f]">
             <Image size={18} />
           </span>
           <div>
             <h2 className="font-display text-2xl font-bold">Médias du site</h2>
-            <p className="mt-1 text-sm text-[#93877d]">
+            <p className="mt-1 text-sm text-[#93878d]">
               Tous les visuels publics sont modifiables ici. Chaque média possède une clé stable
               (`hero-main`, `gallery-1`, etc.) qui ne change pas lorsque son URL est remplacée.
             </p>
@@ -159,9 +159,9 @@ function ContentPage() {
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {media.map((item) => (
-            <div key={item.id} className="rounded-2xl border border-[#eee8e2] bg-[#fcfbfa] p-4">
+            <div key={item.id} className="rounded-2xl border border-[#eee8e8] bg-[#fdfbfc] p-4">
               <div className="flex gap-3">
-                <div className="size-20 shrink-0 overflow-hidden rounded-xl bg-[#f4e3d3]">
+                <div className="size-20 shrink-0 overflow-hidden rounded-xl bg-[#fbe9ef]">
                   {item.media_type === "video" ? (
                     <video src={item.url} muted autoPlay loop className="size-full object-cover" />
                   ) : (
@@ -169,16 +169,16 @@ function ContentPage() {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#c56d3c]">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#c45d7d]">
                     {item.media_type === "video" ? "Vidéo" : "Image"}
                   </p>
                   <h3 className="mt-1 font-display text-lg font-bold">{item.label}</h3>
-                  <p className="text-xs text-[#93877d]">Clé stable : {item.id}</p>
-                  <p className="text-xs text-[#93877d]">Emplacement : {item.slot}</p>
+                  <p className="text-xs text-[#93878d]">Clé stable : {item.id}</p>
+                  <p className="text-xs text-[#93878d]">Emplacement : {item.slot}</p>
                 </div>
               </div>
               <div className="mt-4 space-y-3">
-                <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-[#d8894a] bg-[#fffaf5] px-3 py-3 text-xs font-bold text-[#a75b35] transition hover:bg-[#fff3e8]">
+                <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-[#d85f82] bg-[#fffaf5] px-3 py-3 text-xs font-bold text-[#a5365f] transition hover:bg-[#fff3e8]">
                   <Upload size={14} />
                   {uploadingId === item.id ? "Import en cours…" : "Remplacer depuis mon ordinateur"}
                   <input
@@ -201,7 +201,7 @@ function ContentPage() {
                   <input
                     value={item.url}
                     onChange={(event) => updateMedia(item.id, "url", event.target.value)}
-                    className="mt-1 w-full rounded-xl border border-[#e8e0d7] bg-white px-3 py-2.5 text-sm font-normal outline-none focus:border-[#d8894a]"
+                    className="mt-1 w-full rounded-xl border border-[#e7e2e5] bg-white px-3 py-2.5 text-sm font-normal outline-none focus:border-[#d85f82]"
                   />
                 </label>
                 <label className="block text-xs font-bold text-[#5f554e]">
@@ -209,12 +209,12 @@ function ContentPage() {
                   <input
                     value={item.alt_text}
                     onChange={(event) => updateMedia(item.id, "alt_text", event.target.value)}
-                    className="mt-1 w-full rounded-xl border border-[#e8e0d7] bg-white px-3 py-2.5 text-sm font-normal outline-none focus:border-[#d8894a]"
+                    className="mt-1 w-full rounded-xl border border-[#e7e2e5] bg-white px-3 py-2.5 text-sm font-normal outline-none focus:border-[#d85f82]"
                   />
                 </label>
                 <button
                   onClick={() => saveMedia(item)}
-                  className="flex items-center gap-2 rounded-xl bg-[#ef5b2a] px-3 py-2 text-xs font-bold text-white"
+                  className="flex items-center gap-2 rounded-xl bg-[#d85f82] px-3 py-2 text-xs font-bold text-white"
                 >
                   <Save size={14} /> Enregistrer ce média
                 </button>
@@ -246,7 +246,7 @@ function Editor({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         rows={multiline ? 4 : undefined}
-        className="mt-2 w-full rounded-xl border border-[#e8e0d7] bg-[#fcfbfa] px-3.5 py-3 text-sm font-normal leading-6 outline-none transition-colors focus:border-[#d8894a] focus:ring-2 focus:ring-[#f4e3d3]"
+        className="mt-2 w-full rounded-xl border border-[#e7e2e5] bg-[#fdfbfc] px-3.5 py-3 text-sm font-normal leading-6 outline-none transition-colors focus:border-[#d85f82] focus:ring-2 focus:ring-[#fbe9ef]"
       />
     </label>
   );
