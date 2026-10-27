@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import { ChevronDown, ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AdminCard, AdminPageHeader, AdminPagination } from "@/components/AdminChrome";
@@ -39,6 +39,7 @@ function CatalogPage() {
   const [categoryRows, setCategoryRows] = useState<MenuCategoryRow[]>([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Toutes");
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -58,8 +59,8 @@ function CatalogPage() {
   }, []);
 
   const categories = useMemo(
-    () => [...new Set(products.map((item) => item.category))].sort(),
-    [products],
+    () => [...new Set([...categoryRows.map((item) => item.name), ...products.map((item) => item.category)])].sort(),
+    [categoryRows, products],
   );
   const filtered = useMemo(
     () =>
@@ -153,51 +154,16 @@ function CatalogPage() {
           </button>
         }
       />
-      <div className="grid gap-5 xl:grid-cols-[240px_1fr]">
-        <AdminCard className="h-fit">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-xl font-bold">Catégories</h2>
-            <button
-              onClick={() => setDraft(blank())}
-              className="rounded-lg bg-[#fbe9ef] p-2 text-[#b9456e]"
-              title="Ajouter une catégorie"
-            >
-              <Plus size={15} />
-            </button>
-          </div>
-          <div className="mt-4 space-y-1">
-            <button
-              onClick={() => {
-                setCategory("Toutes");
-                setPage(1);
-              }}
-              className={`flex w-full justify-between rounded-xl px-3 py-2 text-left text-sm font-semibold ${category === "Toutes" ? "bg-[#fbe9ef] text-[#a5365f]" : "text-[#756b68] hover:bg-[#f7f5f5]"}`}
-            >
-              <span>Toutes</span>
-              <span>{products.length}</span>
-            </button>
-            {categories.map((name) => (
-              <div key={name} className="group flex items-center gap-1">
-                <button
-                  onClick={() => {
-                    setCategory(name);
-                    setPage(1);
-                  }}
-                  className={`flex min-w-0 flex-1 justify-between rounded-xl px-3 py-2 text-left text-sm font-semibold ${category === name ? "bg-[#fbe9ef] text-[#a5365f]" : "text-[#756b68] hover:bg-[#f7f5f5]"}`}
-                >
-                  <span className="truncate">{name}</span>
-                  <span>{products.filter((item) => item.category === name).length}</span>
-                </button>
-                <button
-                  onClick={() => void removeCategory(name)}
-                  className="invisible rounded-lg p-1 text-[#b45f73] hover:bg-[#fbe9ef] group-hover:visible"
-                  title="Retirer la catégorie"
-                >
-                  <Trash2 size={13} />
-                </button>
-              </div>
-            ))}
-          </div>
+      <div className="space-y-5">
+        <AdminCard className="p-0">
+          <button type="button" onClick={() => setCategoriesOpen((value) => !value)} className="flex w-full items-center justify-between px-5 py-4 text-left">
+            <span><strong className="font-display text-xl">Catégories</strong><span className="ml-3 text-sm text-[#93878d]">{category === "Toutes" ? "Toutes les catégories" : category}</span></span>
+            <ChevronDown size={19} className={`text-[#a5365f] transition-transform ${categoriesOpen ? "rotate-180" : ""}`} />
+          </button>
+          {categoriesOpen && <div className="flex flex-wrap gap-2 border-t border-[#eee8e8] px-5 py-4">
+            <button onClick={() => { setCategory("Toutes"); setPage(1); setCategoriesOpen(false); }} className={`rounded-full px-3 py-2 text-sm font-semibold ${category === "Toutes" ? "bg-[#fbe9ef] text-[#a5365f]" : "bg-[#f4f3f4] text-[#756b72]"}`}>Toutes <span className="ml-1 text-xs">{products.length}</span></button>
+            {categories.map((name) => <button key={name} onClick={() => { setCategory(name); setPage(1); setCategoriesOpen(false); }} className={`rounded-full px-3 py-2 text-sm font-semibold ${category === name ? "bg-[#fbe9ef] text-[#a5365f]" : "bg-[#f4f3f4] text-[#756b72]"}`}>{name} <span className="ml-1 text-xs">{products.filter((item) => item.category === name).length}</span></button>)}
+          </div>}
         </AdminCard>
         <AdminCard className="overflow-hidden p-0">
           <div className="flex flex-col gap-3 border-b border-[#eee8e8] p-5 md:flex-row md:items-center md:justify-between">
@@ -280,8 +246,8 @@ function CatalogPage() {
         </AdminCard>
       </div>
       {draft && (
-        <div className="fixed inset-0 z-[70] grid place-items-center bg-[#2c2025]/35 p-4">
-          <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[28px] border border-[#eadde2] bg-white p-6 shadow-2xl">
+        <div className="fixed inset-0 z-[70] bg-[#2c2025]/30">
+          <div className="absolute inset-y-0 right-0 w-full max-w-xl overflow-y-auto border-l border-[#eadde2] bg-white p-6 shadow-2xl">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#c45d7d]">

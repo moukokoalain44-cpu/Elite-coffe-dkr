@@ -142,8 +142,8 @@ function AdminLoginPage() {
             </button>
           </form>
           <p className="mt-6 border-t border-[#eee8e8] pt-5 text-center text-xs leading-5 text-[#9b8d91]">
-            Les comptes administrateurs sont créés et gérés dans Supabase Auth. L’inscription
-            publique est désactivée.
+            Les comptes administrateurs sont créés et gérés dans Supabase Auth. La création publique
+            est désactivée.
           </p>
         </section>
       </div>

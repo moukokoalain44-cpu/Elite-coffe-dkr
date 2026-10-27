@@ -25,7 +25,7 @@ export function SiteHeader() {
   const active = (to: string) => pathname === to || (to !== "/" && pathname.startsWith(`${to}/`));
   return (
     <header className="fixed inset-x-0 top-0 z-50">
-      <nav className="border-b border-primary-foreground/10 bg-primary/90 text-primary-foreground shadow-[0_8px_30px_rgba(91,56,38,.12)] backdrop-blur-md">
+      <nav className="border-b border-white/15 bg-primary/88 text-primary-foreground shadow-[0_10px_35px_rgba(23,25,30,.28)] backdrop-blur-xl backdrop-saturate-150">
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-4 sm:h-[76px] sm:px-5 md:px-8">
           <Link
             to="/"
@@ -77,7 +77,7 @@ export function SiteHeader() {
           </div>
         </div>
         {mobileOpen && (
-          <div className="border-t border-primary-foreground/10 bg-primary px-4 py-4 md:hidden">
+          <div className="max-h-[calc(100vh-68px)] overflow-y-auto border-t border-white/15 bg-primary/95 px-4 py-4 shadow-[0_18px_35px_-22px_rgba(0,0,0,.8)] md:hidden">
             <div className="flex flex-col gap-1 text-sm font-medium text-primary-foreground/75">
               <Link
                 to="/reserver"
@@ -102,7 +102,7 @@ export function SiteHeader() {
       </nav>
       <nav
         aria-label="Navigation mobile"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-primary-foreground/15 bg-primary/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 text-primary-foreground shadow-[0_-10px_35px_rgba(23,33,29,.18)] backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-white/15 bg-primary/92 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 text-primary-foreground shadow-[0_-12px_40px_rgba(23,25,30,.35)] backdrop-blur-xl backdrop-saturate-150 md:hidden"
       >
         <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
           {mobileLinks.map(([label, to, Icon]) => (

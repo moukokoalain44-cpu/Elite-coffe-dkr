@@ -23,6 +23,7 @@ import { Route as ReserverRouteImport } from './routes/reserver'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
+import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminRegistrationsRouteImport } from './routes/admin.registrations'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -98,6 +99,11 @@ const AdminContentRoute = AdminContentRouteImport.update({
   path: '/content',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGalleryRoute = AdminGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/reserver': typeof ReserverRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/registrations': typeof AdminRegistrationsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/reserver': typeof ReserverRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/registrations': typeof AdminRegistrationsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/reserver': typeof ReserverRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/registrations': typeof AdminRegistrationsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/reserver'
     | '/admin/catalog'
     | '/admin/content'
+    | '/admin/gallery'
     | '/admin/login'
     | '/admin/registrations'
     | '/admin/settings'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/reserver'
     | '/admin/catalog'
     | '/admin/content'
+    | '/admin/gallery'
     | '/admin/login'
     | '/admin/registrations'
     | '/admin/settings'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/reserver'
     | '/admin/catalog'
     | '/admin/content'
+    | '/admin/gallery'
     | '/admin/login'
     | '/admin/registrations'
     | '/admin/settings'
@@ -355,6 +367,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContentRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/gallery': {
+      id: '/admin/gallery'
+      path: '/gallery'
+      fullPath: '/admin/gallery'
+      preLoaderRoute: typeof AdminGalleryRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/login'
@@ -389,6 +408,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminCatalogRoute: typeof AdminCatalogRoute
   AdminContentRoute: typeof AdminContentRoute
+  AdminGalleryRoute: typeof AdminGalleryRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminRegistrationsRoute: typeof AdminRegistrationsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -398,6 +418,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogRoute: AdminCatalogRoute,
   AdminContentRoute: AdminContentRoute,
+  AdminGalleryRoute: AdminGalleryRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminRegistrationsRoute: AdminRegistrationsRoute,
   AdminSettingsRoute: AdminSettingsRoute,

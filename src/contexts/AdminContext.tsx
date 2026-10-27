@@ -2,6 +2,14 @@ import { createContext, useContext, useMemo, useState, type ReactNode } from "re
 import { PRODUCT_CATALOG, type Product } from "@/data/catalog";
 
 export type RegistrationStatus = "pending" | "confirmed" | "cancelled";
+
+export function canUpdateRegistrationStatus(from: RegistrationStatus, to: RegistrationStatus) {
+  if (from === to) return true;
+  if (from === "pending") return to === "confirmed" || to === "cancelled";
+  if (from === "confirmed") return to === "cancelled";
+  return false;
+}
+
 export type Registration = {
   id: string;
   name: string;
@@ -127,7 +135,11 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       addRegistration: (registration) => setRegistrations((items) => [registration, ...items]),
       updateRegistration: (id, patch) =>
         setRegistrations((items) =>
-          items.map((item) => (item.id === id ? { ...item, ...patch } : item)),
+          items.map((item) => {
+            if (item.id !== id) return item;
+            if (patch.status && !canUpdateRegistrationStatus(item.status, patch.status)) return item;
+            return { ...item, ...patch };
+          }),
         ),
       deleteRegistration: (id) =>
         setRegistrations((items) => items.filter((item) => item.id !== id)),

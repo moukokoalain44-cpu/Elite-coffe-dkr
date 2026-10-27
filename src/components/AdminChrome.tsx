@@ -25,7 +25,8 @@ const nav = [
   { label: "Vue d’ensemble", to: "/admin", icon: LayoutDashboard },
   { label: "Réservations", to: "/admin/registrations", icon: Users },
   { label: "Catalogue", to: "/admin/catalog", icon: Package },
-  { label: "Galerie & contenu", to: "/admin/content", icon: Pencil },
+  { label: "Galerie", to: "/admin/gallery", icon: Pencil },
+  { label: "Contenu", to: "/admin/content", icon: Pencil },
 ];
 
 const navGroups = [
@@ -37,13 +38,15 @@ export function AdminLayout() {
   const navigate = useNavigate();
   const { session, loading, signOut } = useAdminAuth();
   const [open, setOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
+  const [sidebarHovered, setSidebarHovered] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
   const { registrations } = useAdmin();
   const userEmail = session?.user.email ?? "Administrateur";
+  const expanded = open || !collapsed || sidebarHovered;
   const results = query.trim()
     ? nav.filter((item) => item.label.toLowerCase().includes(query.toLowerCase()))
     : [];
@@ -81,11 +84,13 @@ export function AdminLayout() {
   return (
     <div
       data-admin-theme={darkMode ? "dark" : "light"}
-      className="min-h-screen bg-[#f4f3f4] text-[#2c252a]"
+      className="h-screen overflow-hidden bg-[#f4f3f4] text-[#2c252a]"
     >
-      <div className="flex min-h-screen">
+      <div className="flex h-screen min-h-0">
         <aside
-          className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#e7e2e5] bg-white px-5 py-6 transition-[width,transform] duration-200 lg:static lg:translate-x-0 ${collapsed ? "w-[88px]" : "w-72"} ${open ? "translate-x-0" : "-translate-x-full"}`}
+          onMouseEnter={() => setSidebarHovered(true)}
+          onMouseLeave={() => setSidebarHovered(false)}
+          className={`fixed inset-y-0 left-0 z-50 flex h-screen shrink-0 flex-col overflow-y-auto overscroll-contain border-r border-[#e7e2e5] bg-white/95 px-5 py-6 shadow-[10px_0_35px_-28px_rgba(58,45,51,.55)] backdrop-blur-xl transition-[width,transform] duration-300 lg:static lg:translate-x-0 ${expanded ? "w-72" : "w-[88px]"} ${open ? "translate-x-0" : "-translate-x-full"}`}
         >
           <div className="flex items-center justify-between px-2">
             <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
@@ -94,7 +99,7 @@ export function AdminLayout() {
                 alt="Elite Coffee"
                 className="animate-elite-logo size-10 rounded-2xl object-cover shadow-sm"
               />
-              {!collapsed && (
+              {expanded && (
                 <span>
                   <strong className="font-display text-xl">Elite Coffee</strong>
                   <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-[0.24em] text-[#d85f82]">
@@ -111,7 +116,7 @@ export function AdminLayout() {
               <X size={18} />
             </button>
           </div>
-          {!collapsed && (
+          {expanded && (
             <p className="mb-3 mt-10 px-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#a89aa2]">
               Pilotage
             </p>
@@ -119,7 +124,7 @@ export function AdminLayout() {
           <nav className="space-y-4" aria-label="Navigation administrateur">
             {navGroups.map((group) => (
               <div key={group.label}>
-                {!collapsed && (
+                {expanded && (
                   <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#a89aa2]">
                     {group.label}
                   </p>
@@ -132,9 +137,9 @@ export function AdminLayout() {
                       to={to}
                       icon={<Icon size={18} />}
                       onClick={() => setOpen(false)}
-                      collapsed={collapsed}
+                      collapsed={!expanded}
                       count={
-                        label === "Inscriptions"
+                        label === "Réservations"
                           ? registrations.filter((item) => item.status === "pending").length
                           : undefined
                       }
@@ -150,23 +155,23 @@ export function AdminLayout() {
               to="/admin/settings"
               icon={<Settings size={18} />}
               onClick={() => setOpen(false)}
-              collapsed={collapsed}
+              collapsed={!expanded}
             />
             <button
               type="button"
               onClick={() => void handleSignOut()}
-              title={collapsed ? "Quitter le back-office" : undefined}
-              className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold text-[#a1462c] hover:bg-[#fff3ed] ${collapsed ? "justify-center" : ""}`}
+              title={!expanded ? "Quitter le back-office" : undefined}
+              className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold text-[#a1462c] hover:bg-[#fff3ed] ${!expanded ? "justify-center" : ""}`}
             >
-              <LogOut size={18} /> {!collapsed && "Quitter le back-office"}
+              <LogOut size={18} /> {expanded && "Quitter le back-office"}
             </button>
             <button
               type="button"
               onClick={() => setCollapsed((value) => !value)}
               className={`hidden w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold text-[#756b72] hover:bg-[#f4f3f4] lg:flex ${collapsed ? "justify-center" : ""}`}
-              title={collapsed ? "Déplier la barre latérale" : "Replier la barre latérale"}
+              title={!expanded ? "Déplier la barre latérale" : "Replier la barre latérale"}
             >
-              {collapsed ? (
+              {!expanded ? (
                 <PanelLeftOpen size={18} />
               ) : (
                 <>
@@ -183,7 +188,7 @@ export function AdminLayout() {
             aria-label="Fermer le menu"
           />
         )}
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 overflow-y-auto overscroll-contain">
           <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[#e7e2e5] bg-[#f4f3f4]/90 px-5 backdrop-blur-md md:px-8">
             <div className="relative flex items-center gap-3">
               <button

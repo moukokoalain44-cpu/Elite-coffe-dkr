@@ -50,7 +50,7 @@
     },
     {
       "path": "/admin/registrations",
-      "title": "Inscriptions"
+      "title": "Réservations"
     },
     {
       "path": "/admin/catalog",
@@ -67,6 +67,10 @@
     {
       "path": "/admin/login",
       "title": "Connexion administrateur"
+    },
+    {
+      "path": "/admin/gallery",
+      "title": "Galerie"
     }
   ]
 }
