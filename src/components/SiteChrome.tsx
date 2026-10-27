@@ -32,9 +32,11 @@ export function SiteHeader() {
             className="group flex items-center gap-2.5"
             onClick={() => setMobileOpen(false)}
           >
-            <span className="grid size-10 place-items-center rounded-full border border-accent/70 font-display text-lg italic text-accent transition-colors group-hover:bg-accent group-hover:text-primary">
-              E
-            </span>
+            <img
+              src="/assets/brand/elite-coffee-logo.png"
+              alt="Elite Coffee"
+              className="animate-elite-logo size-11 rounded-full border border-white/50 object-cover shadow-lg transition-transform group-hover:scale-105"
+            />
             <span>
               <span className="block font-display text-lg font-bold leading-none tracking-tight sm:text-xl">
                 Elite Coffee

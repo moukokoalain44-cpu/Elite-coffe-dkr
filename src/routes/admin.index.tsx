@@ -1,335 +1,135 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowUpRight,
-  CalendarDays,
-  ChevronDown,
-  ChevronRight,
-  CircleDollarSign,
-  ClipboardList,
-  PackageCheck,
-  TrendingUp,
-  Users,
-} from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { AdminCard, AdminPageHeader, StatusBadge } from "@/components/AdminChrome";
+import { CalendarDays, ChevronRight, Image, Utensils } from "lucide-react";
+import { AdminCard, AdminPageHeader } from "@/components/AdminChrome";
 import { useAdmin } from "@/contexts/AdminContext";
-import { formatCFA } from "@/lib/currency";
 
 export const Route = createFileRoute("/admin/")({ component: AdminDashboard });
-const trend = [
-  { day: "Lun", sales: 42000 },
-  { day: "Mar", sales: 56500 },
-  { day: "Mer", sales: 48000 },
-  { day: "Jeu", sales: 72000 },
-  { day: "Ven", sales: 91000 },
-  { day: "Sam", sales: 84500 },
-  { day: "Dim", sales: 104000 },
-];
-const statusData = [
-  { name: "Confirmées", value: 34, color: "#2e8b68" },
-  { name: "En attente", value: 18, color: "#d8894a" },
-  { name: "Annulées", value: 6, color: "#c66a37" },
-];
-const registrationTrend = [
-  { day: "Lun", total: 4 },
-  { day: "Mar", total: 7 },
-  { day: "Mer", total: 5 },
-  { day: "Jeu", total: 9 },
-  { day: "Ven", total: 12 },
-  { day: "Sam", total: 10 },
-  { day: "Dim", total: 15 },
-];
 
 function AdminDashboard() {
   const { registrations, products } = useAdmin();
+  const pending = registrations.filter((item) => item.status === "pending").length;
+  const categories = new Set(products.map((item) => item.category)).size;
+  const cards = [
+    {
+      label: "Réservations en attente",
+      value: pending,
+      text: "À confirmer depuis l’espace réservation",
+      icon: CalendarDays,
+      to: "/admin/registrations",
+      tone: "bg-[#fbe9ef] text-[#b9456e]",
+    },
+    {
+      label: "Plats sur la carte",
+      value: products.length,
+      text: `${categories} catégories actives`,
+      icon: Utensils,
+      to: "/admin/catalog",
+      tone: "bg-[#f1eff7] text-[#7a629b]",
+    },
+    {
+      label: "Visuels administrables",
+      value: "Galerie",
+      text: "Images et vidéo modifiables par clé stable",
+      icon: Image,
+      to: "/admin/content",
+      tone: "bg-[#eef4f2] text-[#4d8973]",
+    },
+  ];
   return (
     <>
       <AdminPageHeader
-        eyebrow="Bonjour, Oripio"
-        title="Vue d’ensemble"
-        description="Les signaux importants d’Elite Coffee, au même endroit."
-        action={
-          <button className="flex items-center gap-2 rounded-2xl bg-[#5b3826] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_24px_-14px_#5b3826]">
-            10–19 octobre 2026 <ChevronDown size={16} className="text-white/70" />
-          </button>
-        }
+        eyebrow="Pilotage Elite Coffee"
+        title="Votre espace restaurant"
+        description="Une vue simple et utile sur les réservations, la carte et les contenus publiés."
       />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Kpi
-          label="Réservations en attente"
-          value={String(registrations.filter((r) => r.status === "pending").length)}
-          change="-4,2%"
-          icon={<CalendarDays size={19} />}
-          tone="blue"
-        />
+      <div className="grid gap-5 md:grid-cols-3">
+        {cards.map(({ label, value, text, icon: Icon, to, tone }) => (
+          <Link key={label} to={to} className="group">
+            <AdminCard className="h-full transition hover:-translate-y-1 hover:border-[#e1a8b9]">
+              <div className={`grid size-12 place-items-center rounded-2xl ${tone}`}>
+                <Icon size={21} />
+              </div>
+              <p className="mt-5 text-sm text-[#81757b]">{label}</p>
+              <p className="mt-2 font-display text-3xl font-bold">{value}</p>
+              <div className="mt-3 flex items-center justify-between text-xs text-[#9b8d91]">
+                <span>{text}</span>
+                <ChevronRight size={16} className="transition group-hover:translate-x-1" />
+              </div>
+            </AdminCard>
+          </Link>
+        ))}
       </div>
-      <div className="mt-5 grid gap-5 xl:grid-cols-[1.45fr_.8fr]">
-        <AdminCard>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="font-display text-2xl font-bold">Revenus de la semaine</h2>
-              <p className="mt-1 text-sm text-[#93877d]">Commandes encaissées, en FCFA</p>
-            </div>
-            <span className="flex items-center gap-1 rounded-xl bg-[#f7f5f1] px-3 py-2 text-xs font-bold text-[#6f655d]">
-              Cette semaine <ChevronDown size={14} />
-            </span>
-          </div>
-          <div className="mt-6 h-[290px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={trend} barCategoryGap="28%">
-                <CartesianGrid vertical={false} stroke="#eee8e2" />
-                <XAxis
-                  dataKey="day"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#9b9188", fontSize: 12 }}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#9b9188", fontSize: 12 }}
-                  tickFormatter={(value) => `${Math.round(value / 1000)}k`}
-                />
-                <Tooltip
-                  formatter={(value: number) => formatCFA(value)}
-                  contentStyle={{ borderRadius: 14, border: "1px solid #eee8e2" }}
-                />
-                <Bar dataKey="sales" fill="#ef5b2a" radius={[9, 9, 4, 4]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </AdminCard>
+      <div className="mt-5 grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
         <AdminCard>
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="font-display text-2xl font-bold">Statut des commandes</h2>
-              <p className="mt-1 text-sm text-[#93877d]">Sur la période sélectionnée</p>
+              <h2 className="font-display text-2xl font-bold">À traiter aujourd’hui</h2>
+              <p className="mt-1 text-sm text-[#93878d]">
+                Les actions les plus utiles pour garder le site à jour.
+              </p>
             </div>
-            <span className="grid size-9 place-items-center rounded-xl bg-[#f7f5f1]">
-              <ClipboardList size={17} />
+            <span className="rounded-full bg-[#fbe9ef] px-3 py-1 text-xs font-bold text-[#b9456e]">
+              {pending} priorité(s)
             </span>
           </div>
-          <div className="mt-5 h-[190px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  dataKey="value"
-                  nameKey="name"
-                  innerRadius={52}
-                  outerRadius={78}
-                  paddingAngle={5}
-                >
-                  {statusData.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="space-y-3">
-            {statusData.map((item) => (
-              <div key={item.name} className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2 text-[#776d65]">
-                  <i className="size-2.5 rounded-full" style={{ background: item.color }} />
-                  {item.name}
-                </span>
-                <strong>{item.value}</strong>
-              </div>
-            ))}
+          <div className="mt-6 space-y-3">
+            {pending > 0 && (
+              <ActionLink
+                to="/admin/registrations"
+                title="Répondre aux réservations en attente"
+                text={`${pending} demande(s) attendent une confirmation`}
+              />
+            )}
+            <ActionLink
+              to="/admin/catalog"
+              title="Vérifier la carte publiée"
+              text={`${products.length} plats et boissons enregistrés`}
+            />
+            <ActionLink
+              to="/admin/content"
+              title="Actualiser la galerie"
+              text="Remplacer un visuel ou le motion hero"
+            />
           </div>
         </AdminCard>
-      </div>
-      <AdminCard className="mt-5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="font-display text-2xl font-bold">Évolution des inscriptions</h2>
-            <p className="mt-1 text-sm text-[#93877d]">
-              Demandes reçues au fil des jours sur la période sélectionnée.
-            </p>
-          </div>
-          <span className="grid size-10 place-items-center rounded-xl bg-[#e8f5ee] text-[#2e8b68]">
-            <TrendingUp size={18} />
-          </span>
-        </div>
-        <div className="mt-6 h-[250px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={registrationTrend}
-              margin={{ top: 8, right: 12, left: -18, bottom: 0 }}
+        <AdminCard>
+          <h2 className="font-display text-2xl font-bold">Raccourcis</h2>
+          <div className="mt-5 grid gap-3">
+            <Link
+              to="/admin/catalog"
+              className="rounded-2xl bg-[#fdf4f6] p-4 text-sm font-bold text-[#a5365f] hover:bg-[#fbe9ef]"
             >
-              <CartesianGrid vertical={false} stroke="#eee8e2" />
-              <XAxis
-                dataKey="day"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9b9188", fontSize: 12 }}
-              />
-              <YAxis
-                allowDecimals={false}
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9b9188", fontSize: 12 }}
-              />
-              <Tooltip
-                formatter={(value: number) => [`${value} inscriptions`, "Demandes"]}
-                contentStyle={{ borderRadius: 14, border: "1px solid #eee8e2" }}
-              />
-              <Line
-                type="monotone"
-                dataKey="total"
-                stroke="#2e8b68"
-                strokeWidth={3}
-                dot={{ r: 4, fill: "#2e8b68", strokeWidth: 0 }}
-                activeDot={{ r: 6 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </AdminCard>
-      <AdminCard className="mt-5 overflow-hidden p-0">
-        <div className="flex items-center justify-between border-b border-[#eee8e2] px-5 py-5 md:px-6">
-          <div>
-            <h2 className="font-display text-2xl font-bold">Dernières inscriptions</h2>
-            <p className="mt-1 text-sm text-[#93877d]">
-              Les demandes qui nécessitent votre attention
-            </p>
+              + Ajouter un plat
+            </Link>
+            <Link
+              to="/admin/registrations"
+              className="rounded-2xl bg-[#f4f3f4] p-4 text-sm font-bold text-[#665b60] hover:bg-[#eee9eb]"
+            >
+              Voir les réservations
+            </Link>
+            <Link
+              to="/admin/content"
+              className="rounded-2xl bg-[#eef4f2] p-4 text-sm font-bold text-[#4d8973] hover:bg-[#e2efeb]"
+            >
+              Gérer les médias
+            </Link>
           </div>
-          <Link
-            to="/admin/registrations"
-            className="flex items-center gap-1 text-sm font-bold text-[#b65d36] hover:text-[#5b3826]"
-          >
-            Tout voir <ArrowUpRight size={15} />
-          </Link>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[680px] text-left text-sm">
-            <thead className="bg-[#fcfbfa] text-[11px] uppercase tracking-[0.16em] text-[#a69a90]">
-              <tr>
-                <th className="px-6 py-4">Client</th>
-                <th className="px-6 py-4">Date</th>
-                <th className="px-6 py-4">Convives</th>
-                <th className="px-6 py-4">Occasion</th>
-                <th className="px-6 py-4">Statut</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {registrations.slice(0, 4).map((row) => (
-                <tr key={row.id} className="border-t border-[#f1ece7] hover:bg-[#fffaf6]">
-                  <td className="px-6 py-4">
-                    <strong>{row.name}</strong>
-                    <span className="mt-1 block text-xs text-[#9b9188]">{row.phone}</span>
-                  </td>
-                  <td className="px-6 py-4 text-[#6f655d]">
-                    {row.date} · {row.time}
-                  </td>
-                  <td className="px-6 py-4">{row.guests}</td>
-                  <td className="px-6 py-4 text-[#6f655d]">{row.occasion}</td>
-                  <td className="px-6 py-4">
-                    <StatusBadge status={row.status} />
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <Link to="/admin/registrations" className="text-[#9b9188] hover:text-[#5b3826]">
-                      <ChevronRight size={18} />
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </AdminCard>
-      <div className="mt-5 grid gap-5 md:grid-cols-3">
-        <QuickLink
-          to="/admin/registrations"
-          icon={<Users size={20} />}
-          title="Gérer les inscriptions"
-          text={`${registrations.length} demandes à suivre`}
-        />
-        <QuickLink
-          to="/admin/catalog"
-          icon={<PackageCheck size={20} />}
-          title="Mettre à jour la carte"
-          text={`${products.length} produits au catalogue`}
-        />
+        </AdminCard>
       </div>
     </>
   );
 }
-function Kpi({
-  label,
-  value,
-  change,
-  icon,
-  tone,
-}: {
-  label: string;
-  value: string;
-  change: string;
-  icon: React.ReactNode;
-  tone: string;
-}) {
-  return (
-    <AdminCard>
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-[#82776e]">{label}</p>
-          <p className="mt-3 font-display text-3xl font-bold">{value}</p>
-          <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-[#e8f5ee] px-2 py-1 text-[11px] font-bold text-[#2e8b68]">
-            <ArrowUpRight size={12} /> {change}
-          </span>
-        </div>
-        <span
-          className={`grid size-11 place-items-center rounded-2xl ${tone === "orange" ? "bg-[#fff0e7] text-[#df6332]" : tone === "green" ? "bg-[#e8f5ee] text-[#2e8b68]" : tone === "blue" ? "bg-[#e9f1ff] text-[#4777ac]" : "bg-[#f2edff] text-[#7957a8]"}`}
-        >
-          {icon}
-        </span>
-      </div>
-    </AdminCard>
-  );
-}
-function QuickLink({
-  to,
-  icon,
-  title,
-  text,
-}: {
-  to: string;
-  icon: React.ReactNode;
-  title: string;
-  text: string;
-}) {
+function ActionLink({ to, title, text }: { to: string; title: string; text: string }) {
   return (
     <Link
       to={to}
-      className="group flex items-center gap-4 rounded-[22px] border border-[#ebe5df] bg-white p-5 shadow-[0_14px_40px_-30px_rgba(91,56,38,.35)] hover:-translate-y-0.5"
+      className="flex items-center justify-between rounded-2xl border border-[#eee8e8] p-4 hover:border-[#e1a8b9] hover:bg-[#fffafd]"
     >
-      <span className="grid size-11 place-items-center rounded-2xl bg-[#f4e3d3] text-[#a75b35]">
-        {icon}
+      <span>
+        <strong className="block text-sm">{title}</strong>
+        <small className="mt-1 block text-xs text-[#93878d]">{text}</small>
       </span>
-      <span className="min-w-0">
-        <strong className="block font-display text-lg">{title}</strong>
-        <small className="mt-1 block text-[#93877d]">{text}</small>
-      </span>
-      <ArrowUpRight
-        className="ml-auto text-[#b8aaa0] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-        size={17}
-      />
+      <ChevronRight size={17} className="text-[#b9456e]" />
     </Link>
   );
 }

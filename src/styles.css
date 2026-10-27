@@ -68,25 +68,25 @@
 
 :root {
   --radius: 0.875rem;
-  --background: oklch(0.98 0.01 80);
-  --foreground: oklch(0.27 0.04 50);
+  --background: oklch(0.975 0.008 340);
+  --foreground: oklch(0.24 0.025 340);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.27 0.04 50);
+  --card-foreground: oklch(0.24 0.025 340);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.27 0.04 50);
-  --primary: oklch(0.36 0.07 55);
-  --primary-foreground: oklch(0.98 0.01 80);
-  --secondary: oklch(0.94 0.02 75);
-  --secondary-foreground: oklch(0.36 0.07 55);
-  --muted: oklch(0.95 0.015 78);
-  --muted-foreground: oklch(0.5 0.03 55);
-  --accent: oklch(0.63 0.14 48);
+  --primary: oklch(0.31 0.035 340);
+  --primary-foreground: oklch(0.99 0.004 340);
+  --secondary: oklch(0.95 0.018 340);
+  --secondary-foreground: oklch(0.38 0.055 340);
+  --muted: oklch(0.95 0.012 340);
+  --muted-foreground: oklch(0.5 0.025 340);
+  --accent: oklch(0.61 0.13 355);
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.9 0.02 75);
-  --input: oklch(0.88 0.02 75);
-  --ring: oklch(0.63 0.14 48);
+  --border: oklch(0.9 0.018 340);
+  --input: oklch(0.88 0.02 340);
+  --ring: oklch(0.61 0.13 355);
   --star: oklch(0.8 0.15 80);
   --shadow-soft: 0 10px 30px -12px color-mix(in oklab, var(--primary) 25%, transparent);
   --shadow-lift: 0 24px 50px -18px color-mix(in oklab, var(--primary) 40%, transparent);
@@ -152,19 +152,58 @@
 }
 
 @layer base {
-  html { scroll-behavior: smooth; }
-  body { font-family: var(--font-sans); }
-  h1, h2, h3 { font-family: var(--font-display); }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: var(--font-sans);
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
 }
 
-@keyframes float-y { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-@utility animate-float { animation: float-y 5s ease-in-out infinite; }
-@utility animate-float-delayed { animation: float-y 5s ease-in-out 2.5s infinite; }
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+@utility animate-float {
+  animation: float-y 5s ease-in-out infinite;
+}
+@utility animate-float-delayed {
+  animation: float-y 5s ease-in-out 2.5s infinite;
+}
+
+@keyframes elite-logo-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 5px 10px rgb(216 95 130 / 0.12));
+  }
+  50% {
+    filter: drop-shadow(0 8px 16px rgb(216 95 130 / 0.3));
+  }
+}
+@utility animate-elite-logo {
+  animation: elite-logo-glow 4s ease-in-out infinite;
+}
 
 @utility reveal {
-  opacity: 0; transform: translateY(24px);
-  transition: opacity .8s ease, transform .8s ease;
-  &.is-visible { opacity: 1; transform: none; }
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+  &.is-visible {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Admin studio theme: scoped so the public storefront keeps its warm light theme. */

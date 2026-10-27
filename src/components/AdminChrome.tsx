@@ -13,7 +13,6 @@ import {
   Pencil,
   Search,
   Settings,
-  Sparkles,
   Sun,
   Users,
   X,
@@ -24,10 +23,9 @@ import { useAdminAuth } from "@/contexts/AuthContext";
 
 const nav = [
   { label: "Vue d’ensemble", to: "/admin", icon: LayoutDashboard },
-  { label: "Analytics", to: "/admin/analytics", icon: Sparkles },
-  { label: "Inscriptions", to: "/admin/registrations", icon: Users },
+  { label: "Réservations", to: "/admin/registrations", icon: Users },
   { label: "Catalogue", to: "/admin/catalog", icon: Package },
-  { label: "Médias & contenu", to: "/admin/content", icon: Pencil },
+  { label: "Galerie & contenu", to: "/admin/content", icon: Pencil },
 ];
 
 const navGroups = [
@@ -91,13 +89,15 @@ export function AdminLayout() {
         >
           <div className="flex items-center justify-between px-2">
             <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-              <span className="grid size-10 place-items-center rounded-2xl bg-[#5b3826] text-[#fffaf4]">
-                <Coffee size={20} />
-              </span>
+              <img
+                src="/assets/brand/elite-coffee-logo.png"
+                alt="Elite Coffee"
+                className="animate-elite-logo size-10 rounded-2xl object-cover shadow-sm"
+              />
               {!collapsed && (
                 <span>
                   <strong className="font-display text-xl">Elite Coffee</strong>
-                  <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-[0.24em] text-[#d8894a]">
+                  <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-[0.24em] text-[#d85f82]">
                     Admin studio
                   </span>
                 </span>
@@ -318,7 +318,7 @@ function AdminNavLink({
       to={to}
       onClick={onClick}
       title={collapsed ? label : undefined}
-      className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition-colors ${collapsed ? "justify-center" : ""} ${active ? "bg-[#ef5b2a] text-white shadow-[0_8px_20px_-12px_#ef5b2a]" : "text-[#6f655d] hover:bg-[#f7f5f1] hover:text-[#5b3826]"}`}
+      className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition-colors ${collapsed ? "justify-center" : ""} ${active ? "bg-[#d85f82] text-white shadow-[0_8px_20px_-12px_#d85f82]" : "text-[#6f655d] hover:bg-[#f7f5f1] hover:text-[#5b3826]"}`}
     >
       {icon}
       {!collapsed && <span>{label}</span>}
@@ -347,7 +347,7 @@ export function AdminPageHeader({
   return (
     <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
       <div>
-        <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.22em] text-[#c56d3c]">
+        <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.22em] text-[#c45d7d]">
           {eyebrow}
         </p>
         <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl">{title}</h1>

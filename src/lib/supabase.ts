@@ -44,6 +44,47 @@ export async function fetchMenuProducts(): Promise<MenuProductRow[]> {
   return (data ?? []) as MenuProductRow[];
 }
 
+const MENU_COLUMNS =
+  "id,name,category,price,description,price_options,availability_note,featured,image_url,is_visible,sort_order";
+
+export async function fetchMenuProductsAdmin(): Promise<MenuProductRow[]> {
+  const { data, error } = await supabase
+    .from("menu_products")
+    .select(MENU_COLUMNS)
+    .order("category")
+    .order("sort_order");
+  if (error) throw new Error(error.message);
+  return (data ?? []) as MenuProductRow[];
+}
+
+export type MenuProductInput = Omit<MenuProductRow, "id"> & { id?: string };
+
+export async function createMenuProduct(input: MenuProductInput): Promise<MenuProductRow> {
+  const { data, error } = await supabase
+    .from("menu_products")
+    .insert(input)
+    .select(MENU_COLUMNS)
+    .single();
+  if (error) throw new Error(error.message);
+  return data as MenuProductRow;
+}
+
+export async function updateMenuProduct(id: string, patch: Partial<MenuProductInput>) {
+  const { data, error } = await supabase
+    .from("menu_products")
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select(MENU_COLUMNS)
+    .single();
+  if (error) throw new Error(error.message);
+  return data as MenuProductRow;
+}
+
+export async function deleteMenuProduct(id: string) {
+  const { error } = await supabase.from("menu_products").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
 export type OrderInsert = {
   name: string;
   phone: string;
@@ -149,4 +190,51 @@ export async function uploadSiteMedia(file: File, mediaKey: string) {
   });
   if (error) throw new Error(error.message);
   return supabase.storage.from("site-media").getPublicUrl(path).data.publicUrl;
+}
+
+export async function uploadMenuProductMedia(file: File, productId: string) {
+  const allowed = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+  if (!allowed.includes(file.type)) throw new Error("Utilisez une image JPG, PNG, WebP ou AVIF.");
+  if (file.size > 10 * 1024 * 1024) throw new Error("L’image dépasse la limite de 10 Mo.");
+  const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `menu/${productId}/${crypto.randomUUID()}.${extension}`;
+  const { error } = await supabase.storage
+    .from("site-media")
+    .upload(path, file, { cacheControl: "31536000", contentType: file.type, upsert: false });
+  if (error) throw new Error(error.message);
+  return supabase.storage.from("site-media").getPublicUrl(path).data.publicUrl;
+}
+
+export type MenuCategoryRow = { id: string; name: string; sort_order: number };
+
+export async function fetchMenuCategories(): Promise<MenuCategoryRow[]> {
+  const { data, error } = await supabase
+    .from("menu_categories")
+    .select("id,name,sort_order")
+    .order("sort_order")
+    .order("name")
+    .limit(100);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as MenuCategoryRow[];
+}
+
+export async function createMenuCategory(name: string): Promise<MenuCategoryRow> {
+  const id = name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  const { data, error } = await supabase
+    .from("menu_categories")
+    .insert({ id, name })
+    .select("id,name,sort_order")
+    .single();
+  if (error) throw new Error(error.message);
+  return data as MenuCategoryRow;
+}
+
+export async function deleteMenuCategory(id: string) {
+  const { error } = await supabase.from("menu_categories").delete().eq("id", id);
+  if (error) throw new Error(error.message);
 }

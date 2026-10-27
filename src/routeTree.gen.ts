@@ -21,11 +21,9 @@ import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as ReserverRouteImport } from './routes/reserver'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
-import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminRegistrationsRouteImport } from './routes/admin.registrations'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as MenuIdRouteImport } from './routes/menu.$id'
@@ -90,11 +88,6 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
@@ -108,11 +101,6 @@ const AdminContentRoute = AdminContentRouteImport.update({
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminOrdersRoute = AdminOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminRegistrationsRoute = AdminRegistrationsRouteImport.update({
@@ -143,11 +131,9 @@ export interface FileRoutesByFullPath {
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
-  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/login': typeof AdminLoginRoute
-  '/admin/orders': typeof AdminOrdersRoute
   '/admin/registrations': typeof AdminRegistrationsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/menu/$id': typeof MenuIdRoute
@@ -164,11 +150,9 @@ export interface FileRoutesByTo {
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
-  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/login': typeof AdminLoginRoute
-  '/admin/orders': typeof AdminOrdersRoute
   '/admin/registrations': typeof AdminRegistrationsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/menu/$id': typeof MenuIdRoute
@@ -187,11 +171,9 @@ export interface FileRoutesById {
   '/locations': typeof LocationsRoute
   '/menu': typeof MenuRouteWithChildren
   '/reserver': typeof ReserverRoute
-  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/login': typeof AdminLoginRoute
-  '/admin/orders': typeof AdminOrdersRoute
   '/admin/registrations': typeof AdminRegistrationsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/menu/$id': typeof MenuIdRoute
@@ -211,11 +193,9 @@ export interface FileRouteTypes {
     | '/locations'
     | '/menu'
     | '/reserver'
-    | '/admin/analytics'
     | '/admin/catalog'
     | '/admin/content'
     | '/admin/login'
-    | '/admin/orders'
     | '/admin/registrations'
     | '/admin/settings'
     | '/menu/$id'
@@ -232,11 +212,9 @@ export interface FileRouteTypes {
     | '/locations'
     | '/menu'
     | '/reserver'
-    | '/admin/analytics'
     | '/admin/catalog'
     | '/admin/content'
     | '/admin/login'
-    | '/admin/orders'
     | '/admin/registrations'
     | '/admin/settings'
     | '/menu/$id'
@@ -254,11 +232,9 @@ export interface FileRouteTypes {
     | '/locations'
     | '/menu'
     | '/reserver'
-    | '/admin/analytics'
     | '/admin/catalog'
     | '/admin/content'
     | '/admin/login'
-    | '/admin/orders'
     | '/admin/registrations'
     | '/admin/settings'
     | '/menu/$id'
@@ -365,13 +341,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/analytics': {
-      id: '/admin/analytics'
-      path: '/analytics'
-      fullPath: '/admin/analytics'
-      preLoaderRoute: typeof AdminAnalyticsRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/catalog': {
       id: '/admin/catalog'
       path: '/catalog'
@@ -391,13 +360,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/orders': {
-      id: '/admin/orders'
-      path: '/orders'
-      fullPath: '/admin/orders'
-      preLoaderRoute: typeof AdminOrdersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/registrations': {
@@ -425,22 +387,18 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
-  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminCatalogRoute: typeof AdminCatalogRoute
   AdminContentRoute: typeof AdminContentRoute
   AdminLoginRoute: typeof AdminLoginRoute
-  AdminOrdersRoute: typeof AdminOrdersRoute
   AdminRegistrationsRoute: typeof AdminRegistrationsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminCatalogRoute: AdminCatalogRoute,
   AdminContentRoute: AdminContentRoute,
   AdminLoginRoute: AdminLoginRoute,
-  AdminOrdersRoute: AdminOrdersRoute,
   AdminRegistrationsRoute: AdminRegistrationsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminIndexRoute: AdminIndexRoute,

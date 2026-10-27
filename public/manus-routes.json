@@ -49,10 +49,6 @@
       "title": "Back-office"
     },
     {
-      "path": "/admin/analytics",
-      "title": "Analytics"
-    },
-    {
       "path": "/admin/registrations",
       "title": "Inscriptions"
     },

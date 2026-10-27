@@ -1,10 +1,420 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Eye, EyeOff, Pencil, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AdminCard, AdminPageHeader, AdminPagination } from "@/components/AdminChrome";
-import { useAdmin } from "@/contexts/AdminContext";
 import { formatCFA } from "@/lib/currency";
+import {
+  createMenuCategory,
+  createMenuProduct,
+  deleteMenuCategory,
+  deleteMenuProduct,
+  fetchMenuCategories,
+  fetchMenuProductsAdmin,
+  type MenuCategoryRow,
+  type MenuProductInput,
+  type MenuProductRow,
+  updateMenuProduct,
+  uploadMenuProductMedia,
+} from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin/catalog")({ component: CatalogPage });
-function CatalogPage() { const { products, updateProduct } = useAdmin(); const [query, setQuery] = useState(""); const [page, setPage] = useState(1); const filtered = useMemo(() => products.filter((p) => `${p.name} ${p.category}`.toLowerCase().includes(query.toLowerCase())), [products, query]); const pageSize = 6; const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize)); const visible = filtered.slice((page - 1) * pageSize, page * pageSize); return <><AdminPageHeader eyebrow="Offre" title="Catalogue" description="Gardez la carte, les prix et la visibilité des produits à jour." /><AdminCard className="overflow-hidden p-0"><div className="flex items-center justify-between border-b border-[#eee8e2] p-5"><div className="flex items-center gap-2 rounded-xl border border-[#e8e0d7] px-3 py-2.5 md:w-80"><Search size={17} className="text-[#9b9188]" /><input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder="Rechercher un produit…" className="w-full bg-transparent text-sm outline-none placeholder:text-[#aaa098]" /></div><span className="text-sm text-[#93877d]">{filtered.length} produits</span></div><div className="grid gap-4 p-5 sm:grid-cols-2 xl:grid-cols-3">{visible.map((product) => <article key={product.id} className="overflow-hidden rounded-2xl border border-[#eee8e2] bg-[#fcfbfa]"><div className="flex gap-4 p-4"><img src={product.image} alt="" className="size-20 rounded-xl object-cover" /><div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><div><p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#c56d3c]">{product.category}</p><h2 className="mt-1 truncate font-display text-lg font-bold">{product.name}</h2></div><button onClick={() => { updateProduct(product.id, { featured: !product.featured }); toast.success("Visibilité mise à jour"); }} className="rounded-lg p-2 text-[#8d8178] hover:bg-[#f4e3d3]" aria-label="Modifier la visibilité">{product.featured ? <Eye size={16} /> : <EyeOff size={16} />}</button></div><p className="mt-2 font-bold text-[#5b3826]">{formatCFA(product.price)}</p></div></div><div className="flex items-center justify-between border-t border-[#eee8e2] px-4 py-3"><span className="text-xs text-[#93877d]">{product.featured ? "Mis en avant" : "Visible au catalogue"}</span><button onClick={() => { const next = window.prompt("Nouveau prix en FCFA", String(product.price)); if (next && Number(next) > 0) { updateProduct(product.id, { price: Number(next) }); toast.success("Prix mis à jour"); } }} className="flex items-center gap-1 text-xs font-bold text-[#a75b35] hover:text-[#5b3826]"><Pencil size={13} /> Modifier</button></div></article>)}</div><AdminPagination page={Math.min(page, totalPages)} totalPages={totalPages} onPageChange={setPage} /></AdminCard></>; }
+
+type Draft = Omit<MenuProductRow, "id"> & { id?: string };
+const blank = (category = "Nouvelle catégorie"): Draft => ({
+  name: "",
+  category,
+  price: 0,
+  description: "",
+  price_options: [],
+  availability_note: "Disponible sur place",
+  featured: false,
+  image_url: null,
+  is_visible: true,
+  sort_order: 0,
+});
+
+function CatalogPage() {
+  const [products, setProducts] = useState<MenuProductRow[]>([]);
+  const [categoryRows, setCategoryRows] = useState<MenuCategoryRow[]>([]);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("Toutes");
+  const [page, setPage] = useState(1);
+  const [draft, setDraft] = useState<Draft | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const pageSize = 8;
+
+  const refresh = async () => {
+    try {
+      const [items, groups] = await Promise.all([fetchMenuProductsAdmin(), fetchMenuCategories()]);
+      setProducts(items);
+      setCategoryRows(groups);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Impossible de charger la carte");
+    }
+  };
+  useEffect(() => {
+    void refresh();
+  }, []);
+
+  const categories = useMemo(
+    () => [...new Set(products.map((item) => item.category))].sort(),
+    [products],
+  );
+  const filtered = useMemo(
+    () =>
+      products.filter((item) => {
+        const matchesText = `${item.name} ${item.category} ${item.description}`
+          .toLowerCase()
+          .includes(query.toLowerCase());
+        return matchesText && (category === "Toutes" || item.category === category);
+      }),
+    [products, query, category],
+  );
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const visible = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const setField = <K extends keyof Draft>(key: K, value: Draft[K]) =>
+    setDraft((current) => (current ? { ...current, [key]: value } : current));
+
+  const save = async () => {
+    if (!draft?.name.trim() || !draft.category.trim() || Number(draft.price) < 0) {
+      toast.error("Renseignez le nom, la catégorie et un prix valide.");
+      return;
+    }
+    try {
+      const payload: MenuProductInput = {
+        ...draft,
+        name: draft.name.trim(),
+        category: draft.category.trim(),
+        price: Number(draft.price),
+      };
+      const saved = draft.id
+        ? await updateMenuProduct(draft.id, payload)
+        : await createMenuProduct(payload);
+      setProducts((current) =>
+        draft.id
+          ? current.map((item) => (item.id === saved.id ? saved : item))
+          : [saved, ...current],
+      );
+      setDraft(null);
+      toast.success(draft.id ? "Plat mis à jour" : "Plat ajouté à la carte");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Impossible d’enregistrer le plat");
+    }
+  };
+  const remove = async (item: MenuProductRow) => {
+    if (!window.confirm(`Supprimer « ${item.name} » de la carte ?`)) return;
+    try {
+      await deleteMenuProduct(item.id);
+      setProducts((current) => current.filter((row) => row.id !== item.id));
+      toast.success("Plat supprimé");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Impossible de supprimer ce plat");
+    }
+  };
+  const removeCategory = async (name: string) => {
+    const items = products.filter((item) => item.category === name);
+    if (items.length) {
+      toast.error("Supprimez ou déplacez d’abord les plats de cette catégorie.");
+      return;
+    }
+    setCategory("Toutes");
+    toast.success("Catégorie retirée de la liste");
+  };
+  const upload = async (file: File | undefined) => {
+    if (!file || !draft) return;
+    if (!draft.id) {
+      toast.error("Enregistrez d’abord le plat avant d’ajouter une image.");
+      return;
+    }
+    setUploading(true);
+    try {
+      setField("image_url", await uploadMenuProductMedia(file, draft.id));
+      toast.success("Image importée");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Import impossible");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <>
+      <AdminPageHeader
+        eyebrow="Gestion de la carte"
+        title="Menu & catégories"
+        description="Ajoutez, modifiez ou retirez les plats réellement proposés sur place. Chaque changement est enregistré dans Supabase."
+        action={
+          <button
+            onClick={() => setDraft(blank())}
+            className="flex items-center gap-2 rounded-2xl bg-[#d85f82] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_25px_-14px_#d85f82]"
+          >
+            <Plus size={17} /> Nouveau plat
+          </button>
+        }
+      />
+      <div className="grid gap-5 xl:grid-cols-[240px_1fr]">
+        <AdminCard className="h-fit">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-xl font-bold">Catégories</h2>
+            <button
+              onClick={() => setDraft(blank())}
+              className="rounded-lg bg-[#fbe9ef] p-2 text-[#b9456e]"
+              title="Ajouter une catégorie"
+            >
+              <Plus size={15} />
+            </button>
+          </div>
+          <div className="mt-4 space-y-1">
+            <button
+              onClick={() => {
+                setCategory("Toutes");
+                setPage(1);
+              }}
+              className={`flex w-full justify-between rounded-xl px-3 py-2 text-left text-sm font-semibold ${category === "Toutes" ? "bg-[#fbe9ef] text-[#a5365f]" : "text-[#756b68] hover:bg-[#f7f5f5]"}`}
+            >
+              <span>Toutes</span>
+              <span>{products.length}</span>
+            </button>
+            {categories.map((name) => (
+              <div key={name} className="group flex items-center gap-1">
+                <button
+                  onClick={() => {
+                    setCategory(name);
+                    setPage(1);
+                  }}
+                  className={`flex min-w-0 flex-1 justify-between rounded-xl px-3 py-2 text-left text-sm font-semibold ${category === name ? "bg-[#fbe9ef] text-[#a5365f]" : "text-[#756b68] hover:bg-[#f7f5f5]"}`}
+                >
+                  <span className="truncate">{name}</span>
+                  <span>{products.filter((item) => item.category === name).length}</span>
+                </button>
+                <button
+                  onClick={() => void removeCategory(name)}
+                  className="invisible rounded-lg p-1 text-[#b45f73] hover:bg-[#fbe9ef] group-hover:visible"
+                  title="Retirer la catégorie"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </AdminCard>
+        <AdminCard className="overflow-hidden p-0">
+          <div className="flex flex-col gap-3 border-b border-[#eee8e2] p-5 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-2 rounded-xl border border-[#e8e0e7] bg-white px-3 py-2.5 md:w-96">
+              <Search size={17} className="text-[#9b8d91]" />
+              <input
+                value={query}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setPage(1);
+                }}
+                placeholder="Rechercher un plat…"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-[#aaa0a5]"
+              />
+            </div>
+            <span className="text-sm text-[#93878d]">{filtered.length} plats</span>
+          </div>
+          <div className="grid gap-4 p-5 sm:grid-cols-2 xl:grid-cols-3">
+            {visible.map((product) => (
+              <article
+                key={product.id}
+                className="overflow-hidden rounded-2xl border border-[#eee8e2] bg-[#fdfbfc]"
+              >
+                <div className="relative h-40 bg-[#f5edf0]">
+                  {product.image_url ? (
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    <div className="grid size-full place-items-center text-[#bd9eaa]">
+                      <ImagePlus size={28} />
+                    </div>
+                  )}
+                  <span
+                    className={`absolute left-3 top-3 rounded-full px-2 py-1 text-[10px] font-bold ${product.is_visible ? "bg-white/90 text-[#428366]" : "bg-[#3f3639]/80 text-white"}`}
+                  >
+                    {product.is_visible ? "Visible" : "Masqué"}
+                  </span>
+                </div>
+                <div className="p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#c45d7d]">
+                    {product.category}
+                  </p>
+                  <h2 className="mt-1 truncate font-display text-lg font-bold">{product.name}</h2>
+                  <p className="mt-2 line-clamp-2 min-h-10 text-xs leading-5 text-[#81757b]">
+                    {product.description || "Aucune description"}
+                  </p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <strong className="text-[#a5365f]">{formatCFA(product.price)}</strong>
+                    <span className="text-[11px] text-[#9b8d91]">
+                      {product.availability_note || "Sur place"}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between border-t border-[#eee8e2] px-4 py-3">
+                  <button
+                    onClick={() => setDraft(product)}
+                    className="flex items-center gap-1 text-xs font-bold text-[#a5365f]"
+                  >
+                    <Pencil size={13} /> Modifier
+                  </button>
+                  <button
+                    onClick={() => void remove(product)}
+                    className="rounded-lg p-2 text-[#b45f73] hover:bg-[#fbe9ef]"
+                    title="Supprimer"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+          <AdminPagination
+            page={Math.min(page, totalPages)}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </AdminCard>
+      </div>
+      {draft && (
+        <div className="fixed inset-0 z-[70] grid place-items-center bg-[#2c2025]/35 p-4">
+          <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[28px] border border-[#eadde2] bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#c45d7d]">
+                  Édition de la carte
+                </p>
+                <h2 className="mt-1 font-display text-3xl font-bold">
+                  {draft.id ? "Modifier le plat" : "Ajouter un plat"}
+                </h2>
+              </div>
+              <button onClick={() => setDraft(null)} className="rounded-xl p-2 hover:bg-[#f8f1f3]">
+                <X size={19} />
+              </button>
+            </div>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <Field label="Nom du plat">
+                <input
+                  value={draft.name}
+                  onChange={(event) => setField("name", event.target.value)}
+                />
+              </Field>
+              <Field label="Catégorie">
+                <input
+                  list="menu-categories"
+                  value={draft.category}
+                  onChange={(event) => setField("category", event.target.value)}
+                />
+                <datalist id="menu-categories">
+                  {categories.map((item) => (
+                    <option key={item} value={item} />
+                  ))}
+                </datalist>
+              </Field>
+              <Field label="Prix en FCFA">
+                <input
+                  type="number"
+                  min="0"
+                  value={draft.price}
+                  onChange={(event) => setField("price", Number(event.target.value))}
+                />
+              </Field>
+              <Field label="Disponibilité">
+                <input
+                  value={draft.availability_note ?? ""}
+                  onChange={(event) => setField("availability_note", event.target.value)}
+                  placeholder="Disponible sur place"
+                />
+              </Field>
+              <Field label="Description" wide>
+                <textarea
+                  rows={4}
+                  value={draft.description}
+                  onChange={(event) => setField("description", event.target.value)}
+                />
+              </Field>
+              <Field label="Image du plat" wide>
+                <div className="flex items-center gap-3">
+                  <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-[#d97897] bg-[#fff7f9] px-4 py-3 text-xs font-bold text-[#a5365f]">
+                    <ImagePlus size={15} />{" "}
+                    {uploading ? "Import en cours…" : "Télécharger une image"}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      className="sr-only"
+                      disabled={uploading}
+                      onChange={(event) => {
+                        void upload(event.target.files?.[0]);
+                        event.currentTarget.value = "";
+                      }}
+                    />
+                  </label>
+                  {draft.image_url && (
+                    <img
+                      src={draft.image_url}
+                      alt="Aperçu"
+                      className="size-14 rounded-xl object-cover"
+                    />
+                  )}
+                </div>
+              </Field>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-4 text-sm">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={draft.is_visible}
+                  onChange={(event) => setField("is_visible", event.target.checked)}
+                />{" "}
+                Visible sur la carte
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={draft.featured}
+                  onChange={(event) => setField("featured", event.target.checked)}
+                />{" "}
+                Mettre en avant
+              </label>
+            </div>
+            <div className="mt-7 flex justify-end gap-3">
+              <button
+                onClick={() => setDraft(null)}
+                className="rounded-xl border border-[#e8e0e7] px-4 py-3 text-sm font-bold text-[#776d72]"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => void save()}
+                className="rounded-xl bg-[#d85f82] px-5 py-3 text-sm font-bold text-white"
+              >
+                Enregistrer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+function Field({
+  label,
+  children,
+  wide = false,
+}: {
+  label: string;
+  children: React.ReactNode;
+  wide?: boolean;
+}) {
+  return (
+    <label className={`block text-sm font-bold text-[#665b60] ${wide ? "md:col-span-2" : ""}`}>
+      {label}
+      <div className="mt-2 [&_input]:w-full [&_input]:rounded-xl [&_input]:border [&_input]:border-[#e8e0e7] [&_input]:bg-[#fdfbfc] [&_input]:px-3.5 [&_input]:py-3 [&_input]:font-normal [&_input]:outline-none [&_input]:focus:border-[#d97897] [&_textarea]:w-full [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-[#e8e0e7] [&_textarea]:bg-[#fdfbfc] [&_textarea]:px-3.5 [&_textarea]:py-3 [&_textarea]:font-normal [&_textarea]:outline-none">
+        {children}
+      </div>
+    </label>
+  );
+}
