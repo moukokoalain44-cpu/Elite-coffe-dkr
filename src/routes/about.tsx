@@ -3,6 +3,7 @@ import { ArrowRight, Check, Leaf, Heart, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { CONTACT } from "@/data/site";
 import { PageShell } from "@/components/SiteChrome";
+import { MediaRenderer } from "@/components/MediaRenderer";
 import { useSiteMedia } from "@/hooks/use-site-media";
 
 export const Route = createFileRoute("/about")({
@@ -58,11 +59,12 @@ function AboutPage() {
       <section className="mx-auto max-w-7xl px-4 pb-20 md:px-6">
         <div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
           <div className="overflow-hidden rounded-[2rem] shadow-lift">
-            <img
-              src={aboutInterior?.url}
-              alt={aboutInterior?.alt_text ?? "Intérieur chaleureux d’Elite Coffee"}
-              className="aspect-[4/5] w-full object-cover"
-            />
+            {aboutInterior && (
+              <MediaRenderer
+                media={aboutInterior}
+                className="aspect-[4/5] w-full object-cover"
+              />
+            )}
           </div>
           <div className="lg:pl-8">
             <p className="text-lg leading-8 text-muted-foreground">
@@ -94,16 +96,18 @@ function AboutPage() {
           ))}
         </div>
         <div className="mt-16 grid gap-6 md:grid-cols-3">
-          <img
-            src={aboutCoffee?.url}
-            alt={aboutCoffee?.alt_text ?? "Café Elite Coffee"}
-            className="aspect-[4/3] w-full rounded-3xl object-cover"
-          />
-          <img
-            src={aboutRoom?.url}
-            alt={aboutRoom?.alt_text ?? "Salle Elite Coffee"}
-            className="aspect-[4/3] w-full rounded-3xl object-cover md:translate-y-10"
-          />
+          {aboutCoffee && (
+            <MediaRenderer
+              media={aboutCoffee}
+              className="aspect-[4/3] w-full rounded-3xl object-cover"
+            />
+          )}
+          {aboutRoom && (
+            <MediaRenderer
+              media={aboutRoom}
+              className="aspect-[4/3] w-full rounded-3xl object-cover md:translate-y-10"
+            />
+          )}
           <div className="flex flex-col justify-center rounded-3xl bg-primary p-7 text-primary-foreground md:p-9">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent">Notre carte</p>
             <h2 className="mt-3 font-display text-3xl font-bold">

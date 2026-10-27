@@ -3,6 +3,7 @@ import { ArrowRight, Check, Loader2, Sparkles, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageShell } from "@/components/SiteChrome";
+import { MediaRenderer } from "@/components/MediaRenderer";
 import { useSiteMedia } from "@/hooks/use-site-media";
 import { createReservation, registerCustomer } from "@/lib/supabase";
 
@@ -69,9 +70,8 @@ function GoodPlanPage() {
         </article>
         {brunchMedia?.is_visible && (
           <figure className="overflow-hidden rounded-[2rem] bg-card shadow-soft">
-            <img
-              src={brunchMedia.url}
-              alt={brunchMedia.alt_text}
+            <MediaRenderer
+              media={brunchMedia}
               className="max-h-[28rem] w-full object-cover transition duration-500 hover:scale-[1.02]"
             />
             <figcaption className="px-6 py-4 text-sm font-semibold text-muted-foreground md:px-8">

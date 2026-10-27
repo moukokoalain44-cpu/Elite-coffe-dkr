@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, CalendarDays, Check, Clock3, Users } from "lucide-react";
 import { PageShell } from "@/components/SiteChrome";
+import { MediaRenderer } from "@/components/MediaRenderer";
 import { useSiteMedia } from "@/hooks/use-site-media";
 
 export const Route = createFileRoute("/brunch")({
@@ -61,11 +62,12 @@ function BrunchPage() {
               </Link>
             </div>
           </div>
-          <img
-            src={brunchMedia?.url}
-            alt={brunchMedia?.alt_text ?? "Brunch servi à table"}
-            className="min-h-[360px] w-full object-cover"
-          />
+          {brunchMedia && (
+            <MediaRenderer
+              media={brunchMedia}
+              className="min-h-[360px] w-full object-cover"
+            />
+          )}
         </div>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {[

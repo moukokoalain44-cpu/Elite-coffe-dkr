@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { CONTACT } from "@/data/site";
 import { PageShell } from "@/components/SiteChrome";
+import { MediaRenderer } from "@/components/MediaRenderer";
 import { createReservation, registerCustomer } from "@/lib/supabase";
 import { useSiteMedia } from "@/hooks/use-site-media";
 
@@ -232,12 +233,15 @@ function ReservationPage() {
 
         <aside className="space-y-5">
           <div className="overflow-hidden rounded-3xl bg-primary text-primary-foreground shadow-lift">
-            <div
-              className="h-64 bg-cover bg-center"
-              style={{
-                backgroundImage: `url("${reservationMedia?.url ?? "/assets/instagram/brunch-table.jpg"}")`,
-              }}
-              aria-label={reservationMedia?.alt_text ?? "Table Elite Coffee"}
+            <MediaRenderer
+              media={
+                reservationMedia ?? {
+                  media_type: "image",
+                  url: "/assets/instagram/brunch-table.jpg",
+                  alt_text: "Table Elite Coffee",
+                }
+              }
+              className="h-64 w-full object-cover"
             />
             <div className="p-7">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-accent">
