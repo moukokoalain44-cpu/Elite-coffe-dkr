@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AdminCard, AdminPageHeader, AdminPagination } from "@/components/AdminChrome";
 import { formatCFA } from "@/lib/currency";
+import { getOptimizedMenuImageUrl } from "@/lib/image-url";
 import {
   createMenuCategory,
   createMenuProduct,
@@ -215,8 +216,12 @@ function CatalogPage() {
                 <div className="relative h-40 bg-[#f5edf0]">
                   {product.image_url ? (
                     <img
-                      src={product.image_url}
+                      src={getOptimizedMenuImageUrl(product.image_url, { width: 640, height: 320 })}
                       alt={product.name}
+                      width={640}
+                      height={320}
+                      loading="lazy"
+                      decoding="async"
                       className="size-full object-cover"
                     />
                   ) : (
@@ -345,7 +350,12 @@ function CatalogPage() {
                   </label>
                   {(imagePreviewUrl || draft.image_url) && (
                     <img
-                      src={imagePreviewUrl || draft.image_url || undefined}
+                      src={
+                        imagePreviewUrl ||
+                        (draft.image_url
+                          ? getOptimizedMenuImageUrl(draft.image_url, { width: 640, height: 352 })
+                          : undefined)
+                      }
                       alt="Aperçu"
                       className="h-44 w-full rounded-2xl border border-[#eadde2] object-cover"
                     />

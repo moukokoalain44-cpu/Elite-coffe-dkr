@@ -5,6 +5,7 @@ import { MENU_CATEGORIES, type MenuCategory } from "@/data/catalog";
 import { useMenuCatalog } from "@/hooks/use-menu-catalog";
 import { PageShell } from "@/components/SiteChrome";
 import { formatCFA } from "@/lib/currency";
+import { getOptimizedMenuImageUrl } from "@/lib/image-url";
 
 export const Route = createFileRoute("/menu")({
   head: () => ({
@@ -215,7 +216,7 @@ function MenuPage() {
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
-                {products.map((product) => (
+                {products.map((product, index) => (
                   <article
                     key={product.id}
                     className="group flex min-h-44 flex-col overflow-hidden rounded-3xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
@@ -223,9 +224,13 @@ function MenuPage() {
                     <div className="flex gap-4 p-4">
                       <Link to="/menu/$id" params={{ id: product.id }} className="block shrink-0">
                         <img
-                          src={product.image}
+                          src={getOptimizedMenuImageUrl(product.image, { width: 224, height: 224 })}
                           alt={product.name}
-                          loading="lazy"
+                          width={112}
+                          height={112}
+                          loading={index < 2 ? "eager" : "lazy"}
+                          decoding="async"
+                          fetchPriority={index < 2 ? "high" : "auto"}
                           className="size-24 rounded-2xl object-cover transition-transform duration-500 group-hover:scale-105 sm:size-28"
                         />
                       </Link>
