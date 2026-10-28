@@ -419,7 +419,7 @@ export async function uploadMenuProductMedia(file: File, productId: string) {
   const path = `menu/${productId}/${crypto.randomUUID()}.${extension}`;
   const { error } = await supabase.storage
     .from("site-media")
-    .upload(path, file, { cacheControl: "31536000", contentType: file.type, upsert: false });
+    .upload(path, file, { cacheControl: "31536000", contentType: file.type, upsert: true });
   if (error) throw new Error(error.message);
   return supabase.storage.from("site-media").getPublicUrl(path).data.publicUrl;
 }
