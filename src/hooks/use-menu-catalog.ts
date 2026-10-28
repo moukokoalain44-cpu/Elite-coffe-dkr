@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchMenuProducts, type MenuProductRow } from "@/lib/supabase";
+import { fetchMenuProducts, supabase, type MenuProductRow } from "@/lib/supabase";
 import { PRODUCT_CATALOG, type Product } from "@/data/catalog";
 
 function fromRemote(row: MenuProductRow): Product {
@@ -29,23 +29,41 @@ export function useMenuCatalog() {
 
   useEffect(() => {
     let active = true;
-    fetchMenuProducts()
-      .then((rows) => {
-        if (!active || rows.length === 0) return;
+    const refresh = async (initial = false) => {
+      try {
+        const rows = await fetchMenuProducts();
+        if (!active) return;
         setProducts(rows.map(fromRemote));
         setIsRemote(true);
-      })
-      .catch((error: unknown) => {
+      } catch (error: unknown) {
         console.warn(
           "[Elite Coffee] Catalogue Supabase indisponible, fallback local utilisé.",
           error,
         );
-      })
-      .finally(() => {
-        if (active) setIsLoading(false);
-      });
+      } finally {
+        if (active && initial) setIsLoading(false);
+      }
+    };
+
+    void refresh(true);
+
+    // Realtime rend la mise à jour instantanée quand la publication Supabase
+    // est disponible. Le polling garantit le rafraîchissement même si Realtime
+    // est momentanément indisponible ou bloqué par le réseau du visiteur.
+    const channel = supabase
+      .channel("public-menu-products")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "menu_products" },
+        () => void refresh(),
+      )
+      .subscribe();
+    const timer = window.setInterval(() => void refresh(), 15_000);
+
     return () => {
       active = false;
+      window.clearInterval(timer);
+      void supabase.removeChannel(channel);
     };
   }, []);
 
