@@ -283,3 +283,27 @@ create table if not exists public.site_media_assets (
 alter table public.site_media_assets enable row level security;
 create policy "public_read_site_media_assets" on public.site_media_assets for select using (is_visible = true);
 create policy "admin_manage_site_media_assets" on public.site_media_assets for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- ── Stockage des médias du site et des images de plats ─────
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'site-media',
+  'site-media',
+  true,
+  52428800,
+  array[
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/avif',
+    'video/mp4',
+    'video/webm',
+    'video/quicktime'
+  ]::text[]
+)
+on conflict (id) do update
+set
+  name = excluded.name,
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
