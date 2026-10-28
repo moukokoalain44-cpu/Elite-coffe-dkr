@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { fetchMenuProducts, supabase, type MenuProductRow } from "@/lib/supabase";
 import { PRODUCT_CATALOG, type Product } from "@/data/catalog";
 
@@ -29,12 +30,21 @@ export function useMenuCatalog() {
 
   useEffect(() => {
     let active = true;
-    const refresh = async (initial = false) => {
+    let lastSignature = "";
+    const refresh = async (initial = false, notify = false) => {
       try {
         const rows = await fetchMenuProducts();
         if (!active) return;
+        const signature = JSON.stringify(rows);
+        const hasChanged = Boolean(lastSignature && lastSignature !== signature);
+        lastSignature = signature;
         setProducts(rows.map(fromRemote));
         setIsRemote(true);
+        if (notify && hasChanged) {
+          toast.success("La carte a été mise à jour", {
+            description: "Les dernières modifications sont maintenant affichées.",
+          });
+        }
       } catch (error: unknown) {
         console.warn(
           "[Elite Coffee] Catalogue Supabase indisponible, fallback local utilisé.",
@@ -55,7 +65,7 @@ export function useMenuCatalog() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "menu_products" },
-        () => void refresh(),
+        () => void refresh(false, true),
       )
       .subscribe();
     const timer = window.setInterval(() => void refresh(), 15_000);
