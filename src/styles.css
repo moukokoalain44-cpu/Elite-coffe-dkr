@@ -416,10 +416,20 @@
 [data-admin-theme="dark"] [class*="text-[#82776e]"] {
   color: #d9cfdb !important;
 }
-[data-admin-theme="dark"] [class*="text-[#a89aa2]"],
-[data-admin-theme="dark"] [class*="text-[#aaa0a5]"] {
-  color: #aa9cab !important;
-}
+  [data-admin-theme="dark"] [class*="text-[#a89aa2]"],
+  [data-admin-theme="dark"] [class*="text-[#aaa0a5]"] {
+    color: #aa9cab !important;
+  }
+  [data-admin-theme="dark"] [class*="text-[#"] {
+    color: #f1e8ef !important;
+  }
+  [data-admin-theme="dark"] [class*="bg-[#edf3f8]"],
+  [data-admin-theme="dark"] [class*="bg-[#eef4f2]"],
+  [data-admin-theme="dark"] [class*="bg-[#f3edf8]"],
+  [data-admin-theme="dark"] [class*="bg-[#f5f0e8]"],
+  [data-admin-theme="dark"] [class*="bg-[#fdf4f6]"] {
+    background-color: #2b2532 !important;
+  }
 [data-admin-theme="dark"] input,
 [data-admin-theme="dark"] textarea,
 [data-admin-theme="dark"] select {
