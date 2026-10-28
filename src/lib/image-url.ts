@@ -1,27 +1,11 @@
-const SUPABASE_PUBLIC_OBJECT_PATH = "/storage/v1/object/public/";
-
 /**
- * Requests a right-sized image from Supabase Storage while leaving external
- * sources (including the existing Unsplash fallbacks) untouched.
+ * Keeps public Storage URLs intact.
+ *
+ * Supabase Image Transformation is not enabled on every project plan and can
+ * return a 404 for newly uploaded objects. The browser-side loading strategy
+ * (lazy loading, priority hints and async decoding) still reduces the page
+ * cost without replacing a valid object URL with an invalid render URL.
  */
-export function getOptimizedMenuImageUrl(
-  source: string,
-  dimensions: { width: number; height: number },
-): string {
-  try {
-    const url = new URL(source);
-    if (!url.pathname.includes(SUPABASE_PUBLIC_OBJECT_PATH)) return source;
-
-    url.pathname = url.pathname.replace(
-      SUPABASE_PUBLIC_OBJECT_PATH,
-      "/storage/v1/render/image/public/",
-    );
-    url.searchParams.set("width", String(dimensions.width));
-    url.searchParams.set("height", String(dimensions.height));
-    url.searchParams.set("resize", "cover");
-    url.searchParams.set("quality", "78");
-    return url.toString();
-  } catch {
-    return source;
-  }
+export function getOptimizedMenuImageUrl(source: string): string {
+  return source;
 }

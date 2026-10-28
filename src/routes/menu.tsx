@@ -224,7 +224,7 @@ function MenuPage() {
                     <div className="flex gap-4 p-4">
                       <Link to="/menu/$id" params={{ id: product.id }} className="block shrink-0">
                         <img
-                          src={getOptimizedMenuImageUrl(product.image, { width: 224, height: 224 })}
+                          src={getOptimizedMenuImageUrl(product.image)}
                           alt={product.name}
                           width={112}
                           height={112}

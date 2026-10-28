@@ -216,7 +216,7 @@ function CatalogPage() {
                 <div className="relative h-40 bg-[#f5edf0]">
                   {product.image_url ? (
                     <img
-                      src={getOptimizedMenuImageUrl(product.image_url, { width: 640, height: 320 })}
+                      src={getOptimizedMenuImageUrl(product.image_url)}
                       alt={product.name}
                       width={640}
                       height={320}
@@ -353,7 +353,7 @@ function CatalogPage() {
                       src={
                         imagePreviewUrl ||
                         (draft.image_url
-                          ? getOptimizedMenuImageUrl(draft.image_url, { width: 640, height: 352 })
+                          ? getOptimizedMenuImageUrl(draft.image_url)
                           : undefined)
                       }
                       alt="Aperçu"
