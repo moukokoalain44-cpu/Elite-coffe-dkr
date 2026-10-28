@@ -43,6 +43,7 @@ function CatalogPage() {
   const [page, setPage] = useState(1);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const pageSize = 8;
 
   const refresh = async () => {
@@ -79,14 +80,28 @@ function CatalogPage() {
   const setField = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((current) => (current ? { ...current, [key]: value } : current));
 
+  const openDraft = (nextDraft: Draft) => {
+    setImagePreviewUrl(null);
+    setDraft(nextDraft);
+  };
+
+  const closeDraft = () => {
+    setImagePreviewUrl((current) => {
+      if (current?.startsWith("blob:")) URL.revokeObjectURL(current);
+      return null;
+    });
+    setDraft(null);
+  };
+
   const save = async () => {
     if (!draft?.name.trim() || !draft.category.trim() || Number(draft.price) < 0) {
       toast.error("Renseignez le nom, la catégorie et un prix valide.");
       return;
     }
     try {
+      const { id: _id, ...draftFields } = draft;
       const payload: MenuProductInput = {
-        ...draft,
+        ...draftFields,
         name: draft.name.trim(),
         category: draft.category.trim(),
         price: Number(draft.price),
@@ -99,7 +114,7 @@ function CatalogPage() {
           ? current.map((item) => (item.id === saved.id ? saved : item))
           : [saved, ...current],
       );
-      setDraft(null);
+      closeDraft();
       toast.success(draft.id ? "Plat mis à jour" : "Plat ajouté à la carte");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Impossible d’enregistrer le plat");
@@ -130,9 +145,17 @@ function CatalogPage() {
       toast.error("Enregistrez d’abord le plat avant d’ajouter une image.");
       return;
     }
+    const localPreviewUrl = URL.createObjectURL(file);
+    setImagePreviewUrl((current) => {
+      if (current?.startsWith("blob:")) URL.revokeObjectURL(current);
+      return localPreviewUrl;
+    });
     setUploading(true);
     try {
-      setField("image_url", await uploadMenuProductMedia(file, draft.id));
+      const publicUrl = await uploadMenuProductMedia(file, draft.id);
+      setField("image_url", publicUrl);
+      URL.revokeObjectURL(localPreviewUrl);
+      setImagePreviewUrl(publicUrl);
       toast.success("Image importée");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Import impossible");
@@ -149,7 +172,7 @@ function CatalogPage() {
         description="Ajoutez, modifiez ou retirez les plats réellement proposés sur place. Chaque changement est enregistré dans Supabase."
         action={
           <button
-            onClick={() => setDraft(blank())}
+            onClick={() => openDraft(blank())}
             className="flex items-center gap-2 rounded-2xl bg-[#d85f82] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_25px_-14px_#d85f82]"
           >
             <Plus size={17} /> Nouveau plat
@@ -224,7 +247,7 @@ function CatalogPage() {
                 </div>
                 <div className="flex items-center justify-between border-t border-[#eee8e8] px-4 py-3">
                   <button
-                    onClick={() => setDraft(product)}
+                    onClick={() => openDraft(product)}
                     className="flex items-center gap-1 text-xs font-bold text-[#a5365f]"
                   >
                     <Pencil size={13} /> Modifier
@@ -259,7 +282,7 @@ function CatalogPage() {
                   {draft.id ? "Modifier le plat" : "Ajouter un plat"}
                 </h2>
               </div>
-              <button onClick={() => setDraft(null)} className="rounded-xl p-2 hover:bg-[#f8f1f3]">
+              <button onClick={closeDraft} className="rounded-xl p-2 hover:bg-[#f8f1f3]">
                 <X size={19} />
               </button>
             </div>
@@ -305,7 +328,7 @@ function CatalogPage() {
                 />
               </Field>
               <Field label="Image du plat" wide>
-                <div className="flex items-center gap-3">
+                <div className="space-y-3">
                   <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-[#d97897] bg-[#fff7f9] px-4 py-3 text-xs font-bold text-[#a5365f]">
                     <ImagePlus size={15} />{" "}
                     {uploading ? "Import en cours…" : "Télécharger une image"}
@@ -320,11 +343,11 @@ function CatalogPage() {
                       }}
                     />
                   </label>
-                  {draft.image_url && (
+                  {(imagePreviewUrl || draft.image_url) && (
                     <img
-                      src={draft.image_url}
+                      src={imagePreviewUrl || draft.image_url || undefined}
                       alt="Aperçu"
-                      className="size-14 rounded-xl object-cover"
+                      className="h-44 w-full rounded-2xl border border-[#eadde2] object-cover"
                     />
                   )}
                 </div>
@@ -350,7 +373,7 @@ function CatalogPage() {
             </div>
             <div className="mt-7 flex justify-end gap-3">
               <button
-                onClick={() => setDraft(null)}
+                onClick={closeDraft}
                 className="rounded-xl border border-[#e8e0e7] px-4 py-3 text-sm font-bold text-[#776d72]"
               >
                 Annuler
