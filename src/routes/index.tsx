@@ -369,7 +369,9 @@ function DishShowcase({ products }: { products: Product[] }) {
 }
 
 function Gallery() {
-  const media = useSiteMedia().filter((item) => item.id.startsWith("gallery-"));
+  const media = useSiteMedia()
+    .filter((item) => item.id.startsWith("gallery-"))
+    .slice(0, 4);
   return (
     <section id="locations" className="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-28">
       <SectionHead

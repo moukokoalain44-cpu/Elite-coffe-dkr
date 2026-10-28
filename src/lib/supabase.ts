@@ -250,13 +250,14 @@ export type CommunicationDeliveryLog = {
   campaign_id: string | null;
   phone: string;
   message: string;
+  ultramsg_request_id: number | null;
   status: "queued" | "sent" | "delivered" | "read" | "failed";
   created_at: string;
 };
 export async function fetchCommunicationDeliveryLogs(): Promise<CommunicationDeliveryLog[]> {
   const { data, error } = await supabase
     .from("communication_delivery_log")
-    .select("id,campaign_id,phone,message,status,created_at")
+    .select("id,campaign_id,phone,message,ultramsg_request_id,status,created_at")
     .order("created_at", { ascending: false })
     .limit(2000);
   if (error) throw new Error(error.message);

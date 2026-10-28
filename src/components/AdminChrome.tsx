@@ -39,6 +39,25 @@ const navGroups = [
   { label: "Gestion du restaurant", items: nav.slice(5) },
 ];
 
+function playNotificationSound() {
+  const AudioContextClass = window.AudioContext;
+  if (!AudioContextClass) return;
+  const context = new AudioContextClass();
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(880, context.currentTime);
+  oscillator.frequency.exponentialRampToValueAtTime(1320, context.currentTime + 0.12);
+  gain.gain.setValueAtTime(0.0001, context.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.16, context.currentTime + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.22);
+  oscillator.connect(gain);
+  gain.connect(context.destination);
+  oscillator.start();
+  oscillator.stop(context.currentTime + 0.22);
+  oscillator.addEventListener("ended", () => void context.close(), { once: true });
+}
+
 export function AdminLayout() {
   const navigate = useNavigate();
   const { session, loading, signOut } = useAdminAuth();
@@ -59,6 +78,12 @@ export function AdminLayout() {
     ? nav.filter((item) => item.label.toLowerCase().includes(query.toLowerCase()))
     : [];
   const pendingReservations = registrations.filter((item) => item.status === "pending");
+  const previousPendingCount = useRef<number | null>(null);
+  useEffect(() => {
+    const previous = previousPendingCount.current;
+    if (previous !== null && pendingReservations.length > previous) playNotificationSound();
+    previousPendingCount.current = pendingReservations.length;
+  }, [pendingReservations.length]);
   useEffect(() => {
     setDarkMode(window.localStorage.getItem("elite-admin-theme") === "dark");
     setProfileName(String(session?.user.user_metadata?.["full_name"] ?? "Oripio Studio"));

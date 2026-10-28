@@ -130,8 +130,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState(PRODUCT_CATALOG);
   const [content, setContent] = useState(initialContent);
   useEffect(() => {
-    void fetchReservationsAdmin()
-      .then((rows) =>
+    const refresh = async () => {
+      try {
+        const rows = await fetchReservationsAdmin();
         setRegistrations(
           rows.map((row) => ({
             id: row.id,
@@ -146,9 +147,14 @@ export function AdminProvider({ children }: { children: ReactNode }) {
             status: row.status,
             createdAt: row.created_at,
           })),
-        ),
-      )
-      .catch(() => undefined);
+        );
+      } catch {
+        // Keep the last known admin state when a polling request fails.
+      }
+    };
+    void refresh();
+    const timer = window.setInterval(() => void refresh(), 20_000);
+    return () => window.clearInterval(timer);
   }, []);
   const value = useMemo<AdminContextValue>(
     () => ({

@@ -49,20 +49,20 @@ function CommunicationPage() {
 
   useEffect(() => {
     void reload();
+    const timer = window.setInterval(() => void reload(), 20_000);
+    return () => window.clearInterval(timer);
   }, []);
 
   const totalMessages = deliveryLogs.length;
-  const deliveredMessages = deliveryLogs.filter((item) =>
-    ["delivered", "read"].includes(item.status),
-  ).length;
-  const readMessages = deliveryLogs.filter((item) => item.status === "read").length;
+  const trackedMessages = deliveryLogs.filter((item) => item.ultramsg_request_id !== null).length;
+  const pendingMessages = deliveryLogs.filter((item) => ["queued", "sent"].includes(item.status)).length;
   const failedMessages = deliveryLogs.filter((item) => item.status === "failed").length;
   const campaignStats = (campaignId: string) => {
     const rows = deliveryLogs.filter((item) => item.campaign_id === campaignId);
-    const delivered = rows.filter((item) => ["delivered", "read"].includes(item.status)).length;
+    const tracked = rows.filter((item) => item.ultramsg_request_id !== null).length;
     return {
       total: rows.length,
-      delivered,
+      tracked,
     };
   };
 
@@ -76,6 +76,7 @@ function CommunicationPage() {
     try {
       await sendUltramsgMessage({ phone: clean, message });
       toast.success("Message envoyé dans la file UltraMsg");
+      await reload();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "L’envoi UltraMsg a échoué.");
     } finally {
@@ -167,8 +168,8 @@ function CommunicationPage() {
       <section className="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
           ["Tentatives enregistrées", totalMessages, "journal Supabase"],
-          ["Délivrés confirmés", deliveredMessages, "accusé UltraMsg reçu"],
-          ["Lus confirmés", readMessages, "accusé de lecture reçu"],
+          ["Requêtes UltraMsg tracées", trackedMessages, "identifiant de requête enregistré"],
+          ["En attente de retour", pendingMessages, "statut queued ou sent"],
           ["Échecs enregistrés", failedMessages, "erreur d’envoi journalisée"],
         ].map(([label, value, detail]) => (
           <div
@@ -334,7 +335,7 @@ function CommunicationPage() {
                     const stats = campaignStats(item.id);
                     return stats.total ? (
                       <p className="mt-2 text-xs font-semibold text-[#237747]">
-                        {stats.delivered} délivré(s) confirmé(s) sur {stats.total} tentative(s)
+                        {stats.tracked} requête(s) UltraMsg tracée(s) sur {stats.total} tentative(s)
                         journalisée(s)
                       </p>
                     ) : null;

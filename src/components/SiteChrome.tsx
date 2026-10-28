@@ -48,7 +48,7 @@ export function SiteHeader() {
               </span>
             </span>
           </Link>
-          <div className="hidden items-center gap-1 text-[13px] font-medium text-primary-foreground/70 md:flex">
+          <div className="hidden items-center gap-1 text-[13px] font-medium text-primary-foreground/70 lg:flex">
             {navLinks.map(([label, to]) => (
               <Link
                 key={to}
@@ -65,20 +65,20 @@ export function SiteHeader() {
               href={WHATSAPP_CONTACT_URL}
               target="_blank"
               rel="noreferrer"
-              className="hidden items-center gap-1.5 rounded-sm border border-[#6ed59a]/70 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#bdf3ce] transition-all hover:-translate-y-0.5 hover:bg-[#6ed59a]/15 sm:inline-flex"
+              className="hidden items-center gap-1.5 rounded-sm border border-[#6ed59a]/70 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#bdf3ce] transition-all hover:-translate-y-0.5 hover:bg-[#6ed59a]/15 lg:inline-flex"
             >
               <MessageCircle size={14} /> Nous contacter
             </a>
             <Link
               to="/reserver"
-              className="hidden rounded-sm bg-accent px-4 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-primary shadow-[0_5px_16px_rgba(216,137,74,.18)] transition-all hover:-translate-y-0.5 hover:bg-primary-foreground sm:inline-flex"
+              className="hidden rounded-sm bg-accent px-4 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-primary shadow-[0_5px_16px_rgba(216,137,74,.18)] transition-all hover:-translate-y-0.5 hover:bg-primary-foreground lg:inline-flex"
             >
               Réserver une table
             </Link>
             <button
               type="button"
               onClick={() => setMobileOpen((open) => !open)}
-              className="rounded-full p-2 text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-accent md:hidden"
+              className="rounded-full p-2 text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-accent lg:hidden"
               aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
               aria-expanded={mobileOpen}
             >
@@ -87,7 +87,7 @@ export function SiteHeader() {
           </div>
         </div>
         {mobileOpen && (
-          <div className="max-h-[calc(100vh-68px)] overflow-y-auto border-t border-white/15 bg-primary/95 px-4 py-4 shadow-[0_18px_35px_-22px_rgba(0,0,0,.8)] md:hidden">
+          <div className="max-h-[calc(100vh-68px)] overflow-y-auto border-t border-white/15 bg-primary/95 px-4 py-4 shadow-[0_18px_35px_-22px_rgba(0,0,0,.8)] lg:hidden">
             <div className="flex flex-col gap-1 text-sm font-medium text-primary-foreground/75">
               <Link
                 to="/reserver"
@@ -121,7 +121,7 @@ export function SiteHeader() {
       </nav>
       <nav
         aria-label="Navigation mobile"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-white/15 bg-primary/92 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 text-primary-foreground shadow-[0_-12px_40px_rgba(23,25,30,.35)] backdrop-blur-xl backdrop-saturate-150 md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-white/15 bg-primary/92 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 text-primary-foreground shadow-[0_-12px_40px_rgba(23,25,30,.35)] backdrop-blur-xl backdrop-saturate-150 lg:hidden"
       >
         <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
           {mobileLinks.map(([label, to, Icon]) => (

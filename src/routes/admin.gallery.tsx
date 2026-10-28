@@ -68,7 +68,7 @@ function GalleryAdminPage() {
   });
 
   useEffect(() => {
-    fetchSiteMedia()
+    const refresh = () => fetchSiteMedia()
       .then((rows) => {
         if (!rows.length) return;
         const withLoginCover = keepLoginCover(mergeSiteMediaDefaults(rows));
@@ -76,6 +76,9 @@ function GalleryAdminPage() {
         setDraft((current) => ({ ...current, id: createGalleryKey(withLoginCover) }));
       })
       .catch(() => undefined);
+    void refresh();
+    const timer = window.setInterval(refresh, 30_000);
+    return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {

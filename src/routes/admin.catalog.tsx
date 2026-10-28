@@ -56,6 +56,8 @@ function CatalogPage() {
   };
   useEffect(() => {
     void refresh();
+    const timer = window.setInterval(() => void refresh(), 30_000);
+    return () => window.clearInterval(timer);
   }, []);
 
   const categories = useMemo(

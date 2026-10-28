@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle, Search, UsersRound } from "lucide-react";
+import { Mail, MessageCircle, Search, UsersRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AdminCard, AdminPageHeader } from "@/components/AdminChrome";
@@ -11,9 +11,13 @@ function ClientsPage() {
   const [customers, setCustomers] = useState<CustomerRow[]>([]);
   const [query, setQuery] = useState("");
   useEffect(() => {
-    fetchCustomersAdmin()
-      .then(setCustomers)
-      .catch(() => toast.error("Impossible de charger les clients."));
+    const refresh = () =>
+      fetchCustomersAdmin()
+        .then(setCustomers)
+        .catch(() => toast.error("Impossible de charger les clients."));
+    void refresh();
+    const timer = window.setInterval(refresh, 30_000);
+    return () => window.clearInterval(timer);
   }, []);
   const visible = useMemo(() => {
     const term = query.toLocaleLowerCase("fr").trim();
@@ -30,6 +34,13 @@ function ClientsPage() {
       "_blank",
       "noopener,noreferrer",
     );
+  };
+  const email = (customer: CustomerRow) => {
+    if (!customer.email) {
+      toast.error("Ce client n’a pas renseigné d’adresse e-mail.");
+      return;
+    }
+    window.location.href = `mailto:${customer.email}?subject=${encodeURIComponent("Elite Coffee — votre demande")}`;
   };
   return (
     <>
@@ -80,6 +91,13 @@ function ClientsPage() {
                       className="inline-flex items-center gap-2 rounded-xl bg-[#e8f7ed] px-3 py-2 text-xs font-bold text-[#237747]"
                     >
                       <MessageCircle size={14} /> WhatsApp
+                    </button>
+                    <button
+                      onClick={() => email(customer)}
+                      disabled={!customer.email}
+                      className="ml-2 inline-flex items-center gap-2 rounded-xl bg-[#f3edf8] px-3 py-2 text-xs font-bold text-[#6d4d8d] disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <Mail size={14} /> E-mail
                     </button>
                   </td>
                 </tr>

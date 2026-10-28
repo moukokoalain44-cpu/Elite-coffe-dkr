@@ -12,7 +12,7 @@ function AdminDashboard() {
   const [customerCount, setCustomerCount] = useState<number | null>(null);
   const [followupCount, setFollowupCount] = useState<number | null>(null);
   useEffect(() => {
-    void Promise.all([fetchCustomersAdmin(), fetchReservationMessageLogs()])
+    const refresh = () => Promise.all([fetchCustomersAdmin(), fetchReservationMessageLogs()])
       .then(([customers, messages]) => {
         setCustomerCount(customers.length);
         setFollowupCount(messages.length);
@@ -21,6 +21,9 @@ function AdminDashboard() {
         setCustomerCount(0);
         setFollowupCount(0);
       });
+    void refresh();
+    const timer = window.setInterval(() => void refresh(), 30_000);
+    return () => window.clearInterval(timer);
   }, []);
   const pending = registrations.filter((item) => item.status === "pending").length;
   const categories = new Set(products.map((item) => item.category)).size;
