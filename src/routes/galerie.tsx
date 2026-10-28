@@ -7,6 +7,19 @@ import { useSiteMedia } from "@/hooks/use-site-media";
 export const Route = createFileRoute("/galerie")({ component: GalleryPage });
 function GalleryPage() {
   const media = useSiteMedia().filter((item) => !item.id.startsWith("admin-"));
+  const frameClasses = (index: number) => {
+    const layouts = [
+      "md:col-span-2 md:row-span-2",
+      "md:row-span-1",
+      "md:row-span-2",
+      "md:col-span-2 md:row-span-1",
+      "md:row-span-2",
+      "md:col-span-2 md:row-span-2",
+      "md:row-span-1",
+    ];
+    return layouts[index % layouts.length];
+  };
+
   return (
     <PageShell
       eyebrow="Galerie"
@@ -17,12 +30,15 @@ function GalleryPage() {
         <div className="mb-8 flex items-center gap-3 text-sm text-muted-foreground">
           <Image size={18} className="text-accent" /> Tous les médias publics d’Elite Coffee
         </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {media.map((item) => (
-            <figure key={item.id} className="group overflow-hidden rounded-2xl bg-card shadow-soft">
+        <div className="grid grid-cols-2 gap-4 md:auto-rows-[9rem] md:grid-flow-dense md:grid-cols-4">
+          {media.map((item, index) => (
+            <figure
+              key={item.id}
+              className={`group min-h-52 overflow-hidden rounded-2xl bg-card shadow-soft md:min-h-0 ${frameClasses(index)}`}
+            >
               <MediaRenderer
                 media={item}
-                className="aspect-square w-full object-cover transition duration-500 group-hover:scale-105"
+                className="h-full min-h-52 w-full object-cover transition duration-500 group-hover:scale-105 md:min-h-0"
               />
               <figcaption className="p-3 text-sm font-semibold">{item.alt_text}</figcaption>
             </figure>
