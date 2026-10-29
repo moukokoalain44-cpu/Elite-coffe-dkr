@@ -12,6 +12,7 @@ import {
   deleteMenuProduct,
   fetchMenuCategories,
   fetchMenuProductsAdmin,
+  removeMenuProductMedia,
   type MenuCategoryRow,
   type MenuProductInput,
   type MenuProductRow,
@@ -43,7 +44,8 @@ function CatalogPage() {
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [draft, setDraft] = useState<Draft | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const pageSize = 8;
 
@@ -82,6 +84,7 @@ function CatalogPage() {
     setDraft((current) => (current ? { ...current, [key]: value } : current));
 
   const openDraft = (nextDraft: Draft) => {
+    setPendingImageFile(null);
     setImagePreviewUrl(null);
     setDraft(nextDraft);
   };
@@ -91,6 +94,7 @@ function CatalogPage() {
       if (current?.startsWith("blob:")) URL.revokeObjectURL(current);
       return null;
     });
+    setPendingImageFile(null);
     setDraft(null);
   };
 
@@ -99,13 +103,22 @@ function CatalogPage() {
       toast.error("Renseignez le nom, la catégorie et un prix valide.");
       return;
     }
+    setSaving(true);
+    let uploadedImagePath: string | null = null;
     try {
       const { id: _id, ...draftFields } = draft;
+      let imageUrl = draft.image_url;
+      if (pendingImageFile && draft.id) {
+        const uploaded = await uploadMenuProductMedia(pendingImageFile, draft.id);
+        uploadedImagePath = uploaded.path;
+        imageUrl = uploaded.publicUrl;
+      }
       const payload: MenuProductInput = {
         ...draftFields,
         name: draft.name.trim(),
         category: draft.category.trim(),
         price: Number(draft.price),
+        image_url: imageUrl,
       };
       const saved = draft.id
         ? await updateMenuProduct(draft.id, payload)
@@ -116,9 +129,18 @@ function CatalogPage() {
           : [saved, ...current],
       );
       closeDraft();
-      toast.success(draft.id ? "Plat mis à jour" : "Plat ajouté à la carte");
+      toast.success(draft.id ? "Modifications enregistrées" : "Plat ajouté à la carte", {
+        description: pendingImageFile
+          ? "L’image est enregistrée et sera visible sur la carte publique après synchronisation."
+          : "Les informations du plat ont bien été enregistrées.",
+      });
     } catch (error) {
+      if (uploadedImagePath) {
+        await removeMenuProductMedia(uploadedImagePath).catch(() => undefined);
+      }
       toast.error(error instanceof Error ? error.message : "Impossible d’enregistrer le plat");
+    } finally {
+      setSaving(false);
     }
   };
   const remove = async (item: MenuProductRow) => {
@@ -140,7 +162,7 @@ function CatalogPage() {
     setCategory("Toutes");
     toast.success("Catégorie retirée de la liste");
   };
-  const upload = async (file: File | undefined) => {
+  const selectImage = (file: File | undefined) => {
     if (!file || !draft) return;
     if (!draft.id) {
       toast.error("Enregistrez d’abord le plat avant d’ajouter une image.");
@@ -151,18 +173,7 @@ function CatalogPage() {
       if (current?.startsWith("blob:")) URL.revokeObjectURL(current);
       return localPreviewUrl;
     });
-    setUploading(true);
-    try {
-      const publicUrl = await uploadMenuProductMedia(file, draft.id);
-      setField("image_url", publicUrl);
-      URL.revokeObjectURL(localPreviewUrl);
-      setImagePreviewUrl(publicUrl);
-      toast.success("Image importée");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Import impossible");
-    } finally {
-      setUploading(false);
-    }
+    setPendingImageFile(file);
   };
 
   return (
@@ -336,14 +347,13 @@ function CatalogPage() {
                 <div className="space-y-3">
                   <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-[#d97897] bg-[#fff7f9] px-4 py-3 text-xs font-bold text-[#a5365f]">
                     <ImagePlus size={15} />{" "}
-                    {uploading ? "Import en cours…" : "Télécharger une image"}
+                    {pendingImageFile ? "Image prête à enregistrer" : "Télécharger une image"}
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp,image/avif"
                       className="sr-only"
-                      disabled={uploading}
                       onChange={(event) => {
-                        void upload(event.target.files?.[0]);
+                        selectImage(event.target.files?.[0]);
                         event.currentTarget.value = "";
                       }}
                     />
@@ -390,9 +400,10 @@ function CatalogPage() {
               </button>
               <button
                 onClick={() => void save()}
-                className="rounded-xl bg-[#d85f82] px-5 py-3 text-sm font-bold text-white"
+                disabled={saving}
+                className="rounded-xl bg-[#d85f82] px-5 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Enregistrer
+                {saving ? "Enregistrement…" : "Enregistrer"}
               </button>
             </div>
           </div>

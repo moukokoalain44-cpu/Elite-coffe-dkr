@@ -421,7 +421,15 @@ export async function uploadMenuProductMedia(file: File, productId: string) {
     .from("site-media")
     .upload(path, file, { cacheControl: "31536000", contentType: file.type, upsert: true });
   if (error) throw new Error(error.message);
-  return supabase.storage.from("site-media").getPublicUrl(path).data.publicUrl;
+  return {
+    path,
+    publicUrl: supabase.storage.from("site-media").getPublicUrl(path).data.publicUrl,
+  };
+}
+
+export async function removeMenuProductMedia(path: string) {
+  const { error } = await supabase.storage.from("site-media").remove([path]);
+  if (error) throw new Error(error.message);
 }
 
 export type MenuCategoryRow = { id: string; name: string; sort_order: number };
