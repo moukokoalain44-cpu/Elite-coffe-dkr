@@ -99,17 +99,17 @@ function AdminDashboard() {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         {cards.map(({ label, value, detail, icon: Icon, to, tone }) => (
           <Link key={label} to={to} className="group">
-            <AdminCard className="h-full p-4 transition duration-200 hover:-translate-y-0.5 hover:border-[#e1a8b9] hover:shadow-[0_18px_35px_-26px_rgba(91,56,38,.5)]">
+            <AdminCard className="flex min-h-[158px] h-full flex-col justify-between p-4 transition duration-200 hover:-translate-y-0.5 hover:border-[#e1a8b9] hover:shadow-[0_18px_35px_-26px_rgba(91,56,38,.5)]">
               <div className="flex items-start justify-between gap-3">
-                <span className={`grid size-9 place-items-center rounded-xl ${tone}`}>
-                  <Icon size={17} />
+                <span className={`grid size-11 place-items-center rounded-2xl ${tone}`}>
+                  <Icon size={19} />
                 </span>
-                <ChevronRight size={16} className="mt-1 text-[#c2b4ba] transition group-hover:translate-x-1 group-hover:text-[#b9456e]" />
+                <ChevronRight size={16} className="mt-2 text-[#c2b4ba] transition group-hover:translate-x-1 group-hover:text-[#b9456e]" />
               </div>
-              <p className="mt-4 text-xs font-semibold text-[#81757b]">{label}</p>
-              <div className="mt-1 flex items-baseline gap-2">
-                <p className="font-display text-2xl font-bold text-[#2c252a]">{value}</p>
-                <span className="truncate text-[11px] text-[#9b8d91]">{detail}</span>
+              <div className="mt-5">
+                <p className="text-xs font-semibold text-[#81757b]">{label}</p>
+                <p className="mt-1 font-display text-3xl font-bold leading-none text-[#2c252a]">{value}</p>
+                <span className="mt-2 block truncate text-[11px] text-[#9b8d91]">{detail}</span>
               </div>
             </AdminCard>
           </Link>
