@@ -143,15 +143,24 @@ export async function createOrder(
   return orderId;
 }
 
-export async function createReservation(reservation: ReservationInsert): Promise<string> {
-  const { data, error } = await supabase
-    .from("reservations")
-    .insert(reservation)
-    .select("id")
-    .single();
+export async function createReservation(
+  reservation: ReservationInsert,
+  customerSource: "reservation" | "buffet" = "reservation",
+): Promise<string> {
+  const { data, error } = await supabase.rpc("create_reservation", {
+    p_name: reservation.name,
+    p_phone: reservation.phone,
+    p_email: reservation.email,
+    p_date: reservation.date,
+    p_time: reservation.time,
+    p_guests: reservation.guests,
+    p_occasion: reservation.occasion ?? null,
+    p_message: reservation.message ?? null,
+    p_customer_source: customerSource,
+  });
 
   if (error) throw new Error(error.message);
-  return data.id as string;
+  return data as string;
 }
 
 export async function fetchReservationsAdmin(): Promise<ReservationRow[]> {
@@ -166,7 +175,10 @@ export async function fetchReservationsAdmin(): Promise<ReservationRow[]> {
 }
 
 export async function updateReservationStatus(id: string, status: ReservationRow["status"]) {
-  const { error } = await supabase.from("reservations").update({ status }).eq("id", id);
+  const { error } = await supabase.rpc("update_reservation_status", {
+    p_reservation_id: id,
+    p_status: status,
+  });
   if (error) throw new Error(error.message);
 }
 
@@ -178,7 +190,17 @@ export type ReservationDetailsUpdate = Partial<
 >;
 
 export async function updateReservationDetails(id: string, details: ReservationDetailsUpdate) {
-  const { error } = await supabase.from("reservations").update(details).eq("id", id);
+  const { error } = await supabase.rpc("update_reservation_details", {
+    p_reservation_id: id,
+    p_details: details,
+  });
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteReservation(id: string) {
+  const { error } = await supabase.rpc("delete_reservation", {
+    p_reservation_id: id,
+  });
   if (error) throw new Error(error.message);
 }
 

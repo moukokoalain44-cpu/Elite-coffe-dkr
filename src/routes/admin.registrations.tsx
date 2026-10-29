@@ -4,13 +4,22 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AdminCard, AdminPageHeader, AdminPagination, StatusBadge } from "@/components/AdminChrome";
 import { useAdmin, type Registration, type RegistrationStatus } from "@/contexts/AdminContext";
-import { updateReservationDetails, updateReservationStatus } from "@/lib/supabase";
+import {
+  createReservation,
+  deleteReservation,
+  updateReservationDetails,
+  updateReservationStatus,
+} from "@/lib/supabase";
 
 function canTransition(from: RegistrationStatus, to: RegistrationStatus) {
   if (from === to) return true;
   if (from === "pending") return to === "confirmed" || to === "cancelled";
   if (from === "confirmed") return to === "cancelled";
   return false;
+}
+
+function isPersistedReservationId(id: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
 export const Route = createFileRoute("/admin/registrations")({ component: RegistrationsPage });
@@ -35,10 +44,15 @@ function RegistrationsPage() {
   const pageSize = 4;
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const visible = filtered.slice((page - 1) * pageSize, page * pageSize);
-  const remove = (item: Registration) => {
+  const remove = async (item: Registration) => {
     if (window.confirm(`Supprimer la réservation de ${item.name} ?`)) {
-      deleteRegistration(item.id);
-      toast.success("Réservation supprimée");
+      try {
+        if (isPersistedReservationId(item.id)) await deleteReservation(item.id);
+        deleteRegistration(item.id);
+        toast.success("Réservation supprimée");
+      } catch {
+        toast.error("La réservation n’a pas pu être supprimée.");
+      }
     }
   };
   return (
@@ -158,10 +172,9 @@ function RegistrationsPage() {
                           toast.error("Ce statut ne peut plus être réouvert.");
                           return;
                         }
-                        const persist =
-                          row.id.length > 20
-                            ? updateReservationStatus(row.id, next)
-                            : Promise.resolve();
+                        const persist = isPersistedReservationId(row.id)
+                          ? updateReservationStatus(row.id, next)
+                          : Promise.resolve();
                         void persist
                           .then(() => {
                             updateRegistration(row.id, { status: next });
@@ -195,7 +208,7 @@ function RegistrationsPage() {
                         <Edit3 size={16} />
                       </button>
                       <button
-                        onClick={() => remove(row)}
+                        onClick={() => void remove(row)}
                         className="rounded-lg p-2 text-[#a65b48] hover:bg-[#fff0ed]"
                         aria-label="Supprimer"
                       >
@@ -227,7 +240,7 @@ function RegistrationsPage() {
           onClose={() => setEditing(null)}
           onSave={async (patch) => {
             const exists = registrations.some((item) => item.id === editing.id);
-            if (exists && editing.id.length > 20) {
+            if (exists && isPersistedReservationId(editing.id)) {
               try {
                 await updateReservationDetails(editing.id, {
                   name: patch.name ?? editing.name,
@@ -244,8 +257,32 @@ function RegistrationsPage() {
                 return;
               }
             }
-            if (exists) updateRegistration(editing.id, patch);
-            else addRegistration({ ...editing, ...patch });
+            if (exists) {
+              updateRegistration(editing.id, patch);
+            } else {
+              try {
+                const id = await createReservation({
+                  name: patch.name ?? editing.name,
+                  phone: patch.phone ?? editing.phone,
+                  email: patch.email ?? editing.email ?? "",
+                  date: patch.date ?? editing.date,
+                  time: patch.time ?? editing.time,
+                  guests: patch.guests ?? editing.guests,
+                  occasion: patch.occasion ?? editing.occasion,
+                  message: patch.message ?? editing.message,
+                });
+                addRegistration({
+                  ...editing,
+                  ...patch,
+                  id,
+                  status: "pending",
+                  createdAt: new Date().toISOString(),
+                });
+              } catch {
+                toast.error("La nouvelle réservation n’a pas pu être enregistrée.");
+                return;
+              }
+            }
             toast.success(exists ? "Réservation modifiée" : "Réservation créée");
             setEditing(null);
           }}

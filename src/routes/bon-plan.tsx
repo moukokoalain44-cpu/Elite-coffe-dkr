@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { PageShell } from "@/components/SiteChrome";
 import { MediaRenderer } from "@/components/MediaRenderer";
 import { useSiteMedia } from "@/hooks/use-site-media";
-import { createReservation, registerCustomer } from "@/lib/supabase";
+import { createReservation } from "@/lib/supabase";
 
 export const Route = createFileRoute("/bon-plan")({ component: GoodPlanPage });
 
@@ -30,15 +30,7 @@ function GoodPlanPage() {
           ? { message: String(data.get("message") ?? "").trim() }
           : {}),
       } satisfies Parameters<typeof createReservation>[0];
-      const id = await createReservation(reservation);
-      await Promise.allSettled([
-        registerCustomer({
-          name: reservation.name,
-          email: reservation.email,
-          phone: reservation.phone,
-          source: "buffet",
-        }),
-      ]);
+      await createReservation(reservation, "buffet");
       setSent(true);
       toast.success("Votre demande pour le buffet est enregistrée");
     } catch {

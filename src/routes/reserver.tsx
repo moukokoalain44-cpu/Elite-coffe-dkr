@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { CONTACT } from "@/data/site";
 import { PageShell } from "@/components/SiteChrome";
 import { MediaRenderer } from "@/components/MediaRenderer";
-import { createReservation, registerCustomer } from "@/lib/supabase";
+import { createReservation } from "@/lib/supabase";
 import { useSiteMedia } from "@/hooks/use-site-media";
 
 export const Route = createFileRoute("/reserver")({
@@ -61,14 +61,6 @@ function ReservationPage() {
           : {}),
       } satisfies Parameters<typeof createReservation>[0];
       const id = await createReservation(reservation);
-      await Promise.allSettled([
-        registerCustomer({
-          name: reservation.name,
-          email: reservation.email,
-          phone: reservation.phone,
-          source: "reservation",
-        }),
-      ]);
       setReservationId(id);
       setSent(true);
       toast.success("Votre demande de réservation est enregistrée");
