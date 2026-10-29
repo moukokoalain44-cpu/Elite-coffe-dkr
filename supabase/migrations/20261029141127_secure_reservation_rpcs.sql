@@ -135,7 +135,7 @@ begin
 end;
 $$;
 
-revoke all on function public.update_reservation_status(uuid, text) from public;
+revoke all on function public.update_reservation_status(uuid, text) from public, anon;
 grant execute on function public.update_reservation_status(uuid, text) to authenticated;
 
 create or replace function public.update_reservation_details(
@@ -242,7 +242,7 @@ begin
 end;
 $$;
 
-revoke all on function public.update_reservation_details(uuid, jsonb) from public;
+revoke all on function public.update_reservation_details(uuid, jsonb) from public, anon;
 grant execute on function public.update_reservation_details(uuid, jsonb) to authenticated;
 
 create or replace function public.delete_reservation(p_reservation_id uuid)
@@ -269,7 +269,7 @@ begin
 end;
 $$;
 
-revoke all on function public.delete_reservation(uuid) from public;
+revoke all on function public.delete_reservation(uuid) from public, anon;
 grant execute on function public.delete_reservation(uuid) to authenticated;
 
 -- Toute lecture est limitée aux vrais administrateurs. Les écritures passent
