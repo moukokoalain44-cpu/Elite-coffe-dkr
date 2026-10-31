@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { AdminCard, AdminPageHeader } from "@/components/AdminChrome";
 import { useAdmin } from "@/contexts/AdminContext";
-import { fetchCustomersAdmin, fetchReservationMessageLogs } from "@/lib/supabase";
+import { fetchCustomersAdminCount, fetchReservationMessageLogCount } from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin/")({ component: AdminDashboard });
 
@@ -21,10 +21,10 @@ function AdminDashboard() {
   const [followupCount, setFollowupCount] = useState<number | null>(null);
   useEffect(() => {
     const refresh = () =>
-      Promise.all([fetchCustomersAdmin(), fetchReservationMessageLogs()])
+      Promise.all([fetchCustomersAdminCount(), fetchReservationMessageLogCount()])
         .then(([customers, messages]) => {
-          setCustomerCount(customers.length);
-          setFollowupCount(messages.length);
+          setCustomerCount(customers);
+          setFollowupCount(messages);
         })
         .catch(() => {
           setCustomerCount(0);

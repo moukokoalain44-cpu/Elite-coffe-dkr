@@ -65,6 +65,19 @@ create trigger reservations_status_transition
 before update of status on public.reservations
 for each row execute function public.enforce_reservation_status_transition();
 
+-- ── Accès administrateur explicite ───────────────────────────
+-- Les comptes authentifiés ne sont pas automatiquement administrateurs.
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+alter table public.admin_users enable row level security;
+create or replace function public.is_admin()
+returns boolean language sql stable security definer set search_path = public
+as $$ select exists (select 1 from public.admin_users where user_id = auth.uid()); $$;
+revoke all on function public.is_admin() from public;
+grant execute on function public.is_admin() to authenticated;
+
 -- ── RLS : accès public en écriture seulement ───────────────
 alter table public.orders         enable row level security;
 alter table public.order_items    enable row level security;
@@ -76,9 +89,9 @@ create policy "insert_order_items" on public.order_items for insert with check (
 create policy "insert_reservations" on public.reservations for insert with check (true);
 
 -- Seul l'admin (authenticated) peut lire / modifier
-create policy "admin_orders"        on public.orders        for all using (auth.role() = 'authenticated');
-create policy "admin_order_items"   on public.order_items   for all using (auth.role() = 'authenticated');
-create policy "admin_reservations"  on public.reservations  for all using (auth.role() = 'authenticated');
+create policy "admin_orders"        on public.orders        for all using (public.is_admin()) with check (public.is_admin());
+create policy "admin_order_items"   on public.order_items   for all using (public.is_admin()) with check (public.is_admin());
+create policy "admin_reservations"  on public.reservations  for all using (public.is_admin()) with check (public.is_admin());
 
 -- ── CRM & communication ───────────────────────────────────
 create table if not exists public.customers (
@@ -93,7 +106,7 @@ create table if not exists public.customers (
 create unique index if not exists customers_phone_idx on public.customers(phone);
 alter table public.customers enable row level security;
 create policy "public_insert_customers" on public.customers for insert with check (true);
-create policy "admin_customers" on public.customers for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "admin_customers" on public.customers for all using (public.is_admin()) with check (public.is_admin());
 
 create table if not exists public.contact_messages (
   id          uuid primary key default gen_random_uuid(),
@@ -108,7 +121,7 @@ create table if not exists public.contact_messages (
 );
 alter table public.contact_messages enable row level security;
 create policy "public_insert_contact_messages" on public.contact_messages for insert with check (true);
-create policy "admin_contact_messages" on public.contact_messages for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "admin_contact_messages" on public.contact_messages for all using (public.is_admin()) with check (public.is_admin());
 
 create table if not exists public.reservation_followups (
   id              uuid primary key default gen_random_uuid(),
@@ -123,7 +136,7 @@ create table if not exists public.reservation_followups (
   unique (reservation_id, kind)
 );
 alter table public.reservation_followups enable row level security;
-create policy "admin_followups" on public.reservation_followups for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "admin_followups" on public.reservation_followups for all using (public.is_admin()) with check (public.is_admin());
 
 create table if not exists public.communication_campaigns (
   id                uuid primary key default gen_random_uuid(),
@@ -138,7 +151,7 @@ create table if not exists public.communication_campaigns (
   total_recipients  integer not null default 0
 );
 alter table public.communication_campaigns enable row level security;
-create policy "admin_communication_campaigns" on public.communication_campaigns for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "admin_communication_campaigns" on public.communication_campaigns for all using (public.is_admin()) with check (public.is_admin());
 
 -- Journal des notifications automatiques de réservation.
 create table if not exists public.reservation_message_log (
@@ -153,7 +166,7 @@ create table if not exists public.reservation_message_log (
   created_at          timestamptz not null default now()
 );
 alter table public.reservation_message_log enable row level security;
-create policy "admin_reservation_message_log" on public.reservation_message_log for select to authenticated using (true);
+create policy "admin_reservation_message_log" on public.reservation_message_log for select to authenticated using (public.is_admin());
 
 create table if not exists public.communication_delivery_log (
   id                  uuid primary key default gen_random_uuid(),
@@ -166,7 +179,7 @@ create table if not exists public.communication_delivery_log (
   created_at          timestamptz not null default now()
 );
 alter table public.communication_delivery_log enable row level security;
-create policy "admin_communication_delivery_log" on public.communication_delivery_log for select to authenticated using (true);
+create policy "admin_communication_delivery_log" on public.communication_delivery_log for select to authenticated using (public.is_admin());
 
 create or replace function public.send_ultramsg_message(p_phone text, p_message text, p_campaign_id uuid default null)
 returns bigint
@@ -266,7 +279,7 @@ create table if not exists public.menu_products (
 
 alter table public.menu_products enable row level security;
 create policy "public_read_menu_products" on public.menu_products for select using (is_visible = true);
-create policy "admin_manage_menu_products" on public.menu_products for all to authenticated using (true) with check (true);
+create policy "admin_manage_menu_products" on public.menu_products for all to authenticated using (public.is_admin()) with check (public.is_admin());
 create index if not exists menu_products_category_order_idx on public.menu_products (category, sort_order);
 alter table public.menu_products replica identity full;
 
@@ -283,7 +296,7 @@ create table if not exists public.site_media_assets (
 );
 alter table public.site_media_assets enable row level security;
 create policy "public_read_site_media_assets" on public.site_media_assets for select using (is_visible = true);
-create policy "admin_manage_site_media_assets" on public.site_media_assets for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "admin_manage_site_media_assets" on public.site_media_assets for all using (public.is_admin()) with check (public.is_admin());
 
 -- ── Stockage des médias du site et des images de plats ─────
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -316,16 +329,16 @@ drop policy if exists "public_read_site_media" on storage.objects;
 
 create policy "admin_upload_site_media" on storage.objects
 for insert to authenticated
-with check (bucket_id = 'site-media');
+with check (bucket_id = 'site-media' and public.is_admin());
 
 create policy "admin_update_site_media" on storage.objects
 for update to authenticated
-using (bucket_id = 'site-media')
-with check (bucket_id = 'site-media');
+using (bucket_id = 'site-media' and public.is_admin())
+with check (bucket_id = 'site-media' and public.is_admin());
 
 create policy "admin_delete_site_media" on storage.objects
 for delete to authenticated
-using (bucket_id = 'site-media');
+using (bucket_id = 'site-media' and public.is_admin());
 
 create policy "public_read_site_media" on storage.objects
 for select to public

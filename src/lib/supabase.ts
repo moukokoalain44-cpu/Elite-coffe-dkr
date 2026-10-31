@@ -245,6 +245,14 @@ export async function fetchCustomersAdmin(): Promise<CustomerRow[]> {
   return (data ?? []) as CustomerRow[];
 }
 
+export async function fetchCustomersAdminCount(): Promise<number> {
+  const { count, error } = await supabase
+    .from("customers")
+    .select("id", { count: "exact", head: true });
+  if (error) throw new Error(error.message);
+  return count ?? 0;
+}
+
 export type CommunicationCampaign = {
   id: string;
   name: string;
@@ -383,6 +391,14 @@ export async function fetchReservationMessageLogs(): Promise<ReservationMessageL
   return (data ?? []) as ReservationMessageLog[];
 }
 
+export async function fetchReservationMessageLogCount(): Promise<number> {
+  const { count, error } = await supabase
+    .from("reservation_message_log")
+    .select("id", { count: "exact", head: true });
+  if (error) throw new Error(error.message);
+  return count ?? 0;
+}
+
 export type SiteMediaRow = {
   id: string;
   label: string;
@@ -437,15 +453,24 @@ export async function uploadMenuProductMedia(file: File, productId: string) {
   const allowed = ["image/jpeg", "image/png", "image/webp", "image/avif"];
   if (!allowed.includes(file.type)) throw new Error("Utilisez une image JPG, PNG, WebP ou AVIF.");
   if (file.size > 10 * 1024 * 1024) throw new Error("L’image dépasse la limite de 10 Mo.");
-  const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `menu/${productId}/${crypto.randomUUID()}.${extension}`;
+  const extensionByType: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/avif": "avif",
+  };
+  const extension = extensionByType[file.type] ?? "jpg";
+  const safeProductId = encodeURIComponent(productId.trim());
+  const path = `menu/${safeProductId}/${crypto.randomUUID()}.${extension}`;
   const { error } = await supabase.storage
     .from("site-media")
-    .upload(path, file, { cacheControl: "31536000", contentType: file.type, upsert: true });
-  if (error) throw new Error(error.message);
+    .upload(path, file, { cacheControl: "31536000", contentType: file.type, upsert: false });
+  if (error) throw new Error(`Téléversement de l’image impossible : ${error.message}`);
+  const { data } = supabase.storage.from("site-media").getPublicUrl(path);
+  if (!data.publicUrl) throw new Error("L’URL publique de l’image n’a pas pu être créée.");
   return {
     path,
-    publicUrl: supabase.storage.from("site-media").getPublicUrl(path).data.publicUrl,
+    publicUrl: data.publicUrl,
   };
 }
 
