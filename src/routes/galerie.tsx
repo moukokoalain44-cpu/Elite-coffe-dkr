@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Image } from "lucide-react";
+import { Image, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { PageShell } from "@/components/SiteChrome";
 import { MediaRenderer } from "@/components/MediaRenderer";
 import { useSiteMedia } from "@/hooks/use-site-media";
@@ -7,6 +8,17 @@ import { useSiteMedia } from "@/hooks/use-site-media";
 export const Route = createFileRoute("/galerie")({ component: GalleryPage });
 function GalleryPage() {
   const media = useSiteMedia().filter((item) => !item.id.startsWith("admin-"));
+  const [selectedImage, setSelectedImage] = useState<(typeof media)[number] | null>(null);
+
+  useEffect(() => {
+    if (!selectedImage) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedImage(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [selectedImage]);
+
   const frameClasses = (index: number) => {
     const layouts = [
       "md:col-span-2 md:row-span-2",
@@ -36,15 +48,55 @@ function GalleryPage() {
               key={item.id}
               className={`group min-h-52 overflow-hidden rounded-2xl bg-card shadow-soft md:min-h-0 ${frameClasses(index)}`}
             >
-              <MediaRenderer
-                media={item}
-                className="h-full min-h-52 w-full object-cover transition duration-500 group-hover:scale-105 md:min-h-0"
-              />
+              {item.media_type === "image" ? (
+                <button
+                  type="button"
+                  onClick={() => setSelectedImage(item)}
+                  className="block h-full w-full cursor-zoom-in text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                  aria-label={`Agrandir l’image : ${item.alt_text}`}
+                >
+                  <MediaRenderer
+                    media={item}
+                    className="h-full min-h-52 w-full object-cover transition duration-500 group-hover:scale-105 md:min-h-0"
+                  />
+                </button>
+              ) : (
+                <MediaRenderer
+                  media={item}
+                  className="h-full min-h-52 w-full object-cover transition duration-500 group-hover:scale-105 md:min-h-0"
+                />
+              )}
               <figcaption className="p-3 text-sm font-semibold">{item.alt_text}</figcaption>
             </figure>
           ))}
         </div>
       </section>
+      {selectedImage && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={selectedImage.alt_text}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-[#2c252a]/90 p-4 backdrop-blur-sm md:p-8"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setSelectedImage(null)}
+            className="absolute right-4 top-4 grid size-11 place-items-center rounded-full bg-white/15 text-white transition hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white md:right-8 md:top-8"
+            aria-label="Fermer l’image agrandie"
+          >
+            <X size={22} />
+          </button>
+          <div className="flex max-h-full max-w-6xl flex-col items-center gap-4" onClick={(event) => event.stopPropagation()}>
+            <img
+              src={selectedImage.url}
+              alt={selectedImage.alt_text}
+              className="max-h-[82vh] max-w-full rounded-xl object-contain shadow-2xl"
+            />
+            <p className="text-center text-sm font-medium text-white/90">{selectedImage.alt_text}</p>
+          </div>
+        </div>
+      )}
     </PageShell>
   );
 }
