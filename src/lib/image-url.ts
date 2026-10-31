@@ -7,5 +7,5 @@ import { supabase } from "@/lib/supabase";
  */
 export function getOptimizedMenuImageUrl(source: string): string {
   if (/^(https?:\/\/|data:|\/)/.test(source)) return source;
-  return supabase.storage.from("site-media").getPublicUrl(source).data.publicUrl;
+  return supabase.storage.from("menu-images").getPublicUrl(source).data.publicUrl;
 }

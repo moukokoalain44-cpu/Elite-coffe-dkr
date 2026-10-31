@@ -507,28 +507,21 @@ export async function uploadMenuProductMedia(file: File) {
   if (adminError) throw new Error(`Vérification administrateur impossible : ${adminError.message}`);
   if (!isAdmin) throw new Error("Accès administrateur requis pour téléverser une image.");
 
-  const extensionByType: Record<string, string> = {
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp",
-    "image/avif": "avif",
-  };
-  const extension = extensionByType[file.type] ?? "jpg";
-  const path = `menu/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension}`;
-  const { error } = await supabase.storage
-    .from("site-media")
-    .upload(path, file, { cacheControl: "3600", contentType: file.type, upsert: false });
+  const extension = (file.name.split(".").pop() ?? "jpg")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  const path = `plats/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension || "jpg"}`;
+  const { error } = await supabase.storage.from("menu-images").upload(path, file, {
+    cacheControl: "3600",
+    contentType: file.type || "application/octet-stream",
+    upsert: false,
+  });
   if (error) throw new Error(`Téléversement de l’image impossible : ${error.message}`);
-  const { data } = supabase.storage.from("site-media").getPublicUrl(path);
-  if (!data.publicUrl) throw new Error("L’URL publique de l’image n’a pas pu être créée.");
-  return {
-    path,
-    publicUrl: data.publicUrl,
-  };
+  return path;
 }
 
 export async function removeMenuProductMedia(path: string) {
-  const { error } = await supabase.storage.from("site-media").remove([path]);
+  const { error } = await supabase.storage.from("menu-images").remove([path]);
   if (error) throw new Error(error.message);
 }
 

@@ -110,10 +110,10 @@ function CatalogPage() {
       let imageUrl = draft.image_url;
       if (pendingImageFile) {
         const uploaded = await uploadMenuProductMedia(pendingImageFile);
-        uploadedImagePath = uploaded.path;
+        uploadedImagePath = uploaded;
         // Store the Storage path, not a generated URL. This keeps the catalog
         // portable and matches the working KeurGui admin flow.
-        imageUrl = uploaded.path;
+        imageUrl = uploaded;
       }
       const payload: MenuProductInput = {
         ...draftFields,
