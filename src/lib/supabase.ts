@@ -489,6 +489,24 @@ export async function uploadMenuProductMedia(file: File) {
   const allowed = ["image/jpeg", "image/png", "image/webp", "image/avif"];
   if (!allowed.includes(file.type)) throw new Error("Utilisez une image JPG, PNG, WebP ou AVIF.");
   if (file.size > 10 * 1024 * 1024) throw new Error("L’image dépasse la limite de 10 Mo.");
+
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) throw new Error(`Session Supabase invalide : ${sessionError.message}`);
+  let session = sessionData.session;
+  if (!session) throw new Error("Session administrateur absente. Reconnectez-vous au back-office.");
+
+  if ((session.expires_at ?? 0) * 1000 <= Date.now() + 30_000) {
+    const refreshed = await supabase.auth.refreshSession();
+    if (refreshed.error || !refreshed.data.session) {
+      throw new Error("Session administrateur expirée. Reconnectez-vous au back-office.");
+    }
+    session = refreshed.data.session;
+  }
+
+  const { data: isAdmin, error: adminError } = await supabase.rpc("is_admin");
+  if (adminError) throw new Error(`Vérification administrateur impossible : ${adminError.message}`);
+  if (!isAdmin) throw new Error("Accès administrateur requis pour téléverser une image.");
+
   const extensionByType: Record<string, string> = {
     "image/jpeg": "jpg",
     "image/png": "png",
