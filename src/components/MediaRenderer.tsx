@@ -24,5 +24,20 @@ export function MediaRenderer({ media, className, loading = "lazy", poster }: Me
     );
   }
 
-  return <img src={media.url} alt={media.alt_text} loading={loading} className={className} />;
+  const localWebpUrl = /^\/assets\/instagram\/[^/]+\.(?:jpe?g|png)$/i.test(media.url)
+    ? media.url.replace(/\.(?:jpe?g|png)$/i, ".webp")
+    : null;
+
+  return (
+    <picture className="block h-full w-full">
+      {localWebpUrl && <source srcSet={localWebpUrl} type="image/webp" />}
+      <img
+        src={media.url}
+        alt={media.alt_text}
+        loading={loading}
+        decoding="async"
+        className={className}
+      />
+    </picture>
+  );
 }

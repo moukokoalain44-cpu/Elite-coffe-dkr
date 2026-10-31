@@ -425,6 +425,40 @@ export async function saveSiteMedia(media: SiteMediaRow) {
   if (error) throw new Error(error.message);
 }
 
+async function optimizeImageForUpload(file: File): Promise<File> {
+  if (!file.type.startsWith("image/") || typeof window === "undefined") return file;
+
+  const sourceUrl = URL.createObjectURL(file);
+  try {
+    const image = new window.Image();
+    image.decoding = "async";
+    image.src = sourceUrl;
+    await image.decode();
+
+    const maxDimension = 2000;
+    const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext("2d");
+    if (!context) return file;
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/webp", 0.82),
+    );
+    if (!blob) return file;
+    return new File([blob], `${file.name.replace(/\.[^.]+$/, "")}.webp`, {
+      type: "image/webp",
+      lastModified: Date.now(),
+    });
+  } catch {
+    return file;
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+  }
+}
+
 export async function uploadSiteMedia(file: File, mediaKey: string) {
   const allowed = [
     "image/jpeg",
@@ -435,14 +469,15 @@ export async function uploadSiteMedia(file: File, mediaKey: string) {
     "video/webm",
     "video/quicktime",
   ];
-  if (!allowed.includes(file.type))
+  const preparedFile = await optimizeImageForUpload(file);
+  if (!allowed.includes(preparedFile.type))
     throw new Error("Format non pris en charge. Utilisez JPG, PNG, WebP, MP4, WebM ou MOV.");
-  if (file.size > 50 * 1024 * 1024) throw new Error("Le fichier dépasse la limite de 50 Mo.");
-  const extension = file.name.split(".").pop()?.toLowerCase() || "bin";
+  if (preparedFile.size > 50 * 1024 * 1024) throw new Error("Le fichier dépasse la limite de 50 Mo.");
+  const extension = preparedFile.name.split(".").pop()?.toLowerCase() || "bin";
   const path = `site/${mediaKey}/${crypto.randomUUID()}.${extension}`;
-  const { error } = await supabase.storage.from("site-media").upload(path, file, {
+  const { error } = await supabase.storage.from("site-media").upload(path, preparedFile, {
     cacheControl: "31536000",
-    contentType: file.type,
+    contentType: preparedFile.type,
     upsert: false,
   });
   if (error) throw new Error(error.message);
@@ -451,20 +486,21 @@ export async function uploadSiteMedia(file: File, mediaKey: string) {
 
 export async function uploadMenuProductMedia(file: File, productId: string) {
   const allowed = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-  if (!allowed.includes(file.type)) throw new Error("Utilisez une image JPG, PNG, WebP ou AVIF.");
-  if (file.size > 10 * 1024 * 1024) throw new Error("L’image dépasse la limite de 10 Mo.");
+  const preparedFile = await optimizeImageForUpload(file);
+  if (!allowed.includes(preparedFile.type)) throw new Error("Utilisez une image JPG, PNG, WebP ou AVIF.");
+  if (preparedFile.size > 10 * 1024 * 1024) throw new Error("L’image dépasse la limite de 10 Mo.");
   const extensionByType: Record<string, string> = {
     "image/jpeg": "jpg",
     "image/png": "png",
     "image/webp": "webp",
     "image/avif": "avif",
   };
-  const extension = extensionByType[file.type] ?? "jpg";
+  const extension = extensionByType[preparedFile.type] ?? "jpg";
   const safeProductId = encodeURIComponent(productId.trim());
   const path = `menu/${safeProductId}/${crypto.randomUUID()}.${extension}`;
   const { error } = await supabase.storage
     .from("site-media")
-    .upload(path, file, { cacheControl: "31536000", contentType: file.type, upsert: false });
+    .upload(path, preparedFile, { cacheControl: "31536000", contentType: preparedFile.type, upsert: false });
   if (error) throw new Error(`Téléversement de l’image impossible : ${error.message}`);
   const { data } = supabase.storage.from("site-media").getPublicUrl(path);
   if (!data.publicUrl) throw new Error("L’URL publique de l’image n’a pas pu être créée.");
