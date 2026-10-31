@@ -108,8 +108,8 @@ function CatalogPage() {
     try {
       const { id: _id, ...draftFields } = draft;
       let imageUrl = draft.image_url;
-      if (pendingImageFile && draft.id) {
-        const uploaded = await uploadMenuProductMedia(pendingImageFile, draft.id);
+      if (pendingImageFile) {
+        const uploaded = await uploadMenuProductMedia(pendingImageFile);
         uploadedImagePath = uploaded.path;
         // Store the Storage path, not a generated URL. This keeps the catalog
         // portable and matches the working KeurGui admin flow.
@@ -169,10 +169,6 @@ function CatalogPage() {
   };
   const selectImage = (file: File | undefined) => {
     if (!file || !draft) return;
-    if (!draft.id) {
-      toast.error("Enregistrez d’abord le plat avant d’ajouter une image.");
-      return;
-    }
     const localPreviewUrl = URL.createObjectURL(file);
     setImagePreviewUrl((current) => {
       if (current?.startsWith("blob:")) URL.revokeObjectURL(current);

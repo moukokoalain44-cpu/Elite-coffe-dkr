@@ -484,23 +484,22 @@ export async function uploadSiteMedia(file: File, mediaKey: string) {
   return supabase.storage.from("site-media").getPublicUrl(path).data.publicUrl;
 }
 
-export async function uploadMenuProductMedia(file: File, productId: string) {
+/** Téléverse une image avant la sauvegarde du produit, comme le parcours KeurGui. */
+export async function uploadMenuProductMedia(file: File) {
   const allowed = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-  const preparedFile = await optimizeImageForUpload(file);
-  if (!allowed.includes(preparedFile.type)) throw new Error("Utilisez une image JPG, PNG, WebP ou AVIF.");
-  if (preparedFile.size > 10 * 1024 * 1024) throw new Error("L’image dépasse la limite de 10 Mo.");
+  if (!allowed.includes(file.type)) throw new Error("Utilisez une image JPG, PNG, WebP ou AVIF.");
+  if (file.size > 10 * 1024 * 1024) throw new Error("L’image dépasse la limite de 10 Mo.");
   const extensionByType: Record<string, string> = {
     "image/jpeg": "jpg",
     "image/png": "png",
     "image/webp": "webp",
     "image/avif": "avif",
   };
-  const extension = extensionByType[preparedFile.type] ?? "jpg";
-  const safeProductId = encodeURIComponent(productId.trim());
-  const path = `menu/${safeProductId}/${crypto.randomUUID()}.${extension}`;
+  const extension = extensionByType[file.type] ?? "jpg";
+  const path = `menu/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension}`;
   const { error } = await supabase.storage
     .from("site-media")
-    .upload(path, preparedFile, { cacheControl: "31536000", contentType: preparedFile.type, upsert: false });
+    .upload(path, file, { cacheControl: "3600", contentType: file.type, upsert: false });
   if (error) throw new Error(`Téléversement de l’image impossible : ${error.message}`);
   const { data } = supabase.storage.from("site-media").getPublicUrl(path);
   if (!data.publicUrl) throw new Error("L’URL publique de l’image n’a pas pu être créée.");
