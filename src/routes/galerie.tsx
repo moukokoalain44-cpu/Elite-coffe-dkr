@@ -8,16 +8,16 @@ import { useSiteMedia } from "@/hooks/use-site-media";
 export const Route = createFileRoute("/galerie")({ component: GalleryPage });
 function GalleryPage() {
   const media = useSiteMedia().filter((item) => !item.id.startsWith("admin-"));
-  const [selectedImage, setSelectedImage] = useState<(typeof media)[number] | null>(null);
+  const [selectedMedia, setSelectedMedia] = useState<(typeof media)[number] | null>(null);
 
   useEffect(() => {
-    if (!selectedImage) return;
+    if (!selectedMedia) return;
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSelectedImage(null);
+      if (event.key === "Escape") setSelectedMedia(null);
     };
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [selectedImage]);
+  }, [selectedMedia]);
 
   const frameClasses = (index: number) => {
     const layouts = [
@@ -48,12 +48,12 @@ function GalleryPage() {
               key={item.id}
               className={`group min-h-52 overflow-hidden rounded-2xl bg-card shadow-soft md:min-h-0 ${frameClasses(index)}`}
             >
-              {item.media_type === "image" ? (
+              {item.media_type === "image" || item.media_type === "video" ? (
                 <button
                   type="button"
-                  onClick={() => setSelectedImage(item)}
+                  onClick={() => setSelectedMedia(item)}
                   className="block h-full w-full cursor-zoom-in text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-                  aria-label={`Agrandir l’image : ${item.alt_text}`}
+                  aria-label={`${item.media_type === "video" ? "Agrandir la vidéo" : "Agrandir l’image"} : ${item.alt_text}`}
                 >
                   <MediaRenderer
                     media={item}
@@ -71,29 +71,41 @@ function GalleryPage() {
           ))}
         </div>
       </section>
-      {selectedImage && (
+      {selectedMedia && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={selectedImage.alt_text}
+          aria-label={selectedMedia.alt_text}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-[#2c252a]/90 p-4 backdrop-blur-sm md:p-8"
-          onClick={() => setSelectedImage(null)}
+          onClick={() => setSelectedMedia(null)}
         >
           <button
             type="button"
-            onClick={() => setSelectedImage(null)}
+            onClick={() => setSelectedMedia(null)}
             className="absolute right-4 top-4 grid size-11 place-items-center rounded-full bg-white/15 text-white transition hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white md:right-8 md:top-8"
             aria-label="Fermer l’image agrandie"
           >
             <X size={22} />
           </button>
           <div className="flex max-h-full max-w-6xl flex-col items-center gap-4" onClick={(event) => event.stopPropagation()}>
-            <img
-              src={selectedImage.url}
-              alt={selectedImage.alt_text}
-              className="max-h-[82vh] max-w-full rounded-xl object-contain shadow-2xl"
-            />
-            <p className="text-center text-sm font-medium text-white/90">{selectedImage.alt_text}</p>
+            {selectedMedia.media_type === "video" ? (
+              <video
+                src={selectedMedia.url}
+                controls
+                autoPlay
+                playsInline
+                preload="metadata"
+                aria-label={selectedMedia.alt_text}
+                className="max-h-[82vh] max-w-full rounded-xl object-contain shadow-2xl"
+              />
+            ) : (
+              <img
+                src={selectedMedia.url}
+                alt={selectedMedia.alt_text}
+                className="max-h-[82vh] max-w-full rounded-xl object-contain shadow-2xl"
+              />
+            )}
+            <p className="text-center text-sm font-medium text-white/90">{selectedMedia.alt_text}</p>
           </div>
         </div>
       )}
