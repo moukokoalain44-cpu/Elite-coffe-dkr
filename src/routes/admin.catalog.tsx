@@ -111,7 +111,9 @@ function CatalogPage() {
       if (pendingImageFile && draft.id) {
         const uploaded = await uploadMenuProductMedia(pendingImageFile, draft.id);
         uploadedImagePath = uploaded.path;
-        imageUrl = uploaded.publicUrl;
+        // Store the Storage path, not a generated URL. This keeps the catalog
+        // portable and matches the working KeurGui admin flow.
+        imageUrl = uploaded.path;
       }
       const payload: MenuProductInput = {
         ...draftFields,
@@ -123,6 +125,9 @@ function CatalogPage() {
       const saved = draft.id
         ? await updateMenuProduct(draft.id, payload)
         : await createMenuProduct(payload);
+      if (saved.image_url !== imageUrl) {
+        throw new Error("L’image a été téléversée, mais son chemin n’a pas été enregistré dans Supabase.");
+      }
       setProducts((current) =>
         draft.id
           ? current.map((item) => (item.id === saved.id ? saved : item))

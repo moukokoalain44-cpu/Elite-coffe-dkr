@@ -1,11 +1,11 @@
+import { supabase } from "@/lib/supabase";
+
 /**
- * Keeps public Storage URLs intact.
- *
- * Supabase Image Transformation is not enabled on every project plan and can
- * return a 404 for newly uploaded objects. The browser-side loading strategy
- * (lazy loading, priority hints and async decoding) still reduces the page
- * cost without replacing a valid object URL with an invalid render URL.
+ * Resolve both legacy public URLs and the Storage paths used by new uploads.
+ * Do not use Supabase image transformations here: they are not enabled on
+ * every project and can return a 404 for a newly uploaded object.
  */
 export function getOptimizedMenuImageUrl(source: string): string {
-  return source;
+  if (/^(https?:\/\/|data:|\/)/.test(source)) return source;
+  return supabase.storage.from("site-media").getPublicUrl(source).data.publicUrl;
 }
