@@ -500,7 +500,8 @@ export async function uploadSiteMedia(file: File, mediaKey: string) {
   const preparedFile = await optimizeImageForUpload(file);
   if (!allowed.includes(preparedFile.type))
     throw new Error("Format non pris en charge. Utilisez JPG, PNG, WebP, MP4, WebM ou MOV.");
-  if (preparedFile.size > 50 * 1024 * 1024) throw new Error("Le fichier dépasse la limite de 50 Mo.");
+  if (preparedFile.size > 50 * 1024 * 1024)
+    throw new Error("Le fichier dépasse la limite de 50 Mo.");
   const extension = preparedFile.name.split(".").pop()?.toLowerCase() || "bin";
   const path = `site/${mediaKey}/${crypto.randomUUID()}.${extension}`;
   const { error } = await supabase.storage.from("site-media").upload(path, preparedFile, {
@@ -513,23 +514,68 @@ export async function uploadSiteMedia(file: File, mediaKey: string) {
 }
 
 const MENU_IMAGES_BUCKET = "menu-images";
+const MENU_IMAGE_MAX_SIZE = 10 * 1024 * 1024;
+const MENU_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
+const MENU_IMAGE_EXTENSIONS: Record<string, string> = {
+  avif: "image/avif",
+  jpeg: "image/jpeg",
+  jpg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+};
+
+function getMenuImageMimeType(file: File) {
+  if (MENU_IMAGE_TYPES.has(file.type)) return file.type;
+  const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
+  return MENU_IMAGE_EXTENSIONS[extension] ?? "";
+}
+
+function getMenuImageUploadError(message: string) {
+  const normalized = message.toLowerCase();
+  if (normalized.includes("row-level security") || normalized.includes("not authorized")) {
+    return "Le compte administrateur n’est pas autorisé à téléverser cette image.";
+  }
+  if (
+    normalized.includes("exceed") ||
+    normalized.includes("too large") ||
+    normalized.includes("size")
+  ) {
+    return "L’image dépasse la limite autorisée par le stockage.";
+  }
+  if (normalized.includes("mime") || normalized.includes("content type")) {
+    return "Le format MIME de l’image n’est pas autorisé par le stockage.";
+  }
+  return `Téléversement de l’image impossible : ${message}`;
+}
 
 /** Copie du parcours KeurGui : upload direct puis stockage du chemin dans image_url. */
-export async function uploadMenuProductMedia(file: File) {
+export async function uploadMenuProductMedia(file: File, productId?: string) {
   // Les images brutes de plusieurs Mo sont réduites avant l’appel Storage.
   // La passerelle Supabase peut rejeter un multipart volumineux en HTTP 400
   // avant même l’évaluation des policies RLS.
-  const preparedFile = await optimizeImageForUpload(file);
+  const sourceMimeType = getMenuImageMimeType(file);
+  if (!sourceMimeType) {
+    throw new Error("Type MIME non pris en charge : inconnu. Utilisez JPG, PNG, WebP ou AVIF.");
+  }
+  const sourceFile =
+    file.type === sourceMimeType ? file : new File([file], file.name, { type: sourceMimeType });
+  const preparedFile = await optimizeImageForUpload(sourceFile);
+  if (!MENU_IMAGE_TYPES.has(preparedFile.type)) {
+    throw new Error(`Type MIME non pris en charge : ${preparedFile.type || "inconnu"}.`);
+  }
+  if (preparedFile.size > MENU_IMAGE_MAX_SIZE) {
+    throw new Error("L’image dépasse la limite de 10 Mo après optimisation.");
+  }
   const extension = (preparedFile.name.split(".").pop() ?? "jpg")
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
-  const path = `plats/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension || "jpg"}`;
+  const path = `plats/${productId ?? crypto.randomUUID()}/${crypto.randomUUID()}.${extension || "jpg"}`;
   const { error } = await supabase.storage.from(MENU_IMAGES_BUCKET).upload(path, preparedFile, {
     cacheControl: "3600",
-    contentType: preparedFile.type || "application/octet-stream",
+    contentType: preparedFile.type,
     upsert: false,
   });
-  if (error) throw new Error(`Téléversement de l’image impossible : ${error.message}`);
+  if (error) throw new Error(getMenuImageUploadError(error.message));
   return path;
 }
 

@@ -65,7 +65,13 @@ function CatalogPage() {
   }, []);
 
   const categories = useMemo(
-    () => [...new Set([...categoryRows.map((item) => item.name), ...products.map((item) => item.category)])].sort(),
+    () =>
+      [
+        ...new Set([
+          ...categoryRows.map((item) => item.name),
+          ...products.map((item) => item.category),
+        ]),
+      ].sort(),
     [categoryRows, products],
   );
   const filtered = useMemo(
@@ -108,8 +114,9 @@ function CatalogPage() {
     try {
       const { id: _id, ...draftFields } = draft;
       let imageUrl = draft.image_url;
+      const previousImagePath = draft.image_url?.startsWith("plats/") ? draft.image_url : null;
       if (pendingImageFile) {
-        const uploaded = await uploadMenuProductMedia(pendingImageFile);
+        const uploaded = await uploadMenuProductMedia(pendingImageFile, draft.id);
         uploadedImagePath = uploaded;
         // Store the Storage path, not a generated URL. This keeps the catalog
         // portable and matches the working KeurGui admin flow.
@@ -126,7 +133,12 @@ function CatalogPage() {
         ? await updateMenuProduct(draft.id, payload)
         : await createMenuProduct(payload);
       if (saved.image_url !== imageUrl) {
-        throw new Error("L’image a été téléversée, mais son chemin n’a pas été enregistré dans Supabase.");
+        throw new Error(
+          "L’image a été téléversée, mais son chemin n’a pas été enregistré dans Supabase.",
+        );
+      }
+      if (pendingImageFile && previousImagePath && previousImagePath !== imageUrl) {
+        await removeMenuProductMedia(previousImagePath).catch(() => undefined);
       }
       setProducts((current) =>
         draft.id
@@ -194,14 +206,52 @@ function CatalogPage() {
       />
       <div className="space-y-5">
         <AdminCard className="p-0">
-          <button type="button" onClick={() => setCategoriesOpen((value) => !value)} className="flex w-full items-center justify-between px-5 py-4 text-left">
-            <span><strong className="font-display text-xl">Catégories</strong><span className="ml-3 text-sm text-[#93878d]">{category === "Toutes" ? "Toutes les catégories" : category}</span></span>
-            <ChevronDown size={19} className={`text-[#a5365f] transition-transform ${categoriesOpen ? "rotate-180" : ""}`} />
+          <button
+            type="button"
+            onClick={() => setCategoriesOpen((value) => !value)}
+            className="flex w-full items-center justify-between px-5 py-4 text-left"
+          >
+            <span>
+              <strong className="font-display text-xl">Catégories</strong>
+              <span className="ml-3 text-sm text-[#93878d]">
+                {category === "Toutes" ? "Toutes les catégories" : category}
+              </span>
+            </span>
+            <ChevronDown
+              size={19}
+              className={`text-[#a5365f] transition-transform ${categoriesOpen ? "rotate-180" : ""}`}
+            />
           </button>
-          {categoriesOpen && <div className="flex flex-wrap gap-2 border-t border-[#eee8e8] px-5 py-4">
-            <button onClick={() => { setCategory("Toutes"); setPage(1); setCategoriesOpen(false); }} className={`rounded-full px-3 py-2 text-sm font-semibold ${category === "Toutes" ? "bg-[#fbe9ef] text-[#a5365f]" : "bg-[#f4f3f4] text-[#756b72]"}`}>Toutes <span className="ml-1 text-xs">{products.length}</span></button>
-            {categories.map((name) => <button key={name} onClick={() => { setCategory(name); setPage(1); setCategoriesOpen(false); }} className={`rounded-full px-3 py-2 text-sm font-semibold ${category === name ? "bg-[#fbe9ef] text-[#a5365f]" : "bg-[#f4f3f4] text-[#756b72]"}`}>{name} <span className="ml-1 text-xs">{products.filter((item) => item.category === name).length}</span></button>)}
-          </div>}
+          {categoriesOpen && (
+            <div className="flex flex-wrap gap-2 border-t border-[#eee8e8] px-5 py-4">
+              <button
+                onClick={() => {
+                  setCategory("Toutes");
+                  setPage(1);
+                  setCategoriesOpen(false);
+                }}
+                className={`rounded-full px-3 py-2 text-sm font-semibold ${category === "Toutes" ? "bg-[#fbe9ef] text-[#a5365f]" : "bg-[#f4f3f4] text-[#756b72]"}`}
+              >
+                Toutes <span className="ml-1 text-xs">{products.length}</span>
+              </button>
+              {categories.map((name) => (
+                <button
+                  key={name}
+                  onClick={() => {
+                    setCategory(name);
+                    setPage(1);
+                    setCategoriesOpen(false);
+                  }}
+                  className={`rounded-full px-3 py-2 text-sm font-semibold ${category === name ? "bg-[#fbe9ef] text-[#a5365f]" : "bg-[#f4f3f4] text-[#756b72]"}`}
+                >
+                  {name}{" "}
+                  <span className="ml-1 text-xs">
+                    {products.filter((item) => item.category === name).length}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </AdminCard>
         <AdminCard className="overflow-hidden p-0">
           <div className="flex flex-col gap-3 border-b border-[#eee8e8] p-5 md:flex-row md:items-center md:justify-between">
@@ -363,9 +413,7 @@ function CatalogPage() {
                     <img
                       src={
                         imagePreviewUrl ||
-                        (draft.image_url
-                          ? getOptimizedMenuImageUrl(draft.image_url)
-                          : undefined)
+                        (draft.image_url ? getOptimizedMenuImageUrl(draft.image_url) : undefined)
                       }
                       alt="Aperçu"
                       className="h-44 w-full rounded-2xl border border-[#eadde2] object-cover"
