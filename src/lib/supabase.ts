@@ -548,6 +548,19 @@ function getMenuImageUploadError(message: string) {
   return `Téléversement de l’image impossible : ${message}`;
 }
 
+async function readBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
+  if (typeof blob.arrayBuffer === "function") return blob.arrayBuffer();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result instanceof ArrayBuffer) resolve(reader.result);
+      else reject(new Error("Impossible de lire l’image préparée."));
+    };
+    reader.onerror = () => reject(reader.error ?? new Error("Impossible de lire l’image préparée."));
+    reader.readAsArrayBuffer(blob);
+  });
+}
+
 /** Copie du parcours KeurGui : upload direct puis stockage du chemin dans image_url. */
 export async function uploadMenuProductMedia(file: File, productId?: string) {
   // Les images brutes de plusieurs Mo sont réduites avant l’appel Storage.
@@ -570,7 +583,8 @@ export async function uploadMenuProductMedia(file: File, productId?: string) {
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
   const path = `plats/${productId ?? crypto.randomUUID()}/${crypto.randomUUID()}.${extension || "jpg"}`;
-  const { error } = await supabase.storage.from(MENU_IMAGES_BUCKET).upload(path, preparedFile, {
+  const rawImage = await readBlobAsArrayBuffer(preparedFile);
+  const { error } = await supabase.storage.from(MENU_IMAGES_BUCKET).upload(path, rawImage, {
     cacheControl: "3600",
     contentType: preparedFile.type,
     upsert: false,
