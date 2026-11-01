@@ -6,6 +6,30 @@ const configuredSupabaseUrl = import.meta.env["VITE_SUPABASE_URL"] as string;
 const supabaseUrl = configuredSupabaseUrl?.replace(/\/rest\/v1\/?$/, "");
 const supabaseAnonKey = import.meta.env["VITE_SUPABASE_ANON_KEY"] as string;
 
+function isNewSupabaseApiKey(value: string) {
+  return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
+}
+
+/** Même normalisation d’en-têtes que KeurGui pour les clés Supabase sb_*. */
+function createSupabaseFetch(supabaseKey: string): typeof fetch {
+  return (input, init) => {
+    const headers = new Headers(
+      typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
+    );
+    if (init?.headers) {
+      new Headers(init.headers).forEach((value, key) => headers.set(key, value));
+    }
+    if (
+      isNewSupabaseApiKey(supabaseKey) &&
+      headers.get("Authorization") === `Bearer ${supabaseKey}`
+    ) {
+      headers.delete("Authorization");
+    }
+    headers.set("apikey", supabaseKey);
+    return fetch(input, { ...init, headers });
+  };
+}
+
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
     "[Elite Coffee] Variables d'environnement Supabase manquantes.\n" +
@@ -17,7 +41,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "", {
   global: {
-    fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }),
+    fetch: createSupabaseFetch(supabaseAnonKey ?? ""),
+  },
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
   },
 });
 
@@ -484,34 +512,15 @@ export async function uploadSiteMedia(file: File, mediaKey: string) {
   return supabase.storage.from("site-media").getPublicUrl(path).data.publicUrl;
 }
 
-/** Téléverse une image avant la sauvegarde du produit, comme le parcours KeurGui. */
+const MENU_IMAGES_BUCKET = "menu-images";
+
+/** Copie du parcours KeurGui : upload direct puis stockage du chemin dans image_url. */
 export async function uploadMenuProductMedia(file: File) {
-  const allowed = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-  if (!allowed.includes(file.type)) throw new Error("Utilisez une image JPG, PNG, WebP ou AVIF.");
-  if (file.size > 10 * 1024 * 1024) throw new Error("L’image dépasse la limite de 10 Mo.");
-
-  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-  if (sessionError) throw new Error(`Session Supabase invalide : ${sessionError.message}`);
-  let session = sessionData.session;
-  if (!session) throw new Error("Session administrateur absente. Reconnectez-vous au back-office.");
-
-  if ((session.expires_at ?? 0) * 1000 <= Date.now() + 30_000) {
-    const refreshed = await supabase.auth.refreshSession();
-    if (refreshed.error || !refreshed.data.session) {
-      throw new Error("Session administrateur expirée. Reconnectez-vous au back-office.");
-    }
-    session = refreshed.data.session;
-  }
-
-  const { data: isAdmin, error: adminError } = await supabase.rpc("is_admin");
-  if (adminError) throw new Error(`Vérification administrateur impossible : ${adminError.message}`);
-  if (!isAdmin) throw new Error("Accès administrateur requis pour téléverser une image.");
-
   const extension = (file.name.split(".").pop() ?? "jpg")
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
   const path = `plats/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension || "jpg"}`;
-  const { error } = await supabase.storage.from("menu-images").upload(path, file, {
+  const { error } = await supabase.storage.from(MENU_IMAGES_BUCKET).upload(path, file, {
     cacheControl: "3600",
     contentType: file.type || "application/octet-stream",
     upsert: false,
@@ -521,7 +530,7 @@ export async function uploadMenuProductMedia(file: File) {
 }
 
 export async function removeMenuProductMedia(path: string) {
-  const { error } = await supabase.storage.from("menu-images").remove([path]);
+  const { error } = await supabase.storage.from(MENU_IMAGES_BUCKET).remove([path]);
   if (error) throw new Error(error.message);
 }
 
