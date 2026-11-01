@@ -516,13 +516,17 @@ const MENU_IMAGES_BUCKET = "menu-images";
 
 /** Copie du parcours KeurGui : upload direct puis stockage du chemin dans image_url. */
 export async function uploadMenuProductMedia(file: File) {
-  const extension = (file.name.split(".").pop() ?? "jpg")
+  // Les images brutes de plusieurs Mo sont réduites avant l’appel Storage.
+  // La passerelle Supabase peut rejeter un multipart volumineux en HTTP 400
+  // avant même l’évaluation des policies RLS.
+  const preparedFile = await optimizeImageForUpload(file);
+  const extension = (preparedFile.name.split(".").pop() ?? "jpg")
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
   const path = `plats/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension || "jpg"}`;
-  const { error } = await supabase.storage.from(MENU_IMAGES_BUCKET).upload(path, file, {
+  const { error } = await supabase.storage.from(MENU_IMAGES_BUCKET).upload(path, preparedFile, {
     cacheControl: "3600",
-    contentType: file.type || "application/octet-stream",
+    contentType: preparedFile.type || "application/octet-stream",
     upsert: false,
   });
   if (error) throw new Error(`Téléversement de l’image impossible : ${error.message}`);
