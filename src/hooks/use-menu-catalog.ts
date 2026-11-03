@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { fetchMenuProducts, supabase, type MenuProductRow } from "@/lib/supabase";
-import { PRODUCT_CATALOG, type Product } from "@/data/catalog";
+import {
+  fetchMenuCategories,
+  fetchMenuProducts,
+  supabase,
+  type MenuCategoryRow,
+  type MenuProductRow,
+} from "@/lib/supabase";
+import { MENU_CATEGORIES, PRODUCT_CATALOG, type Product } from "@/data/catalog";
 
 function fromRemote(row: MenuProductRow): Product {
   const fallback = PRODUCT_CATALOG.find((product) => product.id === row.id);
@@ -23,22 +29,49 @@ function fromRemote(row: MenuProductRow): Product {
   };
 }
 
+const LOCAL_CATEGORIES: MenuCategoryRow[] = MENU_CATEGORIES.map((name, index) => ({
+  id: name,
+  name,
+  description: null,
+  sort_order: index,
+  created_at: "",
+}));
+
 export function useMenuCatalog() {
   const [products, setProducts] = useState<Product[]>(PRODUCT_CATALOG);
+  const [categories, setCategories] = useState<MenuCategoryRow[]>(LOCAL_CATEGORIES);
   const [isLoading, setIsLoading] = useState(true);
   const [isRemote, setIsRemote] = useState(false);
 
   useEffect(() => {
     let active = true;
     let lastSignature = "";
+
     const refresh = async (initial = false, notify = false) => {
       try {
-        const rows = await fetchMenuProducts();
+        const [rows, categoryRows] = await Promise.all([
+          fetchMenuProducts(),
+          fetchMenuCategories().catch((error: unknown) => {
+            console.warn("[MENU_PUBLIC_CATEGORIES_READ] menu_categories indisponible.", error);
+            return [] as MenuCategoryRow[];
+          }),
+        ]);
         if (!active) return;
-        const signature = JSON.stringify(rows);
+
+        const nextCategories = categoryRows.length
+          ? categoryRows
+          : [...new Set(rows.map((row) => row.category))].map((name, index) => ({
+              id: name,
+              name,
+              description: null,
+              sort_order: index,
+              created_at: "",
+            }));
+        const signature = JSON.stringify({ rows, categories: nextCategories });
         const hasChanged = Boolean(lastSignature && lastSignature !== signature);
         lastSignature = signature;
         setProducts(rows.map(fromRemote));
+        setCategories(nextCategories);
         setIsRemote(true);
         if (notify && hasChanged) {
           toast.success("La carte a été mise à jour", {
@@ -56,15 +89,16 @@ export function useMenuCatalog() {
     };
 
     void refresh(true);
-
-    // Realtime rend la mise à jour instantanée quand la publication Supabase
-    // est disponible. Le polling garantit le rafraîchissement même si Realtime
-    // est momentanément indisponible ou bloqué par le réseau du visiteur.
     const channel = supabase
-      .channel("public-menu-products")
+      .channel("public-menu-catalog")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "menu_products" },
+        () => void refresh(false, true),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "menu_categories" },
         () => void refresh(false, true),
       )
       .subscribe();
@@ -77,5 +111,5 @@ export function useMenuCatalog() {
     };
   }, []);
 
-  return { products, isLoading, isRemote };
+  return { products, categories, isLoading, isRemote };
 }

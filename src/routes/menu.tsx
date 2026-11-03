@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Plus, Search, ShoppingBag, Star } from "lucide-react";
-import { useMemo, useState } from "react";
-import { MENU_CATEGORIES, type MenuCategory } from "@/data/catalog";
+import { useEffect, useMemo, useState } from "react";
 import { useMenuCatalog } from "@/hooks/use-menu-catalog";
 import { PageShell } from "@/components/SiteChrome";
 import { formatCFA } from "@/lib/currency";
@@ -29,7 +28,7 @@ export const Route = createFileRoute("/menu")({
   component: MenuPage,
 });
 
-const MENU_MOMENTS: { label: string; categories: MenuCategory[]; intro: string }[] = [
+const MENU_MOMENTS: { label: string; categories: string[]; intro: string }[] = [
   {
     label: "Matin & brunch",
     categories: ["Petit déjeuner", "Formule déjeuner", "Pâtisseries et viennoiseries"],
@@ -78,9 +77,46 @@ const MENU_MOMENTS: { label: string; categories: MenuCategory[]; intro: string }
 ];
 
 function MenuPage() {
-  const [category, setCategory] = useState<MenuCategory>("Petit déjeuner");
+  const [category, setCategory] = useState<string>("Petit déjeuner");
   const [query, setQuery] = useState("");
-  const { products: menuProducts, isLoading: menuLoading, isRemote } = useMenuCatalog();
+  const {
+    products: menuProducts,
+    categories: menuCategories,
+    isLoading: menuLoading,
+    isRemote,
+  } = useMenuCatalog();
+  const moments = useMemo(() => {
+    const available = new Set(menuCategories.map((item) => item.name));
+    const sortByConfiguredOrder = (first: string, second: string) => {
+      const firstOrder = menuCategories.find((item) => item.name === first)?.sort_order ?? 0;
+      const secondOrder = menuCategories.find((item) => item.name === second)?.sort_order ?? 0;
+      return firstOrder - secondOrder || first.localeCompare(second, "fr");
+    };
+    const configured = MENU_MOMENTS.map((moment) => ({
+      ...moment,
+      categories: moment.categories
+        .filter((name) => available.has(name))
+        .sort(sortByConfiguredOrder),
+    })).filter((moment) => moment.categories.length > 0);
+    const known = new Set(MENU_MOMENTS.flatMap((moment) => moment.categories));
+    const additional = menuCategories
+      .filter((item) => !known.has(item.name))
+      .map((item) => item.name)
+      .sort(sortByConfiguredOrder);
+    if (additional.length) {
+      configured.push({
+        label: "Autres",
+        categories: additional,
+        intro: "Découvrez les nouvelles catégories ajoutées à la carte.",
+      });
+    }
+    return configured;
+  }, [menuCategories]);
+  useEffect(() => {
+    if (menuCategories.length && !menuCategories.some((item) => item.name === category)) {
+      setCategory(menuCategories[0]!.name);
+    }
+  }, [category, menuCategories]);
   const normalizedQuery = query.trim().toLocaleLowerCase("fr");
   const products = useMemo(
     () =>
@@ -91,7 +127,7 @@ function MenuPage() {
       }),
     [category, menuProducts, normalizedQuery],
   );
-  const activeMoment = MENU_MOMENTS.find((moment) => moment.categories.includes(category));
+  const activeMoment = moments.find((moment) => moment.categories.includes(category));
   const categoryCount = menuProducts.filter((product) => product.category === category).length;
 
   return (
@@ -123,7 +159,7 @@ function MenuPage() {
             </div>
             <div>
               <strong className="block font-display text-2xl text-accent">
-                {MENU_CATEGORIES.length}
+                {menuCategories.length}
               </strong>
               <span className="text-primary-foreground/65">catégories</span>
             </div>
@@ -136,7 +172,7 @@ function MenuPage() {
             role="tablist"
             aria-label="Moments de la carte"
           >
-            {MENU_MOMENTS.map((moment) => {
+            {moments.map((moment) => {
               const active = moment.categories.includes(category);
               return (
                 <button

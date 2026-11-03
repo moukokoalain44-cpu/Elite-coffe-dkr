@@ -1,11 +1,6 @@
-import { supabase } from "@/lib/supabase";
+import { resolveMenuImageUrl } from "@/lib/menu-images";
 
-/**
- * Resolve both legacy public URLs and the Storage paths used by new uploads.
- * Do not use Supabase image transformations here: they are not enabled on
- * every project and can return a 404 for a newly uploaded object.
- */
+/** Resolve catalogue object paths to public menu-images URLs; leave external URLs intact. */
 export function getOptimizedMenuImageUrl(source: string): string {
-  if (/^(https?:\/\/|data:|\/)/.test(source)) return source;
-  return supabase.storage.from("menu-images").getPublicUrl(source).data.publicUrl;
+  return resolveMenuImageUrl(source);
 }

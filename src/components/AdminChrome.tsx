@@ -29,7 +29,7 @@ const nav = [
   { label: "Réservations", to: "/admin/registrations", icon: Users },
   { label: "Clients", to: "/admin/clients", icon: UsersRound },
   { label: "Communication", to: "/admin/communication", icon: MessageCircle },
-  { label: "Catalogue", to: "/admin/catalog", icon: Package },
+  { label: "Gestion du menu", to: "/admin/catalog", icon: Package },
   { label: "Galerie", to: "/admin/gallery", icon: Image },
   { label: "Contenu", to: "/admin/content", icon: FileText },
 ];
