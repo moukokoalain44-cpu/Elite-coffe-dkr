@@ -2,7 +2,7 @@ import { formatCatalogError } from "@/lib/catalog-admin";
 import { supabase } from "@/lib/supabase";
 
 export const MENU_IMAGES_BUCKET = "menu-images";
-export const MAX_MENU_IMAGE_BYTES = 5 * 1024 * 1024;
+export const MAX_MENU_IMAGE_BYTES = 15 * 1024 * 1024;
 export const MENU_IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 
 function extensionForType(type: string): string {
@@ -19,7 +19,7 @@ export async function uploadMenuImage(file: File): Promise<string> {
   }
   if (file.size > MAX_MENU_IMAGE_BYTES) {
     throw new Error(
-      `[uploadMenuImage] storage.objects (bucket=${MENU_IMAGES_BUCKET}, SIZE): l’image dépasse 5 Mo.`,
+      `[uploadMenuImage] storage.objects (bucket=${MENU_IMAGES_BUCKET}, SIZE): l’image dépasse 15 Mo.`,
     );
   }
 

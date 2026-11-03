@@ -299,7 +299,7 @@ function CatalogPage() {
       return;
     }
     if (file.size > MAX_MENU_IMAGE_BYTES) {
-      toast.error("Image trop volumineuse", { description: "La limite est de 5 Mo." });
+      toast.error("Image trop volumineuse", { description: "La limite est de 15 Mo." });
       return;
     }
     setImageFile(file);
@@ -1000,7 +1000,7 @@ function CatalogPage() {
                     />
                   </span>
                   <span className="mt-1 block text-[11px] font-normal text-[#9b8d91]">
-                    Bucket menu-images · maximum 5 Mo.
+                    Bucket menu-images · maximum 15 Mo.
                   </span>
                 </label>
               </div>

@@ -14,13 +14,24 @@ type SupabaseFailure = {
   message?: string;
   details?: string | null;
   hint?: string | null;
+  status?: number | string;
+  statusCode?: number | string;
+  name?: string;
 };
 
 export function formatCatalogError(action: string, resource: string, failure: unknown): Error {
   const error = failure as SupabaseFailure;
-  const code = error?.code || "UNKNOWN";
+  const statusCode = error?.statusCode ?? error?.status;
+  const code = error?.code || (statusCode ? `HTTP_${statusCode}` : "UNKNOWN");
   const message = error?.message || String(failure || "Erreur inconnue");
-  const extra = [error?.details, error?.hint].filter(Boolean).join(" | ");
+  const extra = [
+    error?.details,
+    error?.hint,
+    statusCode ? `HTTP status: ${statusCode}` : null,
+    error?.name ? `SDK error: ${error.name}` : null,
+  ]
+    .filter(Boolean)
+    .join(" | ");
   return new Error(`[${action}] ${resource} (${code}): ${message}${extra ? ` — ${extra}` : ""}`);
 }
 

@@ -388,7 +388,7 @@ create policy "admin_manage_site_media_assets" on public.site_media_assets for a
 
 -- ── Stockage des médias du site et des images de plats ─────
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('menu-images', 'menu-images', true, 5242880, array['image/jpeg', 'image/png', 'image/webp']::text[])
+values ('menu-images', 'menu-images', true, 15728640, array['image/jpeg', 'image/png', 'image/webp']::text[])
 on conflict (id) do update
 set name = excluded.name, public = excluded.public,
     file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;

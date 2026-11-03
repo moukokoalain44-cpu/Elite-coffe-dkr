@@ -26,7 +26,7 @@ vi.mock("@/lib/supabase", () => ({
   },
 }));
 
-import { adminSaveProduct } from "@/lib/catalog-admin";
+import { adminSaveProduct, formatCatalogError } from "@/lib/catalog-admin";
 import { uploadMenuImage } from "@/lib/menu-images";
 
 const imageUrl =
@@ -86,8 +86,8 @@ describe("menu image storage and database flow", () => {
 
   it("does not call Storage for unsupported or oversized files", async () => {
     await expect(uploadMenuImage(imageFile("image/gif"))).rejects.toThrow("MIME");
-    await expect(uploadMenuImage(imageFile("image/png", 5 * 1024 * 1024 + 1))).rejects.toThrow(
-      "5 Mo",
+    await expect(uploadMenuImage(imageFile("image/png", 15 * 1024 * 1024 + 1))).rejects.toThrow(
+      "15 Mo",
     );
     expect(mocks.storageBucket.upload).not.toHaveBeenCalled();
   });
@@ -102,6 +102,20 @@ describe("menu image storage and database flow", () => {
       "uploadMenuImage] storage.objects (bucket=menu-images) (42501)",
     );
     expect(mocks.from).not.toHaveBeenCalled();
+  });
+
+  it("preserves the HTTP status and SDK error name when Storage has no JSON error code", () => {
+    const error = formatCatalogError("uploadMenuImage", "storage.objects", {
+      name: "StorageApiError",
+      status: 400,
+      statusCode: "400",
+      message: "HTTP 400 error",
+    });
+
+    expect(error.message).toContain("(HTTP_400): HTTP 400 error");
+    expect(error.message).toContain("HTTP status: 400");
+    expect(error.message).toContain("SDK error: StorageApiError");
+    expect(error.message).not.toContain("UNKNOWN");
   });
 
   it("saves the uploaded public URL and category relation in menu_products", async () => {
