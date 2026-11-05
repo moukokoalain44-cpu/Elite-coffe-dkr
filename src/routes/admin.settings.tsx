@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Check, ImagePlus, ShieldCheck, UserRound } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AdminCard, AdminPageHeader } from "@/components/AdminChrome";
 import { useAdminAuth } from "@/contexts/AuthContext";
+import { isInlineAvatarDataUri, saveAdminAvatarProfile } from "@/lib/admin-avatar";
+import { uploadSiteMedia } from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin/settings")({ component: SettingsPage });
 
@@ -11,29 +13,76 @@ function SettingsPage() {
   const { session, updateProfile } = useAdminAuth();
   const [name, setName] = useState("Oripio Studio");
   const [avatar, setAvatar] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
+  const initialized = useRef(false);
+  const previewObjectUrl = useRef<string | null>(null);
+
   useEffect(() => {
-    const metadata = session?.user.user_metadata ?? {};
+    if (!session || initialized.current) return;
+    initialized.current = true;
+    const metadata = session.user.user_metadata ?? {};
+    const savedAvatar = String(metadata["avatar_url"] ?? "");
     setName(String(metadata["full_name"] ?? "Oripio Studio"));
-    setAvatar(String(metadata["avatar_url"] ?? ""));
+    setAvatar(savedAvatar);
+    setAvatarPreview(savedAvatar);
   }, [session]);
+
+  useEffect(
+    () => () => {
+      if (previewObjectUrl.current) URL.revokeObjectURL(previewObjectUrl.current);
+    },
+    [],
+  );
+
   const save = async () => {
+    const displayName = name.trim() || "Administrateur";
+    const existingAvatar = avatar;
+    setSaving(true);
+
     try {
-      await updateProfile({ name: name.trim() || "Administrateur", avatar });
+      const nextAvatar = await saveAdminAvatarProfile({
+        name: displayName,
+        avatar: existingAvatar,
+        avatarFile,
+        updateProfile,
+        uploadFile: (file) => uploadSiteMedia(file, "admin-avatar"),
+      });
+      setName(displayName);
+      setAvatar(nextAvatar);
+      setAvatarFile(null);
+      if (previewObjectUrl.current) {
+        URL.revokeObjectURL(previewObjectUrl.current);
+        previewObjectUrl.current = null;
+      }
+      setAvatarPreview(nextAvatar);
       toast.success("Profil administrateur enregistré dans votre compte");
-    } catch {
-      toast.error("Impossible d’enregistrer le profil administrateur");
+    } catch (error) {
+      toast.error("Impossible d’enregistrer le profil administrateur", {
+        description: error instanceof Error ? error.message : "Une erreur inconnue est survenue.",
+      });
+    } finally {
+      setSaving(false);
     }
   };
+
   const chooseAvatar = (file: File | undefined) => {
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      toast.error("Choisissez une image");
+    const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
+    if (!allowedTypes.has(file.type)) {
+      toast.error("Format d’avatar non pris en charge", {
+        description: "Choisissez une image JPEG, PNG, WebP ou AVIF.",
+      });
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => setAvatar(String(reader.result));
-    reader.readAsDataURL(file);
+
+    if (previewObjectUrl.current) URL.revokeObjectURL(previewObjectUrl.current);
+    previewObjectUrl.current = URL.createObjectURL(file);
+    setAvatarFile(file);
+    setAvatarPreview(previewObjectUrl.current);
   };
+
   return (
     <>
       <AdminPageHeader
@@ -44,9 +93,10 @@ function SettingsPage() {
           <button
             type="button"
             onClick={() => void save()}
-            className="flex items-center gap-2 rounded-2xl bg-[#3a2d33] px-4 py-3 text-sm font-bold text-white"
+            disabled={saving}
+            className="flex items-center gap-2 rounded-2xl bg-[#3a2d33] px-4 py-3 text-sm font-bold text-white disabled:cursor-wait disabled:opacity-60"
           >
-            <Check size={16} /> Enregistrer
+            <Check size={16} /> {saving ? "Enregistrement…" : "Enregistrer"}
           </button>
         }
       />
@@ -66,9 +116,9 @@ function SettingsPage() {
           <div className="mt-6 space-y-5">
             <div className="flex items-center gap-4">
               <div className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-3xl bg-[#fbe9ef] text-lg font-bold text-[#a5365f]">
-                {avatar ? (
+                {avatarPreview ? (
                   <img
-                    src={avatar}
+                    src={avatarPreview}
                     alt="Avatar administrateur"
                     className="size-full object-cover"
                   />
@@ -80,7 +130,7 @@ function SettingsPage() {
                 <ImagePlus size={16} /> Choisir un avatar
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp,image/avif"
                   className="sr-only"
                   onChange={(event) => {
                     chooseAvatar(event.target.files?.[0]);
@@ -89,6 +139,11 @@ function SettingsPage() {
                 />
               </label>
             </div>
+            <p className="text-xs text-[#93878d]">
+              L’image est stockée dans Storage; seul son URL est conservé dans le profil.
+              {isInlineAvatarDataUri(avatar) &&
+                " L’ancien avatar intégré sera migré lors de l’enregistrement."}
+            </p>
             <label className="block text-sm font-bold">
               Nom affiché
               <input

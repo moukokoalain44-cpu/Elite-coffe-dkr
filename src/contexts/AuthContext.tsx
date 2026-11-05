@@ -7,7 +7,7 @@ type AuthContextValue = {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  updateProfile: (profile: { name: string; avatar: string }) => Promise<void>;
+  updateProfile: (profile: { name: string; avatar: string | null }) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -46,6 +46,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (error) throw error;
       },
       updateProfile: async ({ name, avatar }) => {
+        if (avatar?.startsWith("data:")) {
+          throw new Error(
+            "L’avatar doit être téléversé dans le stockage, pas dans les métadonnées.",
+          );
+        }
         const { error } = await supabase.auth.updateUser({
           data: { full_name: name, avatar_url: avatar || null },
         });
