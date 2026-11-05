@@ -64,11 +64,13 @@ function AdminLoginPage() {
     <main className="min-h-screen bg-[#f4f3f4] text-[#2c252a]">
       <div className="grid min-h-screen lg:grid-cols-[minmax(0,1.1fr)_minmax(460px,0.9fr)]">
         <section className="relative isolate flex min-h-[330px] flex-col justify-between overflow-hidden bg-[#3f3639] px-6 py-7 text-white sm:px-10 sm:py-9 lg:min-h-screen lg:px-14 lg:py-12">
-          <img
-            src={loginCover.url}
-            alt=""
-            className="absolute inset-0 -z-20 size-full object-cover"
-          />
+          {loginCover.url && (
+            <img
+              src={loginCover.url}
+              alt=""
+              className="absolute inset-0 -z-20 size-full object-cover"
+            />
+          )}
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#3f3639]/80 via-[#5b4c52]/45 to-[#2c252a]/85" />
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_15%_10%,rgba(216,95,130,.24),transparent_45%)]" />
 

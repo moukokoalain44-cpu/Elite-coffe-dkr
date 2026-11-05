@@ -3,6 +3,9 @@ import { ArrowLeft, Check } from "lucide-react";
 import { getProduct } from "@/data/catalog";
 import { PageShell } from "@/components/SiteChrome";
 import { formatCFA } from "@/lib/currency";
+import { useMenuCatalog } from "@/hooks/use-menu-catalog";
+import { getOptimizedMenuImageUrl } from "@/lib/image-url";
+import { MenuProductImage } from "@/components/MenuProductImage";
 
 export const Route = createFileRoute("/menu/$id")({
   head: () => ({
@@ -27,15 +30,16 @@ export const Route = createFileRoute("/menu/$id")({
 
 function ProductPage() {
   const { id } = useParams({ from: "/menu/$id" });
-  const product = getProduct(id);
+  const { products } = useMenuCatalog();
+  const product = products.find((item) => item.id === id) ?? getProduct(id);
   if (!product) throw notFound();
   const unitPrice = product.price;
   return (
     <PageShell eyebrow={product.category} title={product.name} description={product.description}>
       <section className="mx-auto grid max-w-7xl gap-10 px-4 pb-20 md:px-6 lg:grid-cols-[1.05fr_.95fr] lg:items-start">
         <div className="overflow-hidden rounded-[2rem] bg-secondary shadow-lift">
-          <img
-            src={product.image}
+          <MenuProductImage
+            src={product.image ? getOptimizedMenuImageUrl(product.image) : null}
             alt={product.name}
             className="aspect-[4/3] w-full object-cover lg:aspect-[4/5]"
           />

@@ -354,17 +354,18 @@ function CatalogPage() {
 
     setSavingProduct(true);
     const oldImage = editingProduct?.image_url ?? null;
+    const productId = editingProduct?.id ?? newProductId(selectedCategory.name, productForm.name);
     let uploadedUrl: string | null = null;
     let databaseWriteAttempted = false;
     try {
       let nextImage = productForm.image_url;
       if (imageFile) {
-        uploadedUrl = await uploadMenuImage(imageFile);
+        uploadedUrl = await uploadMenuImage(imageFile, productId);
         nextImage = uploadedUrl;
       }
       databaseWriteAttempted = true;
       await adminSaveProduct({
-        id: editingProduct?.id ?? newProductId(selectedCategory.name, productForm.name),
+        id: productId,
         name: productForm.name,
         category: selectedCategory.name,
         category_id: selectedCategory.id,

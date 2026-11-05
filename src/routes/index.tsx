@@ -21,6 +21,8 @@ import { useAdmin } from "@/contexts/AdminContext";
 import { SiteHeader } from "@/components/SiteChrome";
 import { MediaRenderer } from "@/components/MediaRenderer";
 import { formatCFA } from "@/lib/currency";
+import { MenuProductImage } from "@/components/MenuProductImage";
+import { getOptimizedMenuImageUrl } from "@/lib/image-url";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -161,20 +163,22 @@ function Hero() {
       id="home"
       className="relative isolate min-h-[42rem] overflow-hidden bg-primary text-primary-foreground md:min-h-[48rem]"
     >
-      <video
-        src={media?.url}
-        poster={posterMedia?.url ?? "/assets/instagram/hero-brunch.jpg"}
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 z-0 size-full object-cover object-center transition-transform duration-300"
-        style={{
-          filter: `blur(${Math.round(scrollProgress * 5)}px)`,
-          transform: `translate3d(0, ${scrollProgress * 18}px, 0) scale(${1.02 + scrollProgress * 0.035})`,
-        }}
-        aria-label={media?.alt_text ?? "Ambiance Elite Coffee"}
-      />
+      {media?.url && (
+        <video
+          src={media.url}
+          poster={posterMedia?.url || undefined}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 z-0 size-full object-cover object-center transition-transform duration-300"
+          style={{
+            filter: `blur(${Math.round(scrollProgress * 5)}px)`,
+            transform: `translate3d(0, ${scrollProgress * 18}px, 0) scale(${1.02 + scrollProgress * 0.035})`,
+          }}
+          aria-label={media.alt_text || "Ambiance Elite Coffee"}
+        />
+      )}
       <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(91,56,38,.52)_0%,rgba(91,56,38,.2)_42%,rgba(32,26,23,.82)_100%)]" />
       <div className="relative z-20 mx-auto flex min-h-[42rem] max-w-7xl items-center justify-center px-5 pb-20 pt-32 text-center md:min-h-[48rem] md:px-8 md:pb-24">
         <Reveal className="flex max-w-4xl flex-col items-center">
@@ -338,19 +342,21 @@ function DishShowcase({ products }: { products: Product[] }) {
       <SectionHead
         badge={<Pill icon={<Heart size={14} />}>À la carte</Pill>}
         title="Découvrez nos plats"
-        sub="Trois envies, trois images de la carte, renouvelées au fil du temps."
+        sub="Trois suggestions de la carte, renouvelées au fil du temps."
       />
       <div className="flex snap-x gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-3 md:overflow-visible">
         {visible.map((dish, index) => (
           <Reveal key={`${dish.id}-${index}`} className="min-w-[78vw] snap-center md:min-w-0">
             <article className="group relative overflow-hidden rounded-[1.75rem] bg-primary text-primary-foreground shadow-lift">
-              <img
-                src={dish.image}
+              <MenuProductImage
+                src={dish.image ? getOptimizedMenuImageUrl(dish.image) : null}
                 alt={dish.name}
                 className="aspect-[4/5] w-full object-cover transition duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/20 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
+              {dish.image && (
+                <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/20 to-transparent" />
+              )}
+              <div className={dish.image ? "absolute inset-x-0 bottom-0 p-5 md:p-6" : "p-5 md:p-6"}>
                 <span className="rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-[.14em] text-primary">
                   {dish.category}
                 </span>

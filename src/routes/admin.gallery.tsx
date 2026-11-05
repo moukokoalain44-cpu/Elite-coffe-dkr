@@ -68,14 +68,15 @@ function GalleryAdminPage() {
   });
 
   useEffect(() => {
-    const refresh = () => fetchSiteMedia()
-      .then((rows) => {
-        if (!rows.length) return;
-        const withLoginCover = keepLoginCover(mergeSiteMediaDefaults(rows));
-        setMedia(withLoginCover);
-        setDraft((current) => ({ ...current, id: createGalleryKey(withLoginCover) }));
-      })
-      .catch(() => undefined);
+    const refresh = () =>
+      fetchSiteMedia()
+        .then((rows) => {
+          if (!rows.length) return;
+          const withLoginCover = keepLoginCover(mergeSiteMediaDefaults(rows));
+          setMedia(withLoginCover);
+          setDraft((current) => ({ ...current, id: createGalleryKey(withLoginCover) }));
+        })
+        .catch(() => undefined);
     void refresh();
     const timer = window.setInterval(refresh, 30_000);
     return () => window.clearInterval(timer);
@@ -147,6 +148,7 @@ function GalleryAdminPage() {
         ...loginCover,
         label: "Visuel de connexion administrateur",
         media_type: "image",
+        is_visible: true,
       });
       return;
     }
@@ -157,6 +159,7 @@ function GalleryAdminPage() {
         ...item,
         url,
         media_type: file.type.startsWith("video/") ? ("video" as const) : ("image" as const),
+        is_visible: true,
       };
       setMedia((items) => items.map((current) => (current.id === item.id ? next : current)));
       await saveSiteMedia(next);
@@ -202,7 +205,12 @@ function GalleryAdminPage() {
       const url = loginCoverFile
         ? await uploadSiteMedia(loginCoverFile, ADMIN_LOGIN_MEDIA_ID)
         : loginCoverPreview.url;
-      const savedCover = { ...loginCoverPreview, url, media_type: "image" as const };
+      const savedCover = {
+        ...loginCoverPreview,
+        url,
+        media_type: "image" as const,
+        is_visible: true,
+      };
       await saveSiteMedia(savedCover);
       setMedia((items) =>
         items.some((item) => item.id === ADMIN_LOGIN_MEDIA_ID)
@@ -310,20 +318,27 @@ function GalleryAdminPage() {
               <div key={item.id} className="rounded-2xl border border-[#eee8e8] bg-[#fdfbfc] p-4">
                 <div className="flex gap-3">
                   <div className="size-20 shrink-0 overflow-hidden rounded-xl bg-[#fbe9ef]">
-                    {cardItem.media_type === "video" ? (
-                      <video
-                        src={cardItem.url}
-                        muted
-                        autoPlay
-                        loop
-                        className="size-full object-cover"
-                      />
+                    {cardItem.url ? (
+                      cardItem.media_type === "video" ? (
+                        <video
+                          src={cardItem.url}
+                          muted
+                          autoPlay
+                          loop
+                          className="size-full object-cover"
+                        />
+                      ) : (
+                        <img
+                          src={cardItem.url}
+                          alt={cardItem.alt_text}
+                          className="size-full object-cover"
+                        />
+                      )
                     ) : (
-                      <img
-                        src={cardItem.url}
-                        alt={cardItem.alt_text}
-                        className="size-full object-cover"
-                      />
+                      <div className="grid size-full place-content-center justify-items-center gap-1 text-[#a5365f]">
+                        <Image size={18} aria-hidden="true" />
+                        <span className="text-[9px] font-semibold">À téléverser</span>
+                      </div>
                     )}
                   </div>
                   <div className="min-w-0">
@@ -345,11 +360,18 @@ function GalleryAdminPage() {
                 </div>
                 {isLoginCover && (
                   <div className="relative mt-4 aspect-[16/8] overflow-hidden rounded-xl bg-[#eee8e1]">
-                    <img
-                      src={displayedLoginCover.url}
-                      alt={displayedLoginCover.alt_text}
-                      className="size-full object-cover"
-                    />
+                    {displayedLoginCover.url ? (
+                      <img
+                        src={displayedLoginCover.url}
+                        alt={displayedLoginCover.alt_text}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      <div className="grid size-full place-content-center justify-items-center gap-2 text-[#a5365f]">
+                        <Image size={28} aria-hidden="true" />
+                        <span className="text-sm font-semibold">Visuel à téléverser</span>
+                      </div>
+                    )}
                     <span className="absolute bottom-3 left-3 rounded-full bg-[#211811]/80 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
                       {loginCoverPreview
                         ? "Aperçu avant enregistrement"

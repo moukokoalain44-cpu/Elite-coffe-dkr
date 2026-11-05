@@ -229,8 +229,8 @@ function ReservationPage() {
               media={
                 reservationMedia ?? {
                   media_type: "image",
-                  url: "/assets/instagram/brunch-table.jpg",
-                  alt_text: "Table Elite Coffee",
+                  url: "",
+                  alt_text: "Image officielle de réservation à téléverser",
                 }
               }
               className="h-64 w-full object-cover"

@@ -48,7 +48,7 @@ function GalleryPage() {
               key={item.id}
               className={`group min-h-52 overflow-hidden rounded-2xl bg-card shadow-soft md:min-h-0 ${frameClasses(index)}`}
             >
-              {item.media_type === "image" || item.media_type === "video" ? (
+              {item.url ? (
                 <button
                   type="button"
                   onClick={() => setSelectedMedia(item)}
@@ -87,7 +87,10 @@ function GalleryPage() {
           >
             <X size={22} />
           </button>
-          <div className="flex max-h-full max-w-6xl flex-col items-center gap-4" onClick={(event) => event.stopPropagation()}>
+          <div
+            className="flex max-h-full max-w-6xl flex-col items-center gap-4"
+            onClick={(event) => event.stopPropagation()}
+          >
             {selectedMedia.media_type === "video" ? (
               <video
                 src={selectedMedia.url}
@@ -105,7 +108,9 @@ function GalleryPage() {
                 className="max-h-[82vh] max-w-full rounded-xl object-contain shadow-2xl"
               />
             )}
-            <p className="text-center text-sm font-medium text-white/90">{selectedMedia.alt_text}</p>
+            <p className="text-center text-sm font-medium text-white/90">
+              {selectedMedia.alt_text}
+            </p>
           </div>
         </div>
       )}

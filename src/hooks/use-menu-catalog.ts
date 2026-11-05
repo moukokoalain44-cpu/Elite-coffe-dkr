@@ -14,7 +14,7 @@ function fromRemote(row: MenuProductRow): Product {
   return {
     ...(fallback ?? {
       id: row.id,
-      image: "/assets/instagram/hero-brunch.jpg",
+      image: "",
       ingredients: [],
       brewingMethod: "Préparé à la commande.",
     }),
@@ -25,7 +25,7 @@ function fromRemote(row: MenuProductRow): Product {
     priceOptions: row.price_options ?? [],
     ...(row.availability_note ? { availabilityNote: row.availability_note } : {}),
     featured: row.featured,
-    image: row.image_url ?? fallback?.image ?? "/assets/instagram/hero-brunch.jpg",
+    image: row.image_url ?? "",
   };
 }
 

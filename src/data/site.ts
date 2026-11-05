@@ -89,8 +89,6 @@ export const MENU_SECTIONS: { label: string; categories: MenuCategory[]; intro: 
   },
 ];
 
-export const ESPRESSO_IMG = "/assets/instagram/coffee-dessert.jpg";
-
 export const CONTACT = {
   phone: "+221 33 824 96 93",
   phones: ["+221 33 824 96 93", "+221 77 506 39 39", "+221 77 507 36 36"],
