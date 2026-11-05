@@ -80,20 +80,22 @@ export function CookieConsentManager() {
       {ready && !savedChoice && (
         <section
           aria-label="Choix des cookies"
-          className="fixed inset-x-3 bottom-3 z-[80] mx-auto max-w-3xl rounded-2xl border border-border bg-card p-5 text-card-foreground shadow-2xl md:inset-x-6 md:bottom-6 md:p-6"
+          className="fixed inset-x-3 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-[80] mx-auto flex max-h-[min(72vh,30rem)] max-w-3xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-2xl md:inset-x-6 md:bottom-6"
         >
-          <h2 className="font-display text-xl font-bold">Votre confidentialité compte</h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Le site ne charge actuellement aucun outil publicitaire ou de mesure d’audience. Vous
-            pouvez mémoriser vos préférences facultatives et les modifier à tout moment. Les choix
-            nécessaires au fonctionnement restent actifs.
-          </p>
-          <p className="mt-2 text-xs text-muted-foreground">
-            <Link to="/cookies" className="underline underline-offset-2">
-              En savoir plus sur les cookies
-            </Link>
-          </p>
-          <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          <div className="overflow-y-auto p-4 pb-2 md:p-6 md:pb-3">
+            <h2 className="font-display text-xl font-bold">Votre confidentialité compte</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Le site ne charge actuellement aucun outil publicitaire ou de mesure d’audience. Vous
+              pouvez mémoriser vos préférences facultatives et les modifier à tout moment. Les choix
+              nécessaires au fonctionnement restent actifs.
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              <Link to="/cookies" className="underline underline-offset-2">
+                En savoir plus sur les cookies
+              </Link>
+            </p>
+          </div>
+          <div className="grid shrink-0 gap-2 border-t border-border bg-card p-4 sm:grid-cols-3 md:p-5">
             <button
               type="button"
               onClick={() => saveChoice({ analytics: true, marketing: true })}

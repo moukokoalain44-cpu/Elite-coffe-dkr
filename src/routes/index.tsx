@@ -161,7 +161,7 @@ function Hero() {
   return (
     <section
       id="home"
-      className="relative isolate min-h-[42rem] overflow-hidden bg-primary text-primary-foreground md:min-h-[48rem]"
+      className="relative isolate min-h-[clamp(34rem,88svh,42rem)] overflow-hidden bg-primary text-primary-foreground md:min-h-[48rem]"
     >
       {media?.url && (
         <video
@@ -180,13 +180,13 @@ function Hero() {
         />
       )}
       <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(91,56,38,.52)_0%,rgba(91,56,38,.2)_42%,rgba(32,26,23,.82)_100%)]" />
-      <div className="relative z-20 mx-auto flex min-h-[42rem] max-w-7xl items-center justify-center px-5 pb-20 pt-32 text-center md:min-h-[48rem] md:px-8 md:pb-24">
+      <div className="relative z-20 mx-auto flex min-h-[clamp(34rem,88svh,42rem)] max-w-7xl items-center justify-center px-5 pb-20 pt-28 text-center md:min-h-[48rem] md:px-8 md:pb-24">
         <Reveal className="flex max-w-4xl flex-col items-center">
           <p className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/25 bg-primary/20 px-4 py-2 text-[10px] font-bold uppercase tracking-[.2em] text-primary-foreground/85 backdrop-blur-sm">
             <span className="size-2 rounded-full bg-accent shadow-[0_0_0_4px_rgba(216,137,74,.18)]" />
             {BRAND.tagline} · Dakar
           </p>
-          <h1 className="mt-7 max-w-4xl font-display text-5xl font-bold leading-none tracking-[-.06em] text-primary-foreground sm:text-6xl md:text-8xl">
+          <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.65rem,11vw,5rem)] font-bold leading-none tracking-[-.06em] text-primary-foreground md:text-8xl">
             {content.heroTitle}
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-7 text-primary-foreground/75 sm:text-lg">
@@ -344,7 +344,10 @@ function DishShowcase({ products }: { products: Product[] }) {
         title="Découvrez nos plats"
         sub="Trois suggestions de la carte, renouvelées au fil du temps."
       />
-      <div className="flex snap-x gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-3 md:overflow-visible">
+      <p className="mb-3 text-center text-xs text-muted-foreground md:hidden">
+        Faites glisser pour voir plus
+      </p>
+      <div className="flex snap-x gap-4 overflow-x-auto pb-4 pr-8 [scrollbar-width:thin] md:grid md:grid-cols-3 md:overflow-visible md:pr-0">
         {visible.map((dish, index) => (
           <Reveal key={`${dish.id}-${index}`} className="min-w-[78vw] snap-center md:min-w-0">
             <article className="group relative overflow-hidden rounded-[1.75rem] bg-primary text-primary-foreground shadow-lift">

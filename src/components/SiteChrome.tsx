@@ -1,5 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, HelpCircle, Images, Info, Menu, MessageCircle, Utensils, X } from "lucide-react";
+import {
+  BookOpen,
+  Images,
+  Info,
+  Menu,
+  MessageCircle,
+  MoreHorizontal,
+  Utensils,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { WHATSAPP_CONTACT_URL } from "@/data/site";
 import { OPEN_COOKIE_SETTINGS_EVENT } from "@/components/CookieConsentManager";
@@ -18,7 +27,6 @@ const mobileLinks = [
   ["Galerie", "/galerie", Images],
   ["Réserver", "/reserver", BookOpen],
   ["Infos", "/infos", Info],
-  ["FAQ", "/faq", HelpCircle],
 ] as const;
 
 export function SiteHeader() {
@@ -87,7 +95,10 @@ export function SiteHeader() {
           </div>
         </div>
         {mobileOpen && (
-          <div className="max-h-[calc(100vh-68px)] overflow-y-auto border-t border-white/15 bg-primary/95 px-4 py-4 shadow-[0_18px_35px_-22px_rgba(0,0,0,.8)] lg:hidden">
+          <div
+            id="mobile-more-menu"
+            className="max-h-[calc(100vh-68px)] overflow-y-auto border-t border-white/15 bg-primary/95 px-4 py-4 shadow-[0_18px_35px_-22px_rgba(0,0,0,.8)] lg:hidden"
+          >
             <div className="flex flex-col gap-1 text-sm font-medium text-primary-foreground/75">
               <Link
                 to="/reserver"
@@ -135,6 +146,20 @@ export function SiteHeader() {
               <span>{label}</span>
             </Link>
           ))}
+          <button
+            type="button"
+            onClick={() => setMobileOpen((open) => !open)}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-more-menu"
+            className={`relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-semibold ${mobileOpen ? "bg-accent/15 text-accent ring-1 ring-inset ring-accent/40" : "text-primary-foreground/60 hover:text-primary-foreground"}`}
+          >
+            {mobileOpen ? (
+              <X className="size-4" aria-hidden="true" />
+            ) : (
+              <MoreHorizontal className="size-4" aria-hidden="true" />
+            )}
+            <span>Plus</span>
+          </button>
         </div>
       </nav>
     </header>

@@ -180,7 +180,20 @@ function MenuPage() {
                   key={moment.label}
                   type="button"
                   role="tab"
+                  id={`menu-tab-${moments.indexOf(moment)}`}
+                  aria-controls="menu-panel"
                   aria-selected={active}
+                  tabIndex={active ? 0 : -1}
+                  onKeyDown={(event) => {
+                    if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(event.key))
+                      return;
+                    event.preventDefault();
+                    const offset = event.key === "ArrowRight" || event.key === "ArrowDown" ? 1 : -1;
+                    const next =
+                      (moments.indexOf(moment) + offset + moments.length) % moments.length;
+                    setCategory(moments[next]!.categories[0]!);
+                    document.getElementById(`menu-tab-${next}`)?.focus();
+                  }}
                   onClick={() => setCategory(moment.categories[0]!)}
                   className={`whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${active ? "bg-primary text-primary-foreground shadow-soft" : "bg-secondary text-foreground hover:bg-primary/10"}`}
                 >
@@ -231,7 +244,15 @@ function MenuPage() {
             </div>
           </aside>
 
-          <div>
+          <div
+            id="menu-panel"
+            role="tabpanel"
+            aria-labelledby={`menu-tab-${Math.max(
+              0,
+              moments.findIndex((moment) => moment.categories.includes(category)),
+            )}`}
+            tabIndex={0}
+          >
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent">
