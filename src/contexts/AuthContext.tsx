@@ -55,6 +55,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           data: { full_name: name, avatar_url: avatar || null },
         });
         if (error) throw error;
+
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) throw refreshError;
       },
     }),
     [loading, session],
