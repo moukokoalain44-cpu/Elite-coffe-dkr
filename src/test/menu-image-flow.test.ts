@@ -96,6 +96,7 @@ describe("menu image storage and database flow", () => {
       "/api/menu-images",
       expect.objectContaining({
         method: "POST",
+        credentials: "omit",
         headers: { Authorization: "Bearer test-admin-token" },
       }),
     );

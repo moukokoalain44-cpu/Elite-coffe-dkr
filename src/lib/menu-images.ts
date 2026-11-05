@@ -29,6 +29,7 @@ export async function uploadMenuImage(file: File, productId?: string): Promise<s
 
   const response = await fetch("/api/menu-images", {
     method: "POST",
+    credentials: "omit",
     headers: { Authorization: `Bearer ${accessToken}` },
     body: formData,
   });
