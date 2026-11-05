@@ -17,7 +17,6 @@ const mocks = vi.hoisted(() => {
     from: vi.fn(),
     storageFrom: vi.fn(),
     getSession: vi.fn(),
-    fetch: vi.fn(),
   };
 });
 
@@ -61,12 +60,6 @@ describe("menu image storage and database flow", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubGlobal("crypto", { randomUUID: () => "test-uuid" });
-    vi.stubGlobal("fetch", mocks.fetch);
-    mocks.fetch.mockResolvedValue({
-      ok: true,
-      status: 201,
-      json: async () => ({ path: storagePath }),
-    });
     mocks.getSession.mockResolvedValue({
       data: { session: { access_token: "test-admin-token" } },
       error: null,
@@ -88,28 +81,16 @@ describe("menu image storage and database flow", () => {
     vi.unstubAllGlobals();
   });
 
-  it("sends the image as multipart to Express and resolves its public Storage URL", async () => {
+  it("uploads the image directly to Supabase Storage and resolves its public URL", async () => {
     await expect(uploadMenuImage(imageFile(), "cafe-test")).resolves.toBe(imageUrl);
 
     expect(mocks.getSession).toHaveBeenCalledTimes(1);
-    expect(mocks.fetch).toHaveBeenCalledWith(
-      "/api/menu-images",
-      expect.objectContaining({
-        method: "POST",
-        credentials: "omit",
-        headers: { Authorization: "Bearer test-admin-token" },
-      }),
+    expect(mocks.storageBucket.upload).toHaveBeenCalledWith(
+      "plats/cafe-test/test-uuid.png",
+      expect.any(File),
+      { cacheControl: "3600", contentType: "image/png", upsert: false },
     );
-    const requestInit = mocks.fetch.mock.calls[0]?.[1] as RequestInit | undefined;
-    expect(requestInit?.body).toBeInstanceOf(FormData);
-    const formData = requestInit?.body as FormData;
-    expect(formData.get("image")).toBeInstanceOf(File);
-    expect((formData.get("image") as File).name).toBe("cafe.png");
-    expect(formData.get("productId")).toBe("cafe-test");
-    expect(new Headers(requestInit?.headers).has("Content-Type")).toBe(false);
-    expect(mocks.storageFrom).toHaveBeenCalledWith("menu-images");
     expect(mocks.storageBucket.getPublicUrl).toHaveBeenCalledWith(storagePath);
-    expect(mocks.storageBucket.upload).not.toHaveBeenCalled();
   });
 
   it("does not call the backend for unsupported or oversized files", async () => {
@@ -117,24 +98,28 @@ describe("menu image storage and database flow", () => {
     await expect(uploadMenuImage(imageFile("image/png", MAX_MENU_IMAGE_BYTES + 1))).rejects.toThrow(
       "15 Mo",
     );
-    expect(mocks.fetch).not.toHaveBeenCalled();
+    expect(mocks.storageBucket.upload).not.toHaveBeenCalled();
   });
 
   it("does not upload without a valid admin session", async () => {
     mocks.getSession.mockResolvedValueOnce({ data: { session: null }, error: null });
 
     await expect(uploadMenuImage(imageFile())).rejects.toThrow("session administrateur");
-    expect(mocks.fetch).not.toHaveBeenCalled();
+    expect(mocks.storageBucket.upload).not.toHaveBeenCalled();
   });
 
-  it("surfaces a server-side upload error without hiding its details", async () => {
-    mocks.fetch.mockResolvedValueOnce({
-      ok: false,
-      status: 415,
-      json: async () => ({ error: "Type MIME non pris en charge." }),
+  it("surfaces a Storage upload error without hiding its details", async () => {
+    mocks.storageBucket.upload.mockResolvedValueOnce({
+      data: null,
+      error: {
+        name: "StorageApiError",
+        status: 413,
+        statusCode: "413",
+        message: "Payload Too Large",
+      },
     });
 
-    await expect(uploadMenuImage(imageFile())).rejects.toThrow("Type MIME non pris en charge");
+    await expect(uploadMenuImage(imageFile())).rejects.toThrow("Payload Too Large");
   });
 
   it("preserves the HTTP status and SDK error name when Storage has no JSON error code", () => {
