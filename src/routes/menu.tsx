@@ -277,7 +277,7 @@ function MenuPage() {
                 {products.map((product) => (
                   <article
                     key={product.id}
-                    className="group flex min-h-44 flex-col overflow-hidden rounded-3xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+                    className="group flex min-h-44 min-w-0 flex-col overflow-hidden rounded-3xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
                   >
                     <div className="flex gap-4 p-4">
                       <Link to="/menu/$id" params={{ id: product.id }} className="block shrink-0">
@@ -288,9 +288,13 @@ function MenuPage() {
                         />
                       </Link>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-start justify-between gap-3">
-                          <Link to="/menu/$id" params={{ id: product.id }}>
-                            <h3 className="font-display text-xl font-bold leading-tight hover:text-accent">
+                        <div className="flex min-w-0 items-start justify-between gap-3">
+                          <Link
+                            to="/menu/$id"
+                            params={{ id: product.id }}
+                            className="min-w-0 flex-1"
+                          >
+                            <h3 className="break-words font-display text-xl font-bold leading-tight hover:text-accent">
                               {product.name}
                             </h3>
                           </Link>
