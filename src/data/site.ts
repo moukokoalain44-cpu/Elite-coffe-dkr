@@ -91,6 +91,7 @@ export const MENU_SECTIONS: { label: string; categories: MenuCategory[]; intro: 
 
 export const CONTACT = {
   phone: "+221 33 824 96 93",
+  whatsappPhone: "+221 77 506 39 39",
   phones: ["+221 33 824 96 93", "+221 77 506 39 39", "+221 77 507 36 36"],
   email: "elitecoffee2021@gmail.com",
   address: "À l’entrée de la Cité Keur Gorgui, Dakar",
@@ -101,7 +102,10 @@ export const CONTACT = {
     "Horaires et coordonnées vérifiés sur les canaux publics d’Elite Coffee en octobre 2026.",
 };
 
-export const WHATSAPP_CONTACT_URL = `https://wa.me/${CONTACT.phone.replace(/\D/g, "")}?text=${encodeURIComponent("Bonjour Elite Coffee, je souhaite obtenir des informations sur votre restaurant.")}`;
+export const PHONE_CONTACT_URL = `tel:${CONTACT.phone.replace(/\D/g, "")}`;
+export const WHATSAPP_CONTACT_URL = `https://wa.me/${CONTACT.whatsappPhone.replace(/\D/g, "")}?text=${encodeURIComponent("Bonjour Elite Coffee, je souhaite obtenir des informations sur votre restaurant.")}`;
+export const GOOGLE_MAPS_URL =
+  "https://www.google.com/maps/search/?api=1&query=Elite+Coffee+Cité+Keur+Gorgui+Dakar";
 
 export const FOOTER = {
   Explorer: ["Carte", "Adresses", "Traiteur"],

@@ -6,11 +6,12 @@ import {
   Menu,
   MessageCircle,
   MoreHorizontal,
+  Phone,
   Utensils,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { WHATSAPP_CONTACT_URL } from "@/data/site";
+import { PHONE_CONTACT_URL, WHATSAPP_CONTACT_URL } from "@/data/site";
 import { OPEN_COOKIE_SETTINGS_EVENT } from "@/components/CookieConsentManager";
 
 const navLinks = [
@@ -77,6 +78,12 @@ export function SiteHeader() {
             >
               <MessageCircle size={14} /> Nous contacter
             </a>
+            <a
+              href={PHONE_CONTACT_URL}
+              className="hidden items-center gap-1.5 rounded-sm border border-primary-foreground/25 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-primary-foreground/85 transition-all hover:-translate-y-0.5 hover:bg-primary-foreground/10 lg:inline-flex"
+            >
+              <Phone size={14} /> Appeler
+            </a>
             <Link
               to="/reserver"
               className="hidden rounded-sm bg-accent px-4 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-primary shadow-[0_5px_16px_rgba(216,137,74,.18)] transition-all hover:-translate-y-0.5 hover:bg-primary-foreground lg:inline-flex"
@@ -115,6 +122,13 @@ export function SiteHeader() {
                 className="mb-2 inline-flex items-center justify-center gap-2 rounded-xl border border-[#6ed59a]/70 px-4 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[#bdf3ce]"
               >
                 <MessageCircle size={15} /> Nous contacter
+              </a>
+              <a
+                href={PHONE_CONTACT_URL}
+                onClick={() => setMobileOpen(false)}
+                className="mb-2 inline-flex items-center justify-center gap-2 rounded-xl border border-primary-foreground/25 px-4 py-3 text-xs font-bold uppercase tracking-[0.16em] text-primary-foreground/85"
+              >
+                <Phone size={15} /> Appeler le restaurant
               </a>
               {navLinks.map(([label, to]) => (
                 <Link

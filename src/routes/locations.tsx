@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight, Clock3, MapPin, Navigation, Phone } from "lucide-react";
-import { CONTACT } from "@/data/site";
+import { ArrowUpRight, Clock3, Instagram, MapPin, Navigation, Phone } from "lucide-react";
+import { BRAND, CONTACT, GOOGLE_MAPS_URL } from "@/data/site";
 import { Button } from "@/components/ui/button";
 import { PageShell } from "@/components/SiteChrome";
 
@@ -37,13 +37,6 @@ const locations = [
 ];
 
 function LocationsPage() {
-  const directions = (address: string) => {
-    window.open(
-      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
-      "_blank",
-      "noopener,noreferrer",
-    );
-  };
   return (
     <PageShell
       eyebrow="Venez nous voir"
@@ -92,11 +85,21 @@ function LocationsPage() {
               </div>
               <Button
                 type="button"
-                onClick={() => directions(location.address)}
+                asChild
                 className="mt-7 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground hover:-translate-y-0.5 hover:shadow-lift"
               >
-                <Navigation size={16} /> Itinéraire <ArrowUpRight size={15} />
+                <a href={GOOGLE_MAPS_URL} target="_blank" rel="noreferrer">
+                  <Navigation size={16} /> Itinéraire <ArrowUpRight size={15} />
+                </a>
               </Button>
+              <a
+                href={BRAND.instagram}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex items-center gap-2 rounded-full border border-primary/20 px-5 py-3 text-sm font-bold text-primary hover:bg-secondary"
+              >
+                <Instagram size={16} /> Voir Instagram <ArrowUpRight size={15} />
+              </a>
             </article>
           ))}
         </div>

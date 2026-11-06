@@ -1,9 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Clock3, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
+import {
+  Clock3,
+  Instagram,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Navigation,
+  Phone,
+  type LucideIcon,
+} from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { PageShell } from "@/components/SiteChrome";
-import { CONTACT } from "@/data/site";
+import {
+  BRAND,
+  CONTACT,
+  GOOGLE_MAPS_URL,
+  PHONE_CONTACT_URL,
+  WHATSAPP_CONTACT_URL,
+} from "@/data/site";
 import { createContactMessage, registerCustomer } from "@/lib/supabase";
 
 export const Route = createFileRoute("/infos")({ component: InfosPage });
@@ -164,6 +179,22 @@ function InfosPage() {
                 Appelez-nous directement ou passez nous voir à l’entrée de la Cité Keur Gorgui.
               </p>
               <p className="mt-5 font-semibold">{CONTACT.phones.join(" · ")}</p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <a
+                  href={PHONE_CONTACT_URL}
+                  className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary"
+                >
+                  <Phone size={15} /> Appeler
+                </a>
+                <a
+                  href={WHATSAPP_CONTACT_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#6ed59a]/70 px-4 py-2 text-sm font-semibold text-[#bdf3ce]"
+                >
+                  <MessageCircle size={15} /> WhatsApp
+                </a>
+              </div>
             </div>
             <div className="rounded-2xl bg-primary p-6 text-primary-foreground shadow-lift">
               <h3 className="text-2xl font-bold">Newsletter bientôt disponible</h3>
@@ -177,6 +208,24 @@ function InfosPage() {
               >
                 Nous contacter
               </a>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a
+                  href={GOOGLE_MAPS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground"
+                >
+                  <Navigation size={15} /> Google Maps
+                </a>
+                <a
+                  href={BRAND.instagram}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground"
+                >
+                  <Instagram size={15} /> Instagram
+                </a>
+              </div>
             </div>
           </div>
         </div>
