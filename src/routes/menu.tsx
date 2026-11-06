@@ -303,7 +303,7 @@ function MenuPage() {
                             {formatCFA(product.price)}
                           </span>
                         </div>
-                        <p className="mt-2 break-words text-sm leading-5 text-muted-foreground sm:line-clamp-3">
+                        <p className="mt-2 min-w-0 whitespace-normal break-words text-sm leading-5 text-muted-foreground">
                           {product.description || "Préparé à la commande par notre équipe."}
                         </p>
                       </div>
