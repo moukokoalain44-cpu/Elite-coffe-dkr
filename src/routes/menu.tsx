@@ -278,14 +278,14 @@ function MenuPage() {
                 {products.map((product) => (
                   <article
                     key={product.id}
-                    className="group flex min-h-44 min-w-0 flex-col overflow-hidden rounded-3xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+                    className="group flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:min-h-44 sm:rounded-3xl"
                   >
-                    <div className="flex gap-4 p-4">
+                    <div className="flex gap-3 p-3 sm:gap-4 sm:p-4">
                       <Link to="/menu/$id" params={{ id: product.id }} className="block shrink-0">
                         <MenuProductImage
                           src={product.image ? getOptimizedMenuImageUrl(product.image) : null}
                           alt={product.name}
-                          className="size-24 rounded-2xl object-cover transition-transform duration-500 group-hover:scale-105 sm:size-28"
+                          className="size-[72px] rounded-xl object-cover transition-transform duration-500 group-hover:scale-105 sm:size-28 sm:rounded-2xl"
                         />
                       </Link>
                       <div className="min-w-0 flex-1">
@@ -295,20 +295,20 @@ function MenuPage() {
                             params={{ id: product.id }}
                             className="min-w-0 flex-1"
                           >
-                            <h3 className="break-words font-display text-xl font-bold leading-tight hover:text-accent">
+                            <h3 className="break-words font-display text-base font-bold leading-tight hover:text-accent sm:text-xl">
                               {product.name}
                             </h3>
                           </Link>
-                          <span className="shrink-0 font-display text-lg font-bold text-primary">
+                          <span className="shrink-0 text-right font-display text-sm font-bold text-primary sm:text-lg">
                             {formatCFA(product.price)}
                           </span>
                         </div>
-                        <p className="mt-2 min-w-0 whitespace-normal break-words text-sm leading-5 text-muted-foreground">
+                        <p className="mt-1 min-w-0 whitespace-normal break-words text-[13px] leading-5 text-muted-foreground sm:mt-2 sm:text-sm">
                           {product.description || "Préparé à la commande par notre équipe."}
                         </p>
                       </div>
                     </div>
-                    <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/70 px-4 py-3">
+                    <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/70 px-3 py-2.5 sm:px-4 sm:py-3">
                       <span className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
                         <Star size={13} className="fill-star text-star" />{" "}
                         {product.availabilityNote ? "À confirmer" : "Disponible"}
