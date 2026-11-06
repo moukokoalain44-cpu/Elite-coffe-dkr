@@ -213,7 +213,7 @@ function InfosPage() {
                   href={GOOGLE_MAPS_URL}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground"
+                  className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/35 px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
                 >
                   <Navigation size={15} /> Google Maps
                 </a>
@@ -221,7 +221,7 @@ function InfosPage() {
                   href={BRAND.instagram}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground"
+                  className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/35 px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
                 >
                   <Instagram size={15} /> Instagram
                 </a>
