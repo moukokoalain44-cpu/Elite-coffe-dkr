@@ -149,7 +149,6 @@ function Hero() {
   const { content } = useAdmin();
   const siteMedia = useSiteMedia();
   const media = siteMedia.find((item) => item.id === "hero-main");
-  const posterMedia = siteMedia.find((item) => item.id === "gallery-1");
   const [scrollOffset, setScrollOffset] = useState(0);
   useEffect(() => {
     const onScroll = () => setScrollOffset(Math.min(window.scrollY, 360));
@@ -166,7 +165,6 @@ function Hero() {
       {media?.url && (
         <video
           src={media.url}
-          poster={posterMedia?.url || undefined}
           autoPlay
           muted
           loop
