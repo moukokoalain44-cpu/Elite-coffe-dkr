@@ -89,7 +89,10 @@ function MenuPage() {
     isRemote,
   } = useMenuCatalog();
   const moments = useMemo(() => {
-    const available = new Set(menuCategories.map((item) => item.name));
+    const available = new Set([
+      ...menuCategories.map((item) => item.name),
+      ...menuProducts.map((item) => item.category),
+    ]);
     const sortByConfiguredOrder = (first: string, second: string) => {
       const firstOrder = menuCategories.find((item) => item.name === first)?.sort_order ?? 0;
       const secondOrder = menuCategories.find((item) => item.name === second)?.sort_order ?? 0;
@@ -102,9 +105,8 @@ function MenuPage() {
         .sort(sortByConfiguredOrder),
     })).filter((moment) => moment.categories.length > 0);
     const known = new Set(MENU_MOMENTS.flatMap((moment) => moment.categories));
-    const additional = menuCategories
-      .filter((item) => !known.has(item.name))
-      .map((item) => item.name)
+    const additional = [...available]
+      .filter((name) => !known.has(name))
       .sort(sortByConfiguredOrder);
     if (additional.length) {
       configured.push({
@@ -114,12 +116,14 @@ function MenuPage() {
       });
     }
     return configured;
-  }, [menuCategories]);
+  }, [menuCategories, menuProducts]);
   useEffect(() => {
-    if (menuCategories.length && !menuCategories.some((item) => item.name === category)) {
-      setCategory(menuCategories[0]!.name);
+    if (!menuProducts.length || menuProducts.some((item) => item.category === category)) return;
+    const fallbackCategory = moments[0]?.categories[0] ?? menuProducts[0]?.category;
+    if (fallbackCategory && fallbackCategory !== category) {
+      setCategory(fallbackCategory);
     }
-  }, [category, menuCategories]);
+  }, [category, menuProducts, moments]);
   useEffect(() => {
     const item = activeCategoryRef.current;
     const container = item?.parentElement;
@@ -180,9 +184,9 @@ function MenuPage() {
         </div>
 
         <div className="mt-10 flex flex-col gap-4 border-b border-border pb-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="relative min-w-0">
+          <div className="relative min-w-0 max-w-full">
             <div
-              className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 pr-6 [scrollbar-width:thin] lg:pr-0"
+              className="flex min-w-0 max-w-full snap-x snap-mandatory gap-2 overflow-x-auto pb-1 pr-6 [scrollbar-width:thin] lg:pr-0"
               role="tablist"
               aria-label="Moments de la carte"
             >
@@ -240,13 +244,13 @@ function MenuPage() {
               ? "Carte synchronisée avec Supabase"
               : "Mode hors connexion"}
         </div>
-        <div className="mt-6 grid gap-6 lg:grid-cols-[230px_1fr] lg:items-start">
-          <aside className="rounded-3xl bg-secondary/70 p-3 lg:sticky lg:top-28">
+        <div className="mt-6 grid min-w-0 gap-6 lg:grid-cols-[230px_1fr] lg:items-start">
+          <aside className="min-w-0 max-w-full overflow-hidden rounded-3xl bg-secondary/70 p-3 lg:sticky lg:top-28">
             <p className="px-3 pb-2 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
               {activeMoment?.label}
             </p>
-            <div className="relative -mx-1">
-              <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto px-1 pb-1 pr-7 [scrollbar-width:thin] lg:grid lg:overflow-visible lg:pr-1">
+            <div className="relative -mx-1 min-w-0 max-w-full">
+              <div className="flex min-w-0 max-w-full snap-x snap-mandatory gap-2 overflow-x-auto px-1 pb-1 pr-7 [scrollbar-width:thin] lg:grid lg:overflow-visible lg:pr-1">
                 {activeMoment?.categories.map((item) => {
                   const count = menuProducts.filter((product) => product.category === item).length;
                   return (
