@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronDown, Plus, Search, ShoppingBag } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMenuCatalog } from "@/hooks/use-menu-catalog";
 import { PageShell } from "@/components/SiteChrome";
 import { formatCFA } from "@/lib/currency";
@@ -81,6 +81,7 @@ function MenuPage() {
   const [category, setCategory] = useState<string>("Petit déjeuner");
   const [query, setQuery] = useState("");
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
+  const activeCategoryRef = useRef<HTMLButtonElement>(null);
   const {
     products: menuProducts,
     categories: menuCategories,
@@ -119,6 +120,16 @@ function MenuPage() {
       setCategory(menuCategories[0]!.name);
     }
   }, [category, menuCategories]);
+  useEffect(() => {
+    const item = activeCategoryRef.current;
+    const container = item?.parentElement;
+    if (!item || !container || container.scrollWidth <= container.clientWidth) return;
+    const left = item.offsetLeft - (container.clientWidth - item.clientWidth) / 2;
+    container.scrollTo({
+      left: Math.max(0, left),
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    });
+  }, [category]);
   const normalizedQuery = query.trim().toLocaleLowerCase("fr");
   const products = useMemo(
     () =>
@@ -168,42 +179,49 @@ function MenuPage() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-b border-border pb-5 md:flex-row md:items-center md:justify-between">
-          <div
-            className="flex gap-2 overflow-x-auto pb-1"
-            role="tablist"
-            aria-label="Moments de la carte"
-          >
-            {moments.map((moment) => {
-              const active = moment.categories.includes(category);
-              return (
-                <button
-                  key={moment.label}
-                  type="button"
-                  role="tab"
-                  id={`menu-tab-${moments.indexOf(moment)}`}
-                  aria-controls="menu-panel"
-                  aria-selected={active}
-                  tabIndex={active ? 0 : -1}
-                  onKeyDown={(event) => {
-                    if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(event.key))
-                      return;
-                    event.preventDefault();
-                    const offset = event.key === "ArrowRight" || event.key === "ArrowDown" ? 1 : -1;
-                    const next =
-                      (moments.indexOf(moment) + offset + moments.length) % moments.length;
-                    setCategory(moments[next]!.categories[0]!);
-                    document.getElementById(`menu-tab-${next}`)?.focus();
-                  }}
-                  onClick={() => setCategory(moment.categories[0]!)}
-                  className={`whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${active ? "bg-primary text-primary-foreground shadow-soft" : "bg-secondary text-foreground hover:bg-primary/10"}`}
-                >
-                  {moment.label}
-                </button>
-              );
-            })}
+        <div className="mt-10 flex flex-col gap-4 border-b border-border pb-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="relative min-w-0">
+            <div
+              className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 pr-6 [scrollbar-width:thin] lg:pr-0"
+              role="tablist"
+              aria-label="Moments de la carte"
+            >
+              {moments.map((moment) => {
+                const active = moment.categories.includes(category);
+                return (
+                  <button
+                    key={moment.label}
+                    type="button"
+                    role="tab"
+                    id={`menu-tab-${moments.indexOf(moment)}`}
+                    aria-controls="menu-panel"
+                    aria-selected={active}
+                    tabIndex={active ? 0 : -1}
+                    onKeyDown={(event) => {
+                      if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(event.key))
+                        return;
+                      event.preventDefault();
+                      const offset =
+                        event.key === "ArrowRight" || event.key === "ArrowDown" ? 1 : -1;
+                      const next =
+                        (moments.indexOf(moment) + offset + moments.length) % moments.length;
+                      setCategory(moments[next]!.categories[0]!);
+                      document.getElementById(`menu-tab-${next}`)?.focus();
+                    }}
+                    onClick={() => setCategory(moment.categories[0]!)}
+                    className={`snap-start whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${active ? "bg-primary text-primary-foreground shadow-soft" : "bg-secondary text-foreground hover:bg-primary/10"}`}
+                  >
+                    {moment.label}
+                  </button>
+                );
+              })}
+            </div>
+            <span
+              className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent lg:hidden"
+              aria-hidden="true"
+            />
           </div>
-          <label className="flex min-w-0 items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm text-muted-foreground md:w-72">
+          <label className="flex min-w-0 items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm text-muted-foreground lg:w-72">
             <Search size={16} aria-hidden="true" />
             <span className="sr-only">Rechercher dans la catégorie</span>
             <input
@@ -227,21 +245,28 @@ function MenuPage() {
             <p className="px-3 pb-2 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
               {activeMoment?.label}
             </p>
-            <div className="flex gap-2 overflow-x-auto lg:grid lg:overflow-visible">
-              {activeMoment?.categories.map((item) => {
-                const count = menuProducts.filter((product) => product.category === item).length;
-                return (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => setCategory(item)}
-                    className={`flex shrink-0 items-center justify-between gap-4 rounded-2xl px-3 py-2.5 text-left text-sm font-semibold transition-colors lg:w-full ${category === item ? "bg-card text-primary shadow-soft" : "text-foreground/70 hover:bg-card/70"}`}
-                  >
-                    <span>{item}</span>
-                    <span className="text-xs text-muted-foreground">{count}</span>
-                  </button>
-                );
-              })}
+            <div className="relative -mx-1">
+              <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto px-1 pb-1 pr-7 [scrollbar-width:thin] lg:grid lg:overflow-visible lg:pr-1">
+                {activeMoment?.categories.map((item) => {
+                  const count = menuProducts.filter((product) => product.category === item).length;
+                  return (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setCategory(item)}
+                      ref={category === item ? activeCategoryRef : undefined}
+                      className={`flex shrink-0 snap-start items-center justify-between gap-4 rounded-2xl px-3 py-2.5 text-left text-sm font-semibold transition-colors lg:w-full ${category === item ? "bg-card text-primary shadow-soft" : "text-foreground/70 hover:bg-card/70"}`}
+                    >
+                      <span>{item}</span>
+                      <span className="text-xs text-muted-foreground">{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <span
+                className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-secondary/70 to-transparent lg:hidden"
+                aria-hidden="true"
+              />
             </div>
           </aside>
 
@@ -283,29 +308,29 @@ function MenuPage() {
                     return (
                       <article
                         key={product.id}
-                        className="group mx-auto w-[calc(100%-0.75rem)] min-w-0 overflow-hidden rounded-2xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:mx-0 sm:w-auto sm:rounded-3xl"
+                        className="group w-full min-w-0 overflow-hidden rounded-2xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:rounded-3xl"
                       >
-                        <div className="flex min-w-0 items-start gap-3 p-3 sm:gap-4 sm:p-4">
-                          <div className="w-[72px] shrink-0 sm:w-28">
+                        <div className="flex min-w-0 items-start gap-2 p-2.5 sm:gap-4 sm:p-4">
+                          <div className="w-[60px] shrink-0 sm:w-28">
                             <Link to="/menu/$id" params={{ id: product.id }} className="block">
                               <MenuProductImage
                                 src={product.image ? getOptimizedMenuImageUrl(product.image) : null}
                                 alt={product.name}
-                                className="size-[72px] rounded-xl object-cover transition-transform duration-500 group-hover:scale-105 sm:size-28 sm:rounded-2xl"
+                                className="size-[60px] rounded-lg object-cover transition-transform duration-500 group-hover:scale-105 sm:size-28 sm:rounded-2xl"
                               />
                             </Link>
-                            <span className="mt-2 block text-center font-display text-sm font-bold text-primary sm:text-lg">
+                            <span className="mt-1.5 block text-center font-display text-xs font-bold text-primary sm:mt-2 sm:text-lg">
                               {formatCFA(product.price)}
                             </span>
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="flex min-w-0 items-start justify-between gap-2">
+                            <div className="flex min-w-0 items-start justify-between gap-1.5 sm:gap-2">
                               <Link
                                 to="/menu/$id"
                                 params={{ id: product.id }}
                                 className="min-w-0 flex-1"
                               >
-                                <h3 className="break-words font-display text-base font-bold leading-tight hover:text-accent sm:text-xl">
+                                <h3 className="break-words font-display text-sm font-bold leading-tight hover:text-accent sm:text-xl">
                                   {product.name}
                                 </h3>
                               </Link>
@@ -315,7 +340,7 @@ function MenuPage() {
                                 aria-controls={descriptionId}
                                 aria-label={`${expanded ? "Masquer" : "Afficher"} la description de ${product.name}`}
                                 onClick={() => setExpandedProductId(expanded ? null : product.id)}
-                                className="grid size-9 shrink-0 place-items-center rounded-full bg-secondary text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                                className="grid size-9 shrink-0 place-items-center rounded-full bg-secondary text-primary transition-colors hover:bg-primary hover:text-primary-foreground sm:size-9"
                               >
                                 <ChevronDown
                                   size={18}

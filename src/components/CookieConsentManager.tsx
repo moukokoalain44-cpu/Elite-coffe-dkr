@@ -80,40 +80,42 @@ export function CookieConsentManager() {
       {ready && !savedChoice && (
         <section
           aria-label="Choix des cookies"
-          className="fixed inset-x-3 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-[80] mx-auto flex max-h-[min(72vh,30rem)] max-w-3xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-2xl md:inset-x-6 md:bottom-6"
+          className="fixed inset-x-3 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-[80] mx-auto flex max-h-[min(52vh,24rem)] max-w-3xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-2xl sm:max-h-[min(72vh,30rem)] md:inset-x-6 md:bottom-6"
         >
-          <div className="overflow-y-auto p-4 pb-2 md:p-6 md:pb-3">
-            <h2 className="font-display text-xl font-bold">Votre confidentialité compte</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          <div className="overflow-y-auto p-3 pb-1.5 sm:p-4 sm:pb-2 md:p-6 md:pb-3">
+            <h2 className="font-display text-lg font-bold sm:text-xl">
+              Votre confidentialité compte
+            </h2>
+            <p className="mt-1.5 text-xs leading-5 text-muted-foreground sm:mt-2 sm:text-sm sm:leading-6">
               Le site ne charge actuellement aucun outil publicitaire ou de mesure d’audience. Vous
               pouvez mémoriser vos préférences facultatives et les modifier à tout moment. Les choix
               nécessaires au fonctionnement restent actifs.
             </p>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <p className="mt-1.5 text-xs text-muted-foreground sm:mt-2">
               <Link to="/cookies" className="underline underline-offset-2">
                 En savoir plus sur les cookies
               </Link>
             </p>
           </div>
-          <div className="grid shrink-0 gap-2 border-t border-border bg-card p-4 sm:grid-cols-3 md:p-5">
+          <div className="flex shrink-0 flex-wrap items-center gap-2 border-t border-border bg-card p-3 sm:grid sm:grid-cols-3 sm:p-4 md:p-5">
             <button
               type="button"
               onClick={() => saveChoice({ analytics: true, marketing: true })}
-              className="min-h-11 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground hover:bg-primary/90"
+              className="min-h-10 min-w-0 flex-1 rounded-xl bg-primary px-3 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/90 sm:min-h-11 sm:px-4 sm:py-2.5 sm:text-sm"
             >
               Tout accepter
             </button>
             <button
               type="button"
               onClick={() => saveChoice({ analytics: false, marketing: false })}
-              className="min-h-11 rounded-xl border border-primary bg-background px-4 py-2.5 text-sm font-bold text-primary hover:bg-secondary"
+              className="min-h-10 min-w-0 flex-1 rounded-xl border border-primary bg-background px-3 py-2 text-xs font-bold text-primary hover:bg-secondary sm:min-h-11 sm:px-4 sm:py-2.5 sm:text-sm"
             >
               Tout refuser
             </button>
             <button
               type="button"
               onClick={() => setSettingsOpen(true)}
-              className="min-h-11 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold hover:bg-secondary"
+              className="basis-full py-1 text-xs font-semibold text-muted-foreground underline underline-offset-2 hover:text-foreground sm:min-h-11 sm:rounded-xl sm:border sm:border-border sm:bg-background sm:px-4 sm:py-2.5 sm:text-sm sm:no-underline"
             >
               Personnaliser
             </button>
