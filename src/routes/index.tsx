@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ArrowRight,
   Award,
@@ -325,18 +325,26 @@ function FavoriteSpace() {
 }
 
 function DishShowcase({ products }: { products: Product[] }) {
+  const illustratedProducts = useMemo(
+    () => products.filter((product) => Boolean(product.image?.trim())),
+    [products],
+  );
   const [slides, setSlides] = useState<Product[]>([]);
   useEffect(() => {
-    if (!products.length) return;
+    if (!illustratedProducts.length) {
+      setSlides([]);
+      return;
+    }
     const choose = () => {
-      const shuffled = [...products].sort(() => Math.random() - 0.5);
+      const shuffled = [...illustratedProducts].sort(() => Math.random() - 0.5);
       setSlides(shuffled.slice(0, 3));
     };
     choose();
     const timer = window.setInterval(choose, 4200);
     return () => window.clearInterval(timer);
-  }, [products]);
-  const visible = slides.length ? slides : products.slice(0, 3);
+  }, [illustratedProducts]);
+  if (!illustratedProducts.length) return null;
+  const visible = slides.length ? slides : illustratedProducts.slice(0, 3);
   return (
     <section id="plats" className="mx-auto max-w-7xl px-4 py-20 md:px-6 md:py-28">
       <SectionHead
