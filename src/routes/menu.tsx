@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Plus, Search, ShoppingBag, Star } from "lucide-react";
+import { ArrowRight, ChevronDown, Plus, Search, ShoppingBag } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useMenuCatalog } from "@/hooks/use-menu-catalog";
 import { PageShell } from "@/components/SiteChrome";
@@ -80,6 +80,7 @@ const MENU_MOMENTS: { label: string; categories: string[]; intro: string }[] = [
 function MenuPage() {
   const [category, setCategory] = useState<string>("Petit déjeuner");
   const [query, setQuery] = useState("");
+  const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
   const {
     products: menuProducts,
     categories: menuCategories,
@@ -275,47 +276,67 @@ function MenuPage() {
               </div>
             ) : (
               <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-                {products.map((product) => (
-                  <article
-                    key={product.id}
-                    className="group flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:min-h-44 sm:rounded-3xl"
-                  >
-                    <div className="flex gap-3 p-3 sm:gap-4 sm:p-4">
-                      <Link to="/menu/$id" params={{ id: product.id }} className="block shrink-0">
-                        <MenuProductImage
-                          src={product.image ? getOptimizedMenuImageUrl(product.image) : null}
-                          alt={product.name}
-                          className="size-[72px] rounded-xl object-cover transition-transform duration-500 group-hover:scale-105 sm:size-28 sm:rounded-2xl"
-                        />
-                      </Link>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex min-w-0 items-start justify-between gap-3">
-                          <Link
-                            to="/menu/$id"
-                            params={{ id: product.id }}
-                            className="min-w-0 flex-1"
-                          >
-                            <h3 className="break-words font-display text-base font-bold leading-tight hover:text-accent sm:text-xl">
-                              {product.name}
-                            </h3>
-                          </Link>
-                          <span className="shrink-0 text-right font-display text-sm font-bold text-primary sm:text-lg">
-                            {formatCFA(product.price)}
-                          </span>
+                {products.map((product) =>
+                  (() => {
+                    const expanded = expandedProductId === product.id;
+                    const descriptionId = `product-description-${product.id}`;
+                    return (
+                      <article
+                        key={product.id}
+                        className="group min-w-0 overflow-hidden rounded-2xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:rounded-3xl"
+                      >
+                        <div className="flex min-w-0 items-start gap-3 p-3 sm:gap-4 sm:p-4">
+                          <div className="w-[72px] shrink-0 sm:w-28">
+                            <Link to="/menu/$id" params={{ id: product.id }} className="block">
+                              <MenuProductImage
+                                src={product.image ? getOptimizedMenuImageUrl(product.image) : null}
+                                alt={product.name}
+                                className="size-[72px] rounded-xl object-cover transition-transform duration-500 group-hover:scale-105 sm:size-28 sm:rounded-2xl"
+                              />
+                            </Link>
+                            <span className="mt-2 block text-center font-display text-sm font-bold text-primary sm:text-lg">
+                              {formatCFA(product.price)}
+                            </span>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex min-w-0 items-start justify-between gap-2">
+                              <Link
+                                to="/menu/$id"
+                                params={{ id: product.id }}
+                                className="min-w-0 flex-1"
+                              >
+                                <h3 className="break-words font-display text-base font-bold leading-tight hover:text-accent sm:text-xl">
+                                  {product.name}
+                                </h3>
+                              </Link>
+                              <button
+                                type="button"
+                                aria-expanded={expanded}
+                                aria-controls={descriptionId}
+                                aria-label={`${expanded ? "Masquer" : "Afficher"} la description de ${product.name}`}
+                                onClick={() => setExpandedProductId(expanded ? null : product.id)}
+                                className="grid size-9 shrink-0 place-items-center rounded-full bg-secondary text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                              >
+                                <ChevronDown
+                                  size={18}
+                                  className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                                />
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                        <p className="mt-1 min-w-0 whitespace-normal break-words text-[13px] leading-5 text-muted-foreground sm:mt-2 sm:text-sm">
-                          {product.description || "Préparé à la commande par notre équipe."}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/70 px-3 py-2.5 sm:px-4 sm:py-3">
-                      <span className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
-                        <Star size={13} className="fill-star text-star" />{" "}
-                        {product.availabilityNote ? "À confirmer" : "Disponible"}
-                      </span>
-                    </div>
-                  </article>
-                ))}
+                        {expanded && (
+                          <div
+                            id={descriptionId}
+                            className="border-t border-border/70 px-3 pb-3 pt-3 text-sm leading-5 text-muted-foreground sm:px-4 sm:pb-4"
+                          >
+                            {product.description || "Préparé à la commande par notre équipe."}
+                          </div>
+                        )}
+                      </article>
+                    );
+                  })(),
+                )}
               </div>
             )}
           </div>
