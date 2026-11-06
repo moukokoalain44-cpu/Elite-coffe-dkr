@@ -283,7 +283,7 @@ function MenuPage() {
                     return (
                       <article
                         key={product.id}
-                        className="group min-w-0 overflow-hidden rounded-2xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:rounded-3xl"
+                        className="group mx-auto w-[calc(100%-0.75rem)] min-w-0 overflow-hidden rounded-2xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:mx-0 sm:w-auto sm:rounded-3xl"
                       >
                         <div className="flex min-w-0 items-start gap-3 p-3 sm:gap-4 sm:p-4">
                           <div className="w-[72px] shrink-0 sm:w-28">
