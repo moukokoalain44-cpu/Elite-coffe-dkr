@@ -137,7 +137,7 @@ function MenuPage() {
       title="La carte, pour tous les moments."
       description="Du café du matin au dîner, Elite Coffee rassemble une cuisine généreuse, des boissons fraîches et des douceurs à partager à Dakar."
     >
-      <section className="mx-auto max-w-7xl px-4 pb-20 md:px-6">
+      <section className="mx-auto min-w-0 max-w-7xl overflow-hidden px-4 pb-20 md:px-6">
         <div className="grid gap-4 rounded-[2rem] bg-primary p-5 text-primary-foreground shadow-lift md:grid-cols-[1fr_auto] md:items-center md:p-7">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">
@@ -252,6 +252,7 @@ function MenuPage() {
               moments.findIndex((moment) => moment.categories.includes(category)),
             )}`}
             tabIndex={0}
+            className="min-w-0 max-w-full overflow-hidden"
           >
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
@@ -273,7 +274,7 @@ function MenuPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid min-w-0 gap-4 sm:grid-cols-2">
                 {products.map((product) => (
                   <article
                     key={product.id}

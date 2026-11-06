@@ -212,9 +212,9 @@ export function PageShell({
     };
   }, []);
   return (
-    <div className="page-shell min-h-screen bg-background">
+    <div className="page-shell min-h-screen min-w-0 w-full bg-background">
       <SiteHeader />
-      <main>
+      <main className="min-w-0">
         <section
           ref={introRef}
           className="page-intro mx-auto max-w-7xl px-4 pb-12 pt-32 md:px-6 md:pb-16 md:pt-40"
@@ -226,7 +226,7 @@ export function PageShell({
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted-foreground">{description}</p>
         </section>
-        <div className="page-content">{children}</div>
+        <div className="page-content min-w-0">{children}</div>
       </main>
       <footer className="border-t border-border bg-secondary/50">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between md:px-6">
