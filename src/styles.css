@@ -190,6 +190,18 @@
   }
 }
 
+.menu-product-card {
+  width: min(100%, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
+}
+
+@media (min-width: 640px) {
+  .menu-product-card {
+    width: auto;
+    max-width: 100%;
+  }
+}
+
 @keyframes float-y {
   0%,
   100% {
