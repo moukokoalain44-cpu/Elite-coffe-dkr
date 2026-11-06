@@ -191,8 +191,8 @@
 }
 
 .menu-product-card {
-  width: min(100%, calc(100vw - 2rem));
-  max-width: calc(100vw - 2rem);
+  width: min(100%, 22rem);
+  max-width: calc(100% - 2rem);
 }
 
 @media (min-width: 640px) {
