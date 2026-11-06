@@ -300,7 +300,7 @@ function MenuPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+              <div className="grid min-w-0 max-w-full gap-4 overflow-x-hidden sm:grid-cols-2">
                 {products.map((product) =>
                   (() => {
                     const expanded = expandedProductId === product.id;
@@ -308,7 +308,7 @@ function MenuPage() {
                     return (
                       <article
                         key={product.id}
-                        className="group w-full min-w-0 overflow-hidden rounded-2xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:rounded-3xl"
+                        className="group mx-auto w-[calc(100%-0.5rem)] max-w-full min-w-0 overflow-hidden rounded-2xl bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:mx-0 sm:w-auto sm:rounded-3xl"
                       >
                         <div className="flex min-w-0 items-start gap-2 p-2.5 sm:gap-4 sm:p-4">
                           <div className="w-[60px] shrink-0 sm:w-28">
